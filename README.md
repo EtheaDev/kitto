@@ -10,10 +10,8 @@ A Kitto application is described as a set of easily maintained **YAML** files, k
 
 Kitto was designed by Nando Dessena and its development is sponsored by [Ethea](http://www.ethea.it/), which uses Kitto for internal development projects and client work and provides Kitto-related tools, support and development services.
 
-Start [here](https://github.com/nandod/kitto/wiki/Kitto-at-a-glance) for further information.
+Start [here](https://github.com/EtheaDev/kitto/wiki/Kitto-at-a-glance) for further information.
 
 Visit [this site](http://kitto.ethea.it) for online demos.
-
-If you feel like discussing Kitto, you can join the [discussion group](https://groups.google.com/forum/#!forum/kitto-discuss) or follow the [blog](http://kittoing.blogspot.it/).
 
 Happy Kittoing!
