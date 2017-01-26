@@ -75,6 +75,7 @@ var
   LUseLanguageSelector: Boolean;
   LFormPanelBodyStyle: string;
   LLocalStorageMode: string;
+  LTitle: TEFNode;
 
   function GetEnableButtonJS: string;
   begin
@@ -100,6 +101,7 @@ var
   end;
 
 begin
+  Draggable := View.GetBoolean('Controller/Movable', False);
   Maximized := Session.IsMobileBrowser;
   Border := not Maximized;
   if Maximized then
@@ -122,7 +124,11 @@ begin
     Width := LWidth;
   LUseLanguageSelector := Session.Config.LanguagePerSession;
 
-  Title := _(Session.Config.AppTitle);
+  LTitle := Config.FindNode('Title');
+  if Assigned(LTitle) then
+    Title := _(LTitle.AsExpandedString)
+  else
+    Title := _(Session.Config.AppTitle);
   Closable := False;
   Resizable := False;
 

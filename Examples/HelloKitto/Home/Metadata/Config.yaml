@@ -70,6 +70,7 @@ LanguagePerSession: True
 
 Login:
   Controller:
+    Title: Login to HelloKitto
     BorderPanel:
       NorthView:
         Controller: HtmlPanel
