@@ -12,5 +12,7 @@ Folder: _(User)
   IsInitiallyCollapsed: True
   View:
     Controller: ChangePassword
+    ImageName: Password
   View:
     Controller: Logout
+    ImageName: Logout

@@ -44,6 +44,8 @@ type
     procedure AddTitle(const ADisplayLabel: string);
     function GetTileHeight: Integer;
     function GetTileWidth: Integer;
+    function GetShowImage: Boolean;
+    function GetImagePosition: string;
     procedure BuildTileBoxHtml(const ARootNode: TKTreeViewNode = nil);
     procedure AddTile(const ANode: TKTreeViewNode; const ADisplayLabel: string);
     procedure AddTiles(const ANode: TKTreeViewNode; const ADisplayLabel: string);
@@ -216,6 +218,16 @@ begin
   end;
 end;
 
+function TKExtTilePanel.GetImagePosition: string;
+begin
+  Result := Config.GetString('ShowImage/Position', '');
+end;
+
+function TKExtTilePanel.GetShowImage: Boolean;
+begin
+  Result := Config.GetBoolean('ShowImage', False);
+end;
+
 function TKExtTilePanel.GetNextTileColor: string;
 begin
   Result := FColors[FColorIndex];
@@ -322,7 +334,11 @@ end;
 procedure TKExtTilePanel.AddTile(const ANode: TKTreeViewNode; const ADisplayLabel: string);
 var
   LClickCode: string;
-
+  LCustomStyle: string;
+  LTileBoxHTML: string;
+  LImageName, LImageURL: string;
+  LView: TKView;
+  LShowImage: boolean;
   function GetCSS: string;
   var
     LCSS: string;
@@ -336,43 +352,78 @@ var
 
   function GetDisplayLabel: string;
   begin
-    if ANode.GetBoolean('HideLabel', False) then
-      Result := ''
+    if not ANode.GetBoolean('HideLabel') then
+      Result := HTMLEncode(ADisplayLabel)
     else
-      Result := HTMLEncode(ADisplayLabel);
+      Result := '';
   end;
 
-  function GetColor: string;
+  procedure AddAttributeToStyle(var AStyle: string; const AStileAttributeName, AFormatStr: string;
+    const ADefault: string = '');
   var
-    LColor: TEFNode;
+    LNode: TEFNode;
+    LNodeStr: string;
   begin
-    LColor := ANode.FindNode('BackgroundColor');
-    if Assigned(LColor) then
-      Result := LColor.AsString
+    LNode := ANode.FindNode(AStileAttributeName);
+    if Assigned(LNode) then
+      LNodeStr := LNode.AsString
+    else if ADefault <> '' then
+      LNodeStr := ADefault
     else
-      Result := GetNextTileColor;
+      Exit;
+    AStyle := Trim(AStyle + ' ' + Format(AFormatStr, [LNodeStr]));
   end;
 
 begin
   if ANode is TKTreeViewFolder then
-    LClickCode := JSMethod(Ajax(DisplayPage, ['PageId', Integer(ANode)]))
-  else
-    LClickCode := JSMethod(Ajax(DisplayView, ['View', Integer(Session.Config.Views.ViewByNode(ANode))]));
-
-  if GetCSS <> '' then
   begin
-    FTileBoxHtml := FTileBoxHtml + Format(
-      '<a href="#" onclick="%s"><div class="k-tile%s">' +
-      '<div class="k-tile-inner">%s</div></div></a>',
-      [HTMLEncode(LClickCode), GetCSS, GetDisplayLabel]);
+    LClickCode := JSMethod(Ajax(DisplayPage, ['PageId', Integer(ANode)]));
+    LView := nil;
   end
   else
   begin
-    FTileBoxHtml := FTileBoxHtml + Format(
-      '<a href="#" onclick="%s"><div class="k-tile" style="background-color:%s;width:%dpx;height:%dpx">' +
-      '<div class="k-tile-inner">%s</div></div></a>',
-      [HTMLEncode(LClickCode), GetColor, GetTileWidth, GetTileHeight, GetDisplayLabel]);
+    LView := Session.Config.Views.ViewByNode(ANode);
+    LClickCode := JSMethod(Ajax(DisplayView, ['View', Integer(LView)]));
   end;
+
+  //Build background css style
+  LCustomStyle := 'background-repeat: no-repeat;';
+  AddAttributeToStyle(LCustomStyle, 'BackgroundColor', 'background-color: %s;', GetNextTileColor);
+  AddAttributeToStyle(LCustomStyle, 'Width', 'width:%spx;', IntToStr(GetTileWidth));
+  AddAttributeToStyle(LCustomStyle, 'Height', 'height:%spx;', IntToStr(GetTileHeight));
+  LImageName := ANode.GetString('ImageName');
+  LShowImage := GetShowImage or (LImageName <> '');
+  if LShowImage then
+  begin
+    if (LImageName = '') and Assigned(LView) then
+      LImageName := LView.ImageName;
+    if LImageName <> '' then
+    begin
+      AddAttributeToStyle(LCustomStyle, 'ImagePosition', 'background-position: %s;', GetImagePosition);
+      LImageURL := Session.Config.FindImageURL(SmartConcat(LImageName, '_', 'large'));
+      if LImageURL = '' then
+        LImageURL := Session.Config.FindImageURL(LImageName);
+      LCustomStyle := LCustomStyle + Format('background-image: url(&quot;%s&quot);', [LImageURL]);
+    end;
+  end;
+  AddAttributeToStyle(LCustomStyle, 'Style', '%s;');
+
+  if GetCSS <> '' then
+  begin
+    LTileBoxHTML := Format(
+      '<a href="#" onclick="%s"><div class="k-tile%s" style="%s">' +
+      '<div class="k-tile-inner">%s</div></div></a>',
+      [HTMLEncode(LClickCode), GetCSS, LCustomStyle, GetDisplayLabel]);
+  end
+  else
+  begin
+    LTileBoxHTML := Format(
+      '<a href="#" onclick="%s"><div class="k-tile" style="%s">' +
+      '<div class="k-tile-inner">%s</div></div></a>',
+      [HTMLEncode(LClickCode), LCustomStyle, GetDisplayLabel]);
+  end;
+
+  FTileBoxHtml := FTileBoxHtml + LTileBoxHTML;
 end;
 
 procedure TKExtTilePanel.BuildTileBoxHtml(const ARootNode: TKTreeViewNode);
