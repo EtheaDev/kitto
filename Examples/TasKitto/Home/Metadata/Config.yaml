@@ -9,7 +9,14 @@ Defaults:
   Window:
     Width: 800
     Height: 600
-  
+  Layout:
+    MemoWidth: 70
+    MaxFieldWidth: 70
+    MinFieldWidth: 6
+    RequiredLabelTemplate: <i>{label}*</i>
+# Default/Layout/LabelSeparator empty if you don't want hide the default LabelSeparator (:)
+    LabelSeparator:
+
 Databases:
   Main: DBX
     Connection:
