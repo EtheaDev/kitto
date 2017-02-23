@@ -1,11 +1,19 @@
 ﻿Type: Tree
-Folder: _(Girls)
-  View: GirlForm
-  View: Girls
-    BackgroundColor: black
-Folder: _(Dolls)
-  View: Dolls
-  View: Hairs
+Folder:
+  Folder: _(Girls)
+    ImageName: girl
+    View: GirlForm
+    View: Girls
+      BackgroundColor: black
+    Back:
+      ImageName: back
+      DisplayLabel: _(menu)      
+      BackgroundColor: blue
+Folder:
+  Folder: _(Dolls)
+    ImageName: doll
+    View: Dolls
+    View: Hairs
 Folder: _(Parties)
   View: Parties
 Folder: _(User)
