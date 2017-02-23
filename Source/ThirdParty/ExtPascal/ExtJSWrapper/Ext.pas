@@ -1861,7 +1861,7 @@ type
     procedure SetFPluginsArray(Value: TExtObjectList);
     procedure SetFPtype(Value: string);
     procedure SetFRef(Value: string);
-    procedure SetFRenderTo(Value: string);
+    procedure SetRenderTo(const AValue: string);
     procedure SetFStateEvents(Value: TExtObjectList);
     procedure SetFStateId(Value: string);
     procedure SetFStateful(Value: Boolean);
@@ -1990,7 +1990,7 @@ type
     property PluginsArray: TExtObjectList read FPluginsArray write SetFPluginsArray;
     property Ptype: string read FPtype write SetFPtype;
     property Ref: string read FRef write SetFRef;
-    property RenderTo: string read FRenderTo write SetFRenderTo;
+    property RenderTo: string read FRenderTo write SetRenderTo;
     property StateEvents: TExtObjectList read FStateEvents write SetFStateEvents;
     property StateId: string read FStateId write SetFStateId;
     property Stateful: Boolean read FStateful write SetFStateful;
@@ -3210,7 +3210,7 @@ type
     procedure SetFKeysArray(Value: TExtObjectList);
     procedure SetFMaskDisabled(Value: Boolean);
     procedure SetFMinButtonWidth(const AValue: Integer);
-    procedure SetFPadding(Value: Integer);
+    procedure SetPadding(const AValue: Integer);
     procedure SetPaddingString(const AValue: string);
     procedure SetFPreventBodyReset(Value: Boolean);
     procedure SetFResizeEvent(Value: string);
@@ -3329,7 +3329,7 @@ type
     property LabelAlign: TExtFormFormPanelLabelAlign read FLabelAlign write SetLabelAlign;
     property MaskDisabled: Boolean read FMaskDisabled write SetFMaskDisabled;
     property MinButtonWidth: Integer read FMinButtonWidth write SetFMinButtonWidth;
-    property Padding: Integer read FPadding write SetFPadding;
+    property Padding: Integer read FPadding write SetPadding;
     property PaddingString: string read FPaddingString write SetPaddingString;
     property PreventBodyReset: Boolean read FPreventBodyReset write SetFPreventBodyReset;
     property ResizeEvent: string read FResizeEvent write SetFResizeEvent;
@@ -9525,10 +9525,10 @@ begin
   JSCode('ref:' + VarToJSON([Value]));
 end;
 
-procedure TExtComponent.SetFRenderTo(Value: string);
+procedure TExtComponent.SetRenderTo(const AValue: string);
 begin
-  FRenderTo := Value;
-  JSCode('renderTo:' + VarToJSON([Value]));
+  FRenderTo := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'renderTo', [AValue]);
 end;
 
 procedure TExtComponent.SetFStateEvents(Value: TExtObjectList);
@@ -13003,10 +13003,10 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'minButtonWidth', [AValue]);
 end;
 
-procedure TExtPanel.SetFPadding(Value: Integer);
+procedure TExtPanel.SetPadding(const AValue: Integer);
 begin
-  FPadding := Value;
-  JSCode('padding:' + VarToJSON([Value]));
+  FPadding := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'padding', [AValue]);
 end;
 
 procedure TExtPanel.SetPaddingString(const AValue: string);

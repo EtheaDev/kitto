@@ -131,6 +131,7 @@ type
     procedure NotifyObservers(const AContext: string = ''); virtual;
     procedure UpdateObserver(const ASubject: IEFSubject; const AContext: string = ''); virtual;
     class function SupportsContainer: Boolean;
+    property Config: TEFNode read GetConfig;
     function IsSynchronous: Boolean;
 
     property View: TKView read GetView write SetView;
