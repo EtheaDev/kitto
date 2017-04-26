@@ -394,7 +394,7 @@ begin
   if AIsBack then
   begin
     LImageName := ANode.GetString('Back/ImageName');
-    if (LImageName = '') and LShowImage then
+    if (LImageName = '') and GetShowImage then
       LImageName := 'back';
     LBackGroundColor := ANode.GetString('Back/BackgroundColor', GetNextTileColor);
   end
