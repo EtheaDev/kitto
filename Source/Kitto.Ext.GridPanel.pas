@@ -692,6 +692,8 @@ begin
       begin
         FAutoFormController := InitEditController(FAutoFormContainer, FindCurrentViewRecord, emViewCurrentRecord);
         FAutoFormController.Config.SetBoolean('HideButtons', True);
+        FAutoFormController.Config.SetString('LayoutNamePrefix', 'Auto');
+        FAutoFormController.Config.SetString('DetailStyle', 'None');
         FAutoFormController.Display;
       end
       else

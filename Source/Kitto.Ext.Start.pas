@@ -74,6 +74,13 @@ begin
     TEFLogger.Instance.Log('Starting as application.');
     Forms.Application.Initialize;
     Forms.Application.CreateForm(TKExtMainForm, KExtMainForm);
+	if FindCmdLineSwitch('c') then
+	begin
+	  try
+	    KExtMainForm.SetConfig(ParamStr(3));		// better test real position - now hammering it down
+	  finally
+	  end;
+	end;  
     Forms.Application.Run;
   end;
 end;

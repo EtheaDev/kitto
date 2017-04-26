@@ -6,8 +6,8 @@ Folder:
     View: Girls
       BackgroundColor: black
     Back:
-      ImageName: back
-      DisplayLabel: _(menu)      
+      ImageName: cancel
+      DisplayLabel: _(menu)
       BackgroundColor: blue
 Folder:
   Folder: _(Dolls)

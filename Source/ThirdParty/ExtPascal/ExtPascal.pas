@@ -1179,7 +1179,7 @@ procedure TExtSession.AfterHandleRequest;
   end;
 
 var
-  I, J : integer;
+//  I, J : integer;
   LMainPageCode: string;
 begin
   if IsDownLoad or IsUpLoad then

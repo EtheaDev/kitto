@@ -38,9 +38,11 @@ Ext.extend(Ext.ux.NumericField, Ext.form.NumberField,
 	thousandSeparator: ',',
 	alwaysDisplayDecimals: false,
 	setValue: function(v){
-	   Ext.ux.NumericField.superclass.setValue.call(this, v);
-       
-	   this.setRawValue(this.getFormattedValue(this.getValue()));
+	    Ext.ux.NumericField.superclass.setValue.call(this, v);
+	    // BEGIN KITTO - support emptyText.
+		if (!Ext.isEmpty(v))
+		// END KITTO
+			this.setRawValue(this.getFormattedValue(this.getValue()));
     },
 	/**
 	 * No more using Ext.util.Format.number, Ext.util.Format.number in ExtJS versions
@@ -49,6 +51,11 @@ Ext.extend(Ext.ux.NumericField, Ext.form.NumberField,
 	 */
     getFormattedValue: function(v){
        
+        // BEGIN KITTO - support emptyText.
+		if(v === this.emptyText || v === undefined)
+            return '';
+		// END KITTO
+		
 		if (Ext.isEmpty(v) || !this.hasFormat()) 
             return v;
 	    else 
@@ -126,7 +133,15 @@ Ext.extend(Ext.ux.NumericField, Ext.form.NumberField,
      * formatting and process of the value because beforeBlur perform a getRawValue and then a setValue.
      */
     onFocus: function(){
-		this.setRawValue(this.removeFormat(this.getRawValue()));
+        // BEGIN KITTO - support emptyText.
+		var v = this.getRawValue();
+		if(v === this.emptyText || v === undefined)
+            this.setRawValue('');
+		else
+			this.setRawValue(this.removeFormat(this.getRawValue()));
+		// replaces
+		//this.setRawValue(this.removeFormat(this.getRawValue()));
+		// END KITTO
     }
 });
 Ext.reg('numericfield', Ext.ux.NumericField);

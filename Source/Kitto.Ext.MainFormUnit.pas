@@ -100,12 +100,13 @@ type
     procedure UpdateSessionCountlabel;
     function GetSessionCount: Integer;
     procedure FillConfigFileNameCombo;
-    procedure SetConfig(const AFileName: string);
     procedure SelectConfigFile;
     procedure DisplayHomeURL(const AHomeURL: string);
     property AppThread: TKExtAppThread read GetAppThread;
     function HasConfigFileName: Boolean;
     procedure DoLog(const AString: string);
+  public	
+    procedure SetConfig(const AFileName: string);
   end;
 
 var

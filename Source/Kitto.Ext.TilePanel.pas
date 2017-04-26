@@ -47,7 +47,8 @@ type
     function GetShowImage: Boolean;
     function GetImagePosition: string;
     procedure BuildTileBoxHtml(const ARootNode: TKTreeViewNode = nil);
-    procedure AddTile(const ANode: TKTreeViewNode; const ADisplayLabel: string);
+    procedure AddTile(const ANode: TKTreeViewNode; const ADisplayLabel: string;
+      AIsBack: Boolean = False);
     procedure AddTiles(const ANode: TKTreeViewNode; const ADisplayLabel: string);
     procedure AddBackTile;
     function GetNextTileColor: string;
@@ -164,7 +165,7 @@ begin
   if SameText(AColorSetName, 'Metro') then
   begin
     SetLength(Result, 10);
-    Result[0] := '#A200FF';
+    Result[0] := '#00904A';
     Result[1] := '#FF0097';
     Result[2] := '#00ABA9';
     Result[3] := '#8CBF26';
@@ -298,7 +299,9 @@ begin
   begin
     // Render folders as rows not tiles in second level.
     if IsNodeIncluded(LOriginalNode) and not Assigned(FRootNode) then
-      AddTitle(ADisplayLabel);
+      AddTitle(ADisplayLabel)
+    else if SameText(ANode.Name, 'Back') then
+      AddBackTile;
     ProcessChildren(ANode);
   end
   else if IsNodeIncluded(LOriginalNode) then
@@ -307,15 +310,8 @@ begin
 end;
 
 procedure TKExtTilePanel.AddBackTile;
-var
-  LClickCode: string;
 begin
-  LClickCode := JSMethod(Ajax(DisplayPage, ['PageId', 0]));
-
-  FTileBoxHtml := FTileBoxHtml + Format(
-    '<a href="#" onclick="%s"><div class="k-tile k-tile-back" style="background-color:%s;width:%dpx;height:%dpx">' +
-    '<div class="k-tile-inner k-tile-back-inner">%s</div></div></a>',
-    [HTMLEncode(LClickCode), GetNextTileColor, GetTileWidth, GetTileHeight, _('Back')]);
+  AddTile(FRootNode, FRootNode.GetString('Back/DisplayLabel',_('Back')), True);
 end;
 
 procedure TKExtTilePanel.AddBreak;
@@ -331,7 +327,8 @@ begin
       [HTMLEncode(ADisplayLabel)]);
 end;
 
-procedure TKExtTilePanel.AddTile(const ANode: TKTreeViewNode; const ADisplayLabel: string);
+procedure TKExtTilePanel.AddTile(const ANode: TKTreeViewNode; const ADisplayLabel: string;
+  AIsBack: Boolean = False);
 var
   LClickCode: string;
   LCustomStyle: string;
@@ -339,6 +336,9 @@ var
   LImageName, LImageURL: string;
   LView: TKView;
   LShowImage: boolean;
+  LPageId: Integer;
+  LBackGroundColor: string;
+
   function GetCSS: string;
   var
     LCSS: string;
@@ -377,8 +377,13 @@ var
 begin
   if ANode is TKTreeViewFolder then
   begin
-    LClickCode := JSMethod(Ajax(DisplayPage, ['PageId', Integer(ANode)]));
     LView := nil;
+    if AIsBack then
+      LPageId := 0
+    else
+      LPageId := Integer(ANode);
+
+    LClickCode := JSMethod(Ajax(DisplayPage, ['PageId', LPageId]));
   end
   else
   begin
@@ -386,12 +391,25 @@ begin
     LClickCode := JSMethod(Ajax(DisplayView, ['View', Integer(LView)]));
   end;
 
+  if AIsBack then
+  begin
+    LImageName := ANode.GetString('Back/ImageName');
+    if (LImageName = '') and LShowImage then
+      LImageName := 'back';
+    LBackGroundColor := ANode.GetString('Back/BackgroundColor', GetNextTileColor);
+  end
+  else
+  begin
+    LImageName := ANode.GetString('ImageName');
+    LBackGroundColor := GetNextTileColor;
+  end;
+
   //Build background css style
   LCustomStyle := 'background-repeat: no-repeat;';
-  AddAttributeToStyle(LCustomStyle, 'BackgroundColor', 'background-color: %s;', GetNextTileColor);
+  AddAttributeToStyle(LCustomStyle, 'BackgroundColor', 'background-color: %s;', LBackGroundColor);
   AddAttributeToStyle(LCustomStyle, 'Width', 'width:%spx;', IntToStr(GetTileWidth));
   AddAttributeToStyle(LCustomStyle, 'Height', 'height:%spx;', IntToStr(GetTileHeight));
-  LImageName := ANode.GetString('ImageName');
+
   LShowImage := GetShowImage or (LImageName <> '');
   if LShowImage then
   begin
