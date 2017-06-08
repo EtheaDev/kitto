@@ -617,7 +617,12 @@ var
   LError: string;
 begin
   AssignFieldChangeEvent(False);
-  LError := UpdateRecord(StoreRecord, SO(Session.RequestBody).O['new'], '', True);
+  try
+    LError := UpdateRecord(StoreRecord, SO(Session.RequestBody).O['new'], '', True);
+  finally
+    AssignFieldChangeEvent(True);
+  end;
+
   FreeAndNil(FCloneValues);
   if LError = '' then
   begin
@@ -645,7 +650,12 @@ var
   LError: string;
 begin
   AssignFieldChangeEvent(False);
-  LError := UpdateRecord(StoreRecord, SO(Session.RequestBody).O['new'], '', True);
+  try
+    LError := UpdateRecord(StoreRecord, SO(Session.RequestBody).O['new'], '', True);
+  finally
+    AssignFieldChangeEvent(True);
+  end;
+
   if LError = '' then
   begin
     FChangesApplied := True;
@@ -658,7 +668,13 @@ procedure TKExtFormPanelController.ConfirmChangesAndClone;
 var
   LError: string;
 begin
-  LError := UpdateRecord(StoreRecord, SO(Session.RequestBody).O['new'], '', True);
+  AssignFieldChangeEvent(False);
+  try
+    LError := UpdateRecord(StoreRecord, SO(Session.RequestBody).O['new'], '', True);
+  finally
+    AssignFieldChangeEvent(True);
+  end;
+
   if LError = '' then
   begin
     FCloneValues := TEFNode.Clone(StoreRecord);
