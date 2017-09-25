@@ -541,8 +541,22 @@ end;
 
 procedure DownloadThumbnailedStream(const AStream: TStream; const AFileName: string;
   const AThumbnailWidth, AThumbnailHeight: Integer);
+
+{ Paradox graphic BLOB header }
+type
+  TPDoxGraphicHeader = record
+    Count: Word;                { Fixed at 1 }
+    HType: Word;                { Fixed at $0100 }
+    Size: Integer              { Size not including header }
+  end;
+
 var
   LFileExt: string;
+  LBytes: TBytes;
+  Size: Longint;
+  Header: TBytes;
+  GraphicHeader: TPDoxGraphicHeader;
+
   LTempFileName: string;
   LStream: TFileStream;
 
@@ -553,7 +567,17 @@ var
     LFileStream := TFileStream.Create(LTempFileName, fmCreate);
     try
       AStream.Position := 0;
-      LFileStream.CopyFrom(AStream, AStream.Size);
+      Size := AStream.Size;
+      if Size >= SizeOf(TPDoxGraphicHeader) then
+      begin
+        SetLength(Header, SizeOf(TPDoxGraphicHeader));
+        AStream.Read(Header, 0, Length(Header));
+        Move(Header[0], GraphicHeader, SizeOf(TPDoxGraphicHeader));
+        if (GraphicHeader.Count <> 1) or (GraphicHeader.HType <> $0100) or
+          (GraphicHeader.Size <> Size - SizeOf(GraphicHeader)) then
+          AStream.Position := 0;
+      end;
+      LFileStream.CopyFrom(AStream, Size - AStream.Position);
       AStream.Position := 0;
     finally
       FreeAndNil(LFileStream);
@@ -596,10 +620,10 @@ begin
   Assert(Assigned(AStream));
 
   LFileExt := ExtractFileExt(AFileName);
-  if MatchText(LFileExt, ['.jpg', '.jpeg', '.png']) then
-  begin
-    LTempFileName := GetTempFileName(LFileExt);
-    try
+  LTempFileName := GetTempFileName(LFileExt);
+  try
+    if MatchText(LFileExt, ['.jpg', '.jpeg', '.png']) then
+    begin
       WriteTempFile;
       if MatchText(LFileExt, ['.jpg', '.jpeg']) then
         TransformTempFileToThumbnail(AThumbnailWidth, AThumbnailHeight, TJPEGImage)
@@ -612,13 +636,24 @@ begin
       finally
         FreeAndNil(LStream);
       end;
-    finally
-      if FileExists(LTempFileName) then
-        DeleteFile(LTempFileName);
-    end;
-  end
-  else
-    Session.DownloadStream(AStream, AFileName);
+    end
+    else if MatchText(LFileExt, ['.bmp']) then
+    begin
+      WriteTempFile;
+      TransformTempFileToThumbnail(AThumbnailWidth, AThumbnailHeight, TBitmap);
+      LStream := TFileStream.Create(LTempFileName, fmOpenRead + fmShareDenyWrite);
+      try
+        Session.DownloadStream(LStream, AFileName);
+      finally
+        FreeAndNil(LStream);
+      end;
+    end
+    else
+      Session.DownloadStream(AStream, AFileName);
+  finally
+    if FileExists(LTempFileName) then
+      DeleteFile(LTempFileName);
+  end;
 end;
 
 end.

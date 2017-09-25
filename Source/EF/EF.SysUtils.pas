@@ -1762,7 +1762,7 @@ begin
 
   if Length(ABytes) >= MIN_BYTES then
   begin
-    if (ABytes[0] = 66) and (ABytes[1] = 77) then
+    if ((ABytes[0] = 66) and (ABytes[1] = 77)) or ((ABytes[8] = 66) and (ABytes[9] = 77)) then
       Result := 'bmp'
     else if ((ABytes[0] = 73) and (ABytes[1] = 73) and (ABytes[2] = 42) and (ABytes[3] = 0))
         or ((ABytes[0] = 77) and (ABytes[1] = 77) and (ABytes[2] = 42) and (ABytes[3] = 0)) then
