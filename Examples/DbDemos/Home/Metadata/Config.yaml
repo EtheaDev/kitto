@@ -1,4 +1,5 @@
 ﻿AppTitle: DbDemos
+AppIcon: DbDemosIcon
 
 Databases:
   Main: FD
