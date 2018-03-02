@@ -29,9 +29,7 @@ type
   class var
     FInstance: TEFTextFileLogEndpoint;
     function GetStream: TEFTextStream;
-  strict
-  private
-    procedure AfterConstruction; protected
+  strict protected
     procedure DoLog(const AString: string); override;
     procedure Configure(const AConfig: TEFNode;
       const AMacroExpansionEngine: TEFMacroExpansionEngine); override;
@@ -41,6 +39,7 @@ type
   public
     class procedure CreateSingletonInstance;
     class procedure FreeSingletonInstance;
+    procedure AfterConstruction; override;
     destructor Destroy; override;
     property FileName: string read FFileName write SetFileName;
   end;

@@ -75,6 +75,7 @@ type
     FDeleteButton: TKExtButton;
     FDupButton: TKExtButton;
     FUsedViewFields: TArray<TKViewField>;
+    FEditItems: TKEditItemList;
     function GetView: TKDataView;
     function GetMaxRecords: Integer;
     function GetDefaultAutoOpen: Boolean;
@@ -82,9 +83,10 @@ type
     procedure SetFieldValue(const AField: TKViewTableField; const AValue: TSuperAvlEntry);
     function FindValueByName(const AValues: ISuperObject; const AName: string): TSuperAvlEntry;
     function GetFieldFilterFunc: TKFieldFilterFunc;
+    function GetEditItems: TKEditItemList;
   strict protected
     FButtonsRequiringSelection: TList<TExtObject>;
-    FEditItems: TKEditItemList;
+    property EditItems: TKEditItemList read GetEditItems;
     procedure CheckCanRead;
     function GetOrderByClause: string; virtual;
     procedure SetViewTable(const AValue: TKViewTable); virtual;
@@ -94,8 +96,8 @@ type
     procedure InitDefaults; override;
     procedure InitSubController(const AController: IKExtController); override;
     procedure AddTopToolbarButtons; override;
-    function AddTopToolbarButton(const AActionName, ATooltip, AImageName: string;
-      const ARequiresSelection: Boolean): TKExtButton;
+    function AddTopToolbarButton(const AActionName, ADefaultTooltip, AImageName: string;
+  const ARequiresSelection: Boolean): TKExtButton;
     property View: TKDataView read GetView;
     property ClientStore: TExtDataStore read FClientStore;
     property ClientReader: TExtDataJsonReader read FClientReader;
@@ -710,6 +712,13 @@ begin
   Result := 'Form';
 end;
 
+function TKExtDataPanelController.GetEditItems: TKEditItemList;
+begin
+  if not Assigned(FEditItems) then
+    FEditItems := TKEditItemList.Create;
+  Result := FEditItems;
+end;
+
 function TKExtDataPanelController.GetExplicitDefaultAction: string;
 begin
   Result := ViewTable.GetExpandedString('Controller/DefaultAction');
@@ -922,13 +931,13 @@ begin
     AddUsedViewField(ViewTable.Fields[I]);
 end;
 
-function TKExtDataPanelController.AddTopToolbarButton(const AActionName, ATooltip, AImageName: string;
+function TKExtDataPanelController.AddTopToolbarButton(const AActionName, ADefaultTooltip, AImageName: string;
   const ARequiresSelection: Boolean): TKExtButton;
 begin
   if (AActionName <> '') and IsActionSupported(AActionName) then
   begin
     Result := TKExtButton.CreateAndAddTo(TopToolbar.Items);
-    Result.Tooltip := ATooltip;
+    Result.Tooltip := FViewTable.GetString('Controller/' + AActionName + '/Tooltip', ADefaultTooltip);
     Result.SetIconAndScale(AImageName);
     if (AActionName <> '') and not IsActionVisible(AActionName) then
       Result.Hidden := True

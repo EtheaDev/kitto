@@ -1,6 +1,7 @@
 ﻿Type: Data
 
 Controller: List
+  ShowNavigationButtons: True
   Filters:
     DisplayLabel: _(Choose Mom)
     Items:
@@ -23,8 +24,8 @@ MainTable:
     PageRecordCount: 2
     AllowViewing: True
     PopupWindow:
-      Height: 500
-      Width: 400
+      Height: 400
+      Width: 350
 
     Grouping:
       FieldName: Hair

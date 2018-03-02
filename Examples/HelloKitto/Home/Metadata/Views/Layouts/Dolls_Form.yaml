@@ -3,14 +3,15 @@
     CharWidth: 20
   Field: Date_Bought
 Row:
-  Field: Hair
-  Field: Dress_Size
-Row:
   Field: Mom
     CharWidth: 20
   Field: Mom_Phone
     CharWidth: 10
     DisplayLabel: _(Mom's Phone)
+PageBreak: Characteristics
+Row:
+  Field: Hair
+  Field: Dress_Size
 Row:
   Field: Aspect
     CharWidth: 16

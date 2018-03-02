@@ -436,7 +436,7 @@ type
     procedure ClearStatus; virtual;
   end;
 
-function OptionAsLabelAlign(const AAlign: string): TExtFormFormPanelLabelAlign;
+function OptionAsLabelAlign(const AAlign: string): TExtContainerLabelAlign;
 function OptionAsGridColumnAlign(const AAlign: string): TExtGridColumnAlign;
 
 implementation
@@ -459,7 +459,7 @@ begin
     raise EEFError.CreateFmt(_('Invalid value %s. Valid values: "Left", "Right", "Center".'), [AAlign]);
 end;
 
-function OptionAsLabelAlign(const AAlign: string): TExtFormFormPanelLabelAlign;
+function OptionAsLabelAlign(const AAlign: string): TExtContainerLabelAlign;
 begin
   if SameText(AAlign, 'Left') then
     Result := laLeft
@@ -701,8 +701,6 @@ begin
 end;
 
 function TKExtPanelBase.FindHostWindow: TExtWindow;
-var
-  LHostWindow: TObject;
 begin
   Result := Config.GetObject('Sys/HostWindow') as TExtWindow;
 end;

@@ -324,7 +324,7 @@ begin
     LEditor := AEditorManager.CreateGridCellEditor(FEditorGridPanel, AViewField);
     if Supports(LEditor, IEFSubject, LSubject) then
       LSubject.AttachObserver(Self);
-    FEditItems.Add(LEditor);
+    EditItems.Add(LEditor);
     AColumn.Editor := LEditor;
   end;
 end;
@@ -630,8 +630,7 @@ begin
 
   LEditorManager := TKExtEditorManager.Create;
   try
-    FreeAndNil(FEditItems);
-    FEditItems := TKEditItemList.Create;
+    EditItems.Clear;
     // Only in-place editing supported ATM, not inserting.
     LEditorManager.Operation := eoUpdate;
     LEditorManager.OnGetSession :=
@@ -713,7 +712,7 @@ begin
   Assert(Assigned(ARecord));
 
   // Set record fields and load data.
-  FEditItems.AllEditors(
+  EditItems.AllEditors(
     procedure (AEditor: IKExtEditor)
     begin
       AEditor.RecordField := ARecord.FieldByName(AEditor.FieldName);
@@ -1059,7 +1058,7 @@ begin
   LCode := LCode + GetJSFunctionCode(
     procedure
     begin
-      FEditItems.AllEditors(
+      EditItems.AllEditors(
         procedure (AEditor: IKExtEditor)
         begin
           AEditor.StoreValue('json.new');

@@ -147,6 +147,30 @@ function kittoInit()
     }
   });
 
+  Ext.override(Ext.TabPanel, {
+
+    goPrevious: function() {
+      var activeTab = this.getActiveTab();
+      if (activeTab) {
+        var previousTab = activeTab.previousSibling();
+        if (previousTab) {
+          this.setActiveTab(previousTab);
+		}
+	  }
+    },
+
+    goNext: function() {
+      var activeTab = this.getActiveTab();
+      if (activeTab) {
+	    var nextTab = activeTab.nextSibling();
+        if (nextTab) {
+          this.setActiveTab(nextTab);
+	    }
+	  }
+    }
+	
+  });
+    
   // Used by TKExtForceCamelCaps.
   String.prototype.capitalize = function(){
     return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );

@@ -1069,7 +1069,6 @@ type
     FForm: TExtFormBasicForm;
     FFormId: string;
     FItemCls: string;
-    FLabelAlign: TExtFormFormPanelLabelAlign; // 'right'
     FLabelPad: Integer; // 5
     FLabelSeparator: string;
     FLabelWidth: Integer; // 100
@@ -1082,7 +1081,6 @@ type
     procedure SetFButtons(Value: TExtObjectList);
     procedure SetFFormId(Value: string);
     procedure SetFItemCls(Value: string);
-    procedure SetLabelAlign(const AValue: TExtFormFormPanelLabelAlign);
     procedure SetFLabelPad(Value: Integer);
     procedure SetLabelSeparator(const AValue: string);
     procedure SetLabelWidth(const AValue: Integer);
@@ -1106,8 +1104,6 @@ type
     property Form: TExtFormBasicForm read FForm;
     property FormId: string read FFormId write SetFFormId;
     property ItemCls: string read FItemCls write SetFItemCls;
-    property LabelAlign: TExtFormFormPanelLabelAlign read FLabelAlign
-      write SetLabelAlign;
     property LabelPad: Integer read FLabelPad write SetFLabelPad;
     property LabelSeparator: string read FLabelSeparator
       write SetLabelSeparator;
@@ -3962,12 +3958,6 @@ begin
   JSCode('itemCls:' + VarToJSON([Value]));
 end;
 
-procedure TExtFormFormPanel.SetLabelAlign(const AValue: TExtFormFormPanelLabelAlign);
-begin
-  FLabelAlign := AValue;
-  ExtSession.ResponseItems.SetConfigItem(Self, 'labelAlign', [EnumToJSString(TypeInfo(TExtFormFormPanelLabelAlign), Ord(AValue))]);
-end;
-
 procedure TExtFormFormPanel.SetFLabelPad(Value: Integer);
 begin
   FLabelPad := Value;
@@ -4040,7 +4030,6 @@ begin
   FLabelWidth := 100;
   FMinButtonWidth := 75;
   FMonitorPoll := 200;
-  FLabelAlign := laRight;
   FForm := TExtFormBasicForm.CreateInternal(Self, 'getForm()');
 end;
 

@@ -61,7 +61,7 @@ interface
 uses
   Generics.Collections, SysUtils,
   {$IFNDEF WebServer}FCGIApp{$ELSE}IdExtHTTPServer{$ENDIF},
-  Classes, ExtPascalUtils;
+  Classes, ExtPascalClasses, ExtPascalUtils;
 
 type
   TArrayOfString  = array of string;
@@ -448,9 +448,9 @@ type
     Theme     : string; // Sets or gets Ext JS installed theme, default '' that is Ext Blue theme
     ExtPath   : string; // Installation path of Ext JS framework, below the your Web server document root. Default value is '/ext'
     ImagePath : string; // Image path below ExtPath, used by <link TExtSession.SetIconCls, SetIconCls> method. Default value is '/images'
-    ExtBuild  : string;
+    ExtBuild  : string; // Custom <extlink http://www.extjs.com/products/extjs/build/>ExtJS build</extlink>. Default is ext-all.
     procedure AfterConstruction; override;
-    destructor Destroy; override; // Custom <extlink http://www.extjs.com/products/extjs/build/>ExtJS build</extlink>. Default is ext-all.
+    destructor Destroy; override;
     property Language : string read FLanguage write SetLanguage; // Actual language for this session, reads HTTP_ACCEPT_LANGUAGE header
     procedure InitDefaultValues; override;
     procedure JSCode(JS : string; JSClassName : string = ''; JSName : string = ''; Owner : string = '');
@@ -471,6 +471,7 @@ type
 
     function GetSingleton<T: TExtObject>(const AName: string): T;
     function IsMobileApple: Boolean;
+    procedure CopyContextFrom(const ASession: TCustomWebSession); override;
   published
     procedure HandleEvent; virtual;
   end;
@@ -568,7 +569,7 @@ implementation
 
 uses
   {$IFDEF MSWINDOWS}{$IF RTLVersion <= 21}Windows,{$IFEND}{$ENDIF}
-  ExtPascalClasses, StrUtils, Math, Ext, ExtUtil, ExtGrid, ExtForm;
+  StrUtils, Math, Ext, ExtUtil, ExtGrid, ExtForm;
 
 var
   _JSFormatSettings: TFormatSettings;
@@ -1015,6 +1016,14 @@ begin
   FResponseItemsStack.Push(Result);
 
   Assert(FResponseItemsStack.Count > 0);
+end;
+
+procedure TExtSession.CopyContextFrom(const ASession: TCustomWebSession);
+begin
+  inherited;
+  if ASession is TExtSession then
+    if TExtSession(ASession).Language <> '' then
+      Language := TExtSession(ASession).Language;
 end;
 
 destructor TExtSession.Destroy;

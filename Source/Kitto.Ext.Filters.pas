@@ -157,6 +157,7 @@ type
     procedure SetViewTable(const AViewTable: TKViewTable);
     function GetId: string;
     procedure Invalidate;
+    destructor Destroy; override;
   published
     procedure GetRecordPage; virtual; abstract;
   end;
@@ -570,6 +571,12 @@ end;
 function TKListFilterBase.AsExtObject: TExtObject;
 begin
   Result := Self;
+end;
+
+destructor TKListFilterBase.Destroy;
+begin
+  FreeAndNil(FServerStore);
+  inherited;
 end;
 
 function TKListFilterBase.GetId: string;

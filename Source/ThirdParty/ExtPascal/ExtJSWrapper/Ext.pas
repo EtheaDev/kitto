@@ -2589,6 +2589,9 @@ type
   TExtContainerLayout = (lyAuto, lyAbsolute, lyAccordion, lyAnchor, lyBorder, lyCard,
     lyColumn, lyFit, lyForm, lyHbox, lyMenu, lyTable, lyToolbar, lyVbox);
 
+  // Enumerated types for properties
+  TExtContainerLabelAlign = (laLeft, laTop, laRight);
+
   TExtContainer = class(TExtBoxComponent)
   private
     FActiveItem: string;
@@ -2603,6 +2606,7 @@ type
     FHideBorders: Boolean;
     FItems: TExtObjectList;
     FItemsArray: TExtObjectList;
+    FLabelAlign: TExtContainerLabelAlign; // 'right'
     FLayout: TExtContainerLayout;
     FLayoutObject: TExtObject;
     FLayoutConfig: TExtObject;
@@ -2647,6 +2651,7 @@ type
     procedure SetFOnBeforeremove(Value: TExtContainerOnBeforeremove);
     procedure SetFOnRemove(Value: TExtContainerOnRemove);
     procedure SetHideLabels(const AValue: Boolean);
+    procedure SetLabelAlign(const AValue: TExtContainerLabelAlign);
   protected
     procedure InitDefaults; override;
     procedure HandleEvent(const AEvtName: string); override;
@@ -2691,6 +2696,7 @@ type
     property HideLabels: Boolean read FHideLabels write SetHideLabels;
     property Items: TExtObjectList read FItems write SetFItems;
     property ItemsArray: TExtObjectList read FItemsArray write SetFItemsArray;
+    property LabelAlign: TExtContainerLabelAlign read FLabelAlign write SetLabelAlign;
     property Layout: TExtContainerLayout read FLayout write SetLayout;
     property LayoutObject: TExtObject read FLayoutObject write SetFLayoutObject;
     property LayoutConfig: TExtObject read FLayoutConfig write SetFLayoutConfig;
@@ -3072,9 +3078,6 @@ type
   TExtPanelButtonAlign = (baRight, baLeft, baCenter);
 
   // Enumerated types for properties
-  TExtFormFormPanelLabelAlign = (laLeft, laTop, laRight);
-
-  // Enumerated types for properties
   TExtGridColumnAlign = (caLeft, caRight, caCenter);
 
   TExtPanel = class(TExtContainer)
@@ -3163,7 +3166,6 @@ type
     FOnIconchange: TExtPanelOnIconchange;
     FOnTitlechange: TExtPanelOnTitlechange;
     FLabelWidth: Integer;
-    FLabelAlign: TExtFormFormPanelLabelAlign;
     procedure SetFAnimCollapse(Value: Boolean);
     procedure SetFApplyTo(Value: string);
     procedure SetAutoHeight(const AValue: Boolean);
@@ -3184,7 +3186,7 @@ type
     procedure SetFBodyStyleObject(Value: TExtObject);
     procedure SetFBodyStyleFunction(Value: TExtFunction);
     procedure SetBorder(const AValue: Boolean);
-    procedure SetFButtonAlign(Value: TExtPanelButtonAlign);
+    procedure SetButtonAlign(const AValue: TExtPanelButtonAlign);
     procedure SetFButtons(Value: TExtObjectList);
     procedure SetFBwrapCfg(Value: TExtObject);
     procedure SetClosable(const AValue: Boolean);
@@ -3248,7 +3250,6 @@ type
     procedure SetFOnIconchange(Value: TExtPanelOnIconchange);
     procedure SetFOnTitlechange(Value: TExtPanelOnTitlechange);
     procedure SetLabelWidth(const AValue: Integer);
-    procedure SetLabelAlign(const AValue: TExtFormFormPanelLabelAlign);
   protected
     procedure InitDefaults; override;
     procedure HandleEvent(const AEvtName: string); override;
@@ -3300,7 +3301,7 @@ type
     property BodyStyleFunction: TExtFunction read FBodyStyleFunction
       write SetFBodyStyleFunction;
     property Border: Boolean read FBorder write SetBorder;
-    property ButtonAlign: TExtPanelButtonAlign read FButtonAlign write SetFButtonAlign;
+    property ButtonAlign: TExtPanelButtonAlign read FButtonAlign write SetButtonAlign;
     property Buttons: TExtObjectList read FButtons write SetFButtons;
     property BwrapCfg: TExtObject read FBwrapCfg write SetFBwrapCfg;
     property Closable: Boolean read FClosable write SetClosable;
@@ -3326,7 +3327,6 @@ type
     property Keys: TExtObject read FKeys write SetKeys;
     property KeysArray: TExtObjectList read FKeysArray write SetFKeysArray;
     property LabelWidth: Integer read FLabelWidth write SetLabelWidth;
-    property LabelAlign: TExtFormFormPanelLabelAlign read FLabelAlign write SetLabelAlign;
     property MaskDisabled: Boolean read FMaskDisabled write SetFMaskDisabled;
     property MinButtonWidth: Integer read FMinButtonWidth write SetFMinButtonWidth;
     property Padding: Integer read FPadding write SetPadding;
@@ -4009,7 +4009,7 @@ function ExtDomQuery: TExtDomQuerySingleton;
 function ExtWindowMgr: TExtWindowMgrSingleton;
 function ExtAjax: TExtAjaxSingleton;
 function ExtStoreMgr: TExtStoreMgrSingleton;
-function LabelAlignAsOption(const AValue: TExtFormFormPanelLabelAlign): string;
+function LabelAlignAsOption(const AValue: TExtContainerLabelAlign): string;
 
 implementation
 
@@ -4109,7 +4109,7 @@ begin
     Result := nil;
 end;
 
-function LabelAlignAsOption(const AValue: TExtFormFormPanelLabelAlign): string;
+function LabelAlignAsOption(const AValue: TExtContainerLabelAlign): string;
 begin
   case AValue of
     laLeft : Result := 'left';
@@ -11490,6 +11490,12 @@ begin
   JSCode('items:' + VarToJSON([Value, false]));
 end;
 
+procedure TExtContainer.SetLabelAlign(const AValue: TExtContainerLabelAlign);
+begin
+  FLabelAlign := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'labelAlign', [EnumToJSString(TypeInfo(TExtContainerLabelAlign), Ord(AValue))]);
+end;
+
 procedure TExtContainer.SetLayout(const AValue: TExtContainerLayout);
 begin
   FLayout := AValue;
@@ -11617,6 +11623,7 @@ begin
   FDefaults := TExtObject.CreateInternal(Self, 'defaults');
   FItems := TExtObjectList.CreateAsAttribute(Self, 'items');
   FItemsArray := TExtObjectList.CreateAsAttribute(Self, 'items');
+  FLabelAlign := laRight;
   FLayoutObject := TExtObject.CreateInternal(Self, 'layout');
   FLayoutConfig := TExtObject.CreateInternal(Self, 'layoutConfig');
   FItems_ := TExtObjectList.CreateAsAttribute(Self, 'items');
@@ -12832,11 +12839,10 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'border', [AValue]);
 end;
 
-procedure TExtPanel.SetFButtonAlign(Value: TExtPanelButtonAlign);
+procedure TExtPanel.SetButtonAlign(const AValue: TExtPanelButtonAlign);
 begin
-  FButtonAlign := Value;
-  JSCode('buttonAlign:"' + EnumToJSString(TypeInfo(TExtPanelButtonAlign),
-    ord(Value)) + '"');
+  FButtonAlign := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'buttonAlign', [EnumToJSString(TypeInfo(TExtPanelButtonAlign), Ord(AValue))]);
 end;
 
 procedure TExtPanel.SetFButtons(Value: TExtObjectList);
@@ -12976,13 +12982,6 @@ procedure TExtPanel.SetLabelWidth(const AValue: Integer);
 begin
   FLabelWidth := AValue;
   ExtSession.ResponseItems.SetConfigItem(Self, 'labelWidth', [AValue]);
-end;
-
-procedure TExtPanel.SetLabelAlign(const AValue: TExtFormFormPanelLabelAlign);
-begin
-  FLabelAlign := AValue;
-  ExtSession.ResponseItems.SetConfigItem(Self, 'labelAlign',
-    [LabelAlignAsOption(AValue)]);
 end;
 
 procedure TExtPanel.SetFKeysArray(Value: TExtObjectList);

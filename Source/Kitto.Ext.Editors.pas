@@ -25,7 +25,7 @@ uses
   Ext, ExtPascal, ExtPascalUtils, ExtForm, ExtGrid, ExtData, ExtUxForm,
   EF.Intf, EF.Classes, EF.Tree, EF.ObserverIntf,
   Kitto.Ext.Base, Kitto.Metadata.Views, Kitto.Metadata.DataView, Kitto.Store,
-  Kitto.Ext.Session, Kitto.Ext.Controller, KItto.Ext.LookupField;
+  Kitto.Ext.Session, Kitto.Ext.Controller, Kitto.Ext.LookupField;
 
 const
   // String fields of this size or longer are represented by multiline edit
@@ -82,11 +82,14 @@ type
 
   TKExtEditPage = class(TExtPanel, IKExtEditItem, IKExtEditContainer)
   strict private
-    FEditPanel: TKExtEditPanel;
+    FMainEditPanel: TKExtEditPanel;
     FDataRecord: TKViewTableRecord;
     FUnexpandedTitle: string;
     FEditItemId: string;
+    FRendered: Boolean;
     procedure SetUnexpandedTitle(const AValue: string);
+  private
+    FPageIndex: Integer;
   protected
     procedure InitDefaults; override;
     function GetObjectNamePrefix: string; override;
@@ -96,14 +99,25 @@ type
     function _Release: Integer; stdcall;
     procedure AddChild(const AEditItem: IKExtEditItem);
     procedure SetOption(const ANode: TEFNode);
+    class function SupportedOptions: TArray<string>;
+
     function AsExtObject: TExtObject;
     procedure RefreshValue;
     procedure SetTransientProperty(const APropertyName: string; const AValue: Variant);
     function GetEditItemId: string;
 
-    property EditPanel: TKExtEditPanel read FEditPanel write FEditPanel;
+    property Rendered: Boolean read FRendered write FRendered;
+    property PageIndex: Integer read FPageIndex write FPageIndex;
+
+    property MainEditPanel: TKExtEditPanel read FMainEditPanel write FMainEditPanel;
     property DataRecord: TKViewTableRecord read FDataRecord write FDataRecord;
     property UnexpandedTitle: string read FUnexpandedTitle write SetUnexpandedTitle;
+
+    /// <summary>
+    ///  Called when creating secondary pages to make sue that relevant
+    ///  properties such as LabelAlign are carried around through pages.
+    /// </summary>
+    procedure ReadPropertiesFrom(const AOther: TKExtEditPage);
   end;
 
   TKExtFormFieldSet = class(TExtFormFieldSet, IKExtEditItem, IKExtEditContainer)
@@ -496,7 +510,8 @@ type
     procedure UpdateGUI(const AUpdatePicture: Boolean);
     procedure PictureViewAfterRender(This: TExtComponent);
     procedure SetTotalCharWidth(const AValue: Integer);
-    const EMPTY_DESCRIPTION = 'Empty';
+    const
+      EMPTY_DESCRIPTION = 'Empty';
   strict protected
     FFieldName: string;
     FRecordField: TKViewTableField;
@@ -568,60 +583,78 @@ type
     function GetCurrentServerFileName: string; override;
   end;
 
+  TKExtSpacer = class(TExtBoxComponent, IKExtEditItem)
+  private
+    FEditItemId: string;
+  public
+    function AsObject: TObject;
+    procedure SetOption(const ANode: TEFNode);
+    function AsExtObject: TExtObject;
+    procedure RefreshValue;
+
+    procedure SetTransientProperty(const APropertyName: string; const AValue: Variant);
+
+    function GetEditItemId: string;
+    property EditItemId: string read FEditItemId write FEditItemId;
+  end;
+
   TKExtLayoutDefaults = record
     MemoWidth: Integer;
     MaxFieldWidth: Integer;
     MinFieldWidth: Integer;
     RequiredLabelTemplate: string;
     MsgTarget: string;
-    LabelSeparator : string;
+    LabelSeparator: string;
     procedure Init;
   end;
 
-  type
-    TKExtEditOperation = (eoUpdate, eoInsert);
+type
+  TKExtEditOperation = (eoUpdate, eoInsert);
 
   TKExtEditorManager = class;
 
   /// <summary>
-  ///  Creates editors based on layouts. Can synthesize a default layout if
+  ///  Creates editors based on layouts. Can manufacture a default layout if
   ///  missing.
   /// </summary>
   TKExtLayoutProcessor = class
   strict private
     FDataRecord: TKViewTableRecord;
-    FForceReadOnly: Boolean;
-    FFormPanel: TKExtEditPanel;
-    FMainEditPage: TKExtEditPage;
+    FMainEditPanel: TKExtEditPanel;
     FCurrentEditPage: TKExtEditPage;
     FFocusField: TExtFormField;
     FDefaults: TKExtLayoutDefaults;
     FCurrentEditItem: IKExtEditItem;
     FCurrentLabelWidth: Integer;
-    FCurrentLabelAlign: TExtFormFormPanelLabelAlign;
+    FCurrentLabelAlign: TExtContainerLabelAlign;
     FEditContainers: TStack<IKExtEditContainer>;
     FOnNewEditItem: TProc<IKExtEditItem>;
     FOperation: TKExtEditOperation;
     FTabPanel: TExtTabPanel;
     FEditorManager: TKExtEditorManager;
+    FOnlyRenderPageBreaks: Boolean;
+    FForceReadOnly: Boolean;
+    FNextPageIndex: Integer;
     function GetSession: TKExtSession;
-    procedure SetMainEditPage(const AValue: TKExtEditPage);
     procedure FinalizeCurrentEditPage;
-    function CreatePageBreak(const ATitle: string): IKExtEditItem;
     function GetViewTable: TKViewTable;
     function CreateEditItem(const ANode: TEFNode;
       const AContainer: IKExtEditContainer): IKExtEditItem;
     function CreateEditor(const AFieldName: string;
       const AContainer: IKExtEditContainer;
       const AOptions: TEFNode = nil): IKExtEditor;
+    function CreatePageBreak(const ATitle: string): IKExtEditItem;
     function CreateFieldSet(const AId: string): IKExtEditItem;
     function CreateCompositeField(const AId: string): IKExtEditItem;
     procedure SetGlobalOption(const ANode: TEFNode);
     procedure LayoutError(const AErrorMessage: string);
     function CreateRow(const AId: string): IKExtEditItem;
-    procedure CreateEditorsFromLayout(const ALayout: TKLayout);
+    function CreateSpacer(const AId: string): IKExtEditItem;
+    procedure CreateEditorsFromLayout(const ALayout: TKLayout; const APageIndex: Integer = 0);
     procedure ProcessLayoutNode(const ANode: TEFNode);
     property Session: TKExtSession read GetSession;
+    function IsPageBreak(const ANode: TEFNode): Boolean;
+    function GetMainEditPage: TKExtEditPage;
   public
     procedure AfterConstruction; override;
     destructor Destroy; override;
@@ -633,9 +666,9 @@ type
     property DataRecord: TKViewTableRecord read FDataRecord write FDataRecord;
     property ViewTable: TKViewTable read GetViewTable;
     property ForceReadOnly: Boolean read FForceReadOnly write FForceReadOnly;
-    property FormPanel: TKExtEditPanel read FFormPanel write FFormPanel;
+    property MainEditPanel: TKExtEditPanel read FMainEditPanel write FMainEditPanel;
     property TabPanel: TExtTabPanel read FTabPanel write FTabPanel;
-    property MainEditPage: TKExtEditPage read FMainEditPage write SetMainEditPage;
+    property CurrentEditPage: TKExtEditPage read FCurrentEditPage write FCurrentEditPage;
     property OnNewEditItem: TProc<IKExtEditItem> read FOnNewEditItem write FOnNewEditItem;
     property Operation: TKExtEditOperation read FOperation write SetOperation;
 
@@ -646,7 +679,16 @@ type
     ///  Layout used to create the editors. Pass nil to manufacture a default
     ///  layout.
     /// </param>
-    procedure CreateEditors(const ALayout: TKLayout);
+    /// <param name="APageIndex">
+    ///  Only relevant if a multi-page layout is specified. The code skips
+    ///  APageIndex PageBreak nodes before creating controls (and stops at the
+    ///  next PageBreak node or at the end of the layout). If APageIndex = 0
+    ///  then the first page is rendered, and the code also creates all
+    ///  secondary pages (one for each PageBreak node in the layout) but without
+    ///  the editors. It is assumed that following calls with APageIndex > 0
+    ///  will be used to populate the secondary pages.
+    /// </param>
+    procedure CreateEditors(const ALayout: TKLayout; const APageIndex: Integer = 0);
 
     /// <summary>
     ///  A reference to the first field to focus. Only valid after calling
@@ -768,10 +810,10 @@ function OptionAsString(const ANode: TEFNode; const AAllowedValues: array of str
     I: Integer;
   begin
     for I := Low(AAllowedValues) to High(AAllowedValues) do
-    if Result = '' then
-      Result := AAllowedValues[I]
-    else
-      Result := Result + ', ' + AAllowedValues[I];
+      if Result = '' then
+        Result := AAllowedValues[I]
+      else
+        Result := Result + ', ' + AAllowedValues[I];
   end;
 
 begin
@@ -809,10 +851,10 @@ begin
     // Temporary, for cases not handled by this detector and setup manually.
     Result := True
   else if Length(AViewTableField.ViewField.Table.GetFilterByFields(
-      function (AFilterByViewField: TKFilterByViewField): Boolean
-      begin
-        Result := AFilterByViewField.SourceField = AViewTableField.ViewField;
-      end)) > 0 then
+    function(AFilterByViewField: TKFilterByViewField): Boolean
+    begin
+      Result := AFilterByViewField.SourceField = AViewTableField.ViewField;
+    end)) > 0 then
     // If any fields are filtered by this field, then the change must be notified.
     Result := True
   else
@@ -857,28 +899,57 @@ begin
     FCurrentLabelWidth := LNode.AsInteger;
 end;
 
-procedure TKExtLayoutProcessor.CreateEditorsFromLayout(const ALayout: TKLayout);
+function TKExtLayoutProcessor.IsPageBreak(const ANode: TEFNode): Boolean;
+begin
+  Assert(Assigned(ANode));
+
+  Result := SameText(ANode.Name, 'PageBreak');
+end;
+
+procedure TKExtLayoutProcessor.CreateEditorsFromLayout(const ALayout: TKLayout; const APageIndex: Integer = 0);
 var
   I: Integer;
+  LSkippedPageBreaks: Integer;
+  LChildIndex: Integer;
 begin
-  Assert(Assigned(FCurrentEditPage));
   Assert(Assigned(ALayout));
 
-  FCurrentEditItem := nil;
-  FCurrentLabelWidth := FORM_LABELWIDTH;
-  FCurrentLabelAlign := FCurrentEditPage.LabelAlign;
-  FEditContainers.Clear;
+  // Skip enough page breaks to locate the right page.
+  LSkippedPageBreaks := 0;
+  LChildIndex := 0;
+  if APageIndex > 0 then
+  begin
+    for I := 0 to ALayout.ChildCount - 1 - 1 do // Not interested in a trailing PageBreak
+    begin
+      if IsPageBreak(ALayout.Children[I]) then
+      begin
+        Inc(LSkippedPageBreaks);
+        if LSkippedPageBreaks = APageIndex then
+        begin
+          LChildIndex := I + 1;
+          Break;
+        end;
+      end;
+    end;
+  end;
 
   InitLabelPosAndWidth(ALayout);
 
-  for I := 0 to ALayout.ChildCount - 1 do
+  for I := LChildIndex to ALayout.ChildCount - 1 do
+  begin
+    // When rendering a secondary page, stop at the next page break
+    // as the other pages are already there.
+    if (APageIndex > 0) and IsPageBreak(ALayout.Children[I]) then
+      Break;
     ProcessLayoutNode(ALayout.Children[I]);
+  end;
 end;
 
 procedure TKExtLayoutProcessor.ProcessLayoutNode(const ANode: TEFNode);
 var
   LViewField: TKViewField;
   LIntf: IKExtEditContainer;
+  LNodeName: string;
 
   procedure ProcessChildNodes;
   var
@@ -889,20 +960,33 @@ var
   end;
 
 begin
+  Assert(Assigned(FCurrentEditPage));
   Assert(Assigned(ANode));
 
   InitLabelPosAndWidth(ANode);
 
+  LNodeName := ANode.Name;
+
   // Skip invisible fields.
-  if SameText(ANode.Name, 'Field') then
+  if SameText(LNodeName, 'Field') then
   begin
     LViewField := ViewTable.FieldByAliasedName(ANode.AsString);
     if not ViewTable.IsFieldVisible(LViewField) then
       Exit;
   end;
 
-  //Process Specific Nodes of Layout
-  if MatchText(ANode.Name, ['Field', 'FieldSet', 'CompositeField', 'Row']) then
+  if FOnlyRenderPageBreaks and not SameText(LNodeName, 'PageBreak') and not MatchText(LNodeName, TKExtEditPage.SupportedOptions) then
+    Exit;
+
+  // Process specific layout nodes.
+  // Page breaks are not editors nor containers.
+  if SameText(LNodeName, 'PageBreak') then
+  begin
+    if FEditContainers.Count > 0 then
+      raise Exception.Create('PageBreak must be a top-level node in a layout.');
+    FCurrentEditItem := CreatePageBreak(_(ANode.Value));
+  end
+  else if MatchText(LNodeName, ['Field', 'FieldSet', 'CompositeField', 'Row', 'Spacer']) then
   begin
     if FEditContainers.Count > 0 then
       FCurrentEditItem := CreateEditItem(ANode, FEditContainers.Peek)
@@ -914,15 +998,8 @@ begin
     if Supports(FCurrentEditItem, IKExtEditContainer, LIntf) then
       FEditContainers.Push(LIntf);
   end
-  // Page breaks are not editors nor containers.
-  else if SameText(ANode.Name, 'PageBreak') then
-  begin
-    if FEditContainers.Count > 0 then
-      raise Exception.Create('PageBreak must be a top-level node in a layout.');
-    FCurrentEditItem := CreatePageBreak(_(ANode.Value));
-  end
   // Unknown name - must be an option.
-  else if SameText(ANode.Name, 'DisplayLabel') then
+  else if SameText(LNodeName, 'DisplayLabel') then
     // DisplayLabel is handled earlier by CreateEditItem, so we just ignore it here.
     Exit
   else
@@ -938,8 +1015,12 @@ begin
       FCurrentEditItem.SetOption(ANode);
   end;
 
-  if (FCurrentEditItem is TKExtFormRowField) and (FCurrentLabelAlign <> laTop) then
-    TKExtFormRowField(FCurrentEditItem).LabelWidth := FCurrentLabelWidth;
+  if (FCurrentEditItem is TKExtFormRowField) then
+  begin
+    TKExtFormRowField(FCurrentEditItem).LabelAlign := FCurrentLabelAlign;
+    if (FCurrentLabelAlign <> laTop) then
+      TKExtFormRowField(FCurrentEditItem).LabelWidth := FCurrentLabelWidth;
+  end;
 
   ProcessChildNodes;
 
@@ -947,31 +1028,44 @@ begin
     FEditContainers.Pop;
 end;
 
-procedure TKExtLayoutProcessor.CreateEditors(const ALayout: TKLayout);
+procedure TKExtLayoutProcessor.CreateEditors(const ALayout: TKLayout; const APageIndex: Integer = 0);
 var
   I: Integer;
   LEditor: IKExtEditor;
+  LInitialPage: TKExtEditPage;
 begin
   Assert(Assigned(FCurrentEditPage));
 
   FFocusField := nil;
+  FCurrentEditItem := nil;
+  FCurrentLabelWidth := FORM_LABELWIDTH;
+  FCurrentLabelAlign := FCurrentEditPage.LabelAlign;
+  FEditContainers.Clear;
 
-  if Assigned(ALayout) then
-    CreateEditorsFromLayout(ALayout)
-  else
+  if not FCurrentEditPage.Rendered then
   begin
-    for I := 0 to ViewTable.FieldCount - 1 do
+    // Store the page in a local variable as it may change inside CreateEditorsFromLayout.
+    LInitialPage := FCurrentEditPage;
+
+    if Assigned(ALayout) then
+      CreateEditorsFromLayout(ALayout, APageIndex)
+    else
     begin
-      if ViewTable.IsFieldVisible(ViewTable.Fields[I]) and ViewTable.Fields[I].IsAccessGranted(ACM_READ) then
+      for I := 0 to ViewTable.FieldCount - 1 do
       begin
-        LEditor := CreateEditor(ViewTable.Fields[I].AliasedName, nil);
-        FCurrentEditPage.AddChild(LEditor);
-        if Assigned(FOnNewEditItem) then
-          FOnNewEditItem(LEditor);
+        if ViewTable.IsFieldVisible(ViewTable.Fields[I]) and ViewTable.Fields[I].IsAccessGranted(ACM_READ) then
+        begin
+          LEditor := CreateEditor(ViewTable.Fields[I].AliasedName, nil);
+          FCurrentEditPage.AddChild(LEditor);
+          if Assigned(FOnNewEditItem) then
+            FOnNewEditItem(LEditor);
+        end;
       end;
     end;
+    FinalizeCurrentEditPage;
+    // Done.
+    LInitialPage.Rendered := True;
   end;
-  FinalizeCurrentEditPage;
 end;
 
 procedure TKExtLayoutProcessor.FinalizeCurrentEditPage;
@@ -983,8 +1077,7 @@ begin
   FFocusField := nil;
 end;
 
-function TKExtLayoutProcessor.CreateEditItem(const ANode: TEFNode;
-  const AContainer: IKExtEditContainer): IKExtEditItem;
+function TKExtLayoutProcessor.CreateEditItem(const ANode: TEFNode; const AContainer: IKExtEditContainer): IKExtEditItem;
 begin
   if SameText(ANode.Name, 'Field') then
     Result := CreateEditor(ANode.Value, AContainer, ANode)
@@ -994,6 +1087,8 @@ begin
     Result := CreateCompositeField(ANode.AsExpandedString)
   else if SameText(ANode.Name, 'Row') then
     Result := CreateRow(ANode.AsExpandedString)
+  else if SameText(ANode.Name, 'Spacer') then
+    Result := CreateSpacer(ANode.AsExpandedString)
   else
     raise EEFError.CreateFmt(_('Unknown edit item type %s.'), [ANode.Name]);
   if Assigned(AContainer) then
@@ -1124,22 +1219,36 @@ begin
   Result := LFieldSet;
 end;
 
+function TKExtLayoutProcessor.GetMainEditPage: TKExtEditPage;
+begin
+  Assert(Assigned(FTabPanel));
+  Assert(FTabPanel.Items.Count > 0);
+  Assert(FTabPanel.Items[0] is TKExtEditPage);
+
+  Result := TKExtEditPage(FTabPanel.Items[0]);
+end;
+
 function TKExtLayoutProcessor.CreatePageBreak(const ATitle: string): IKExtEditItem;
 var
   LPageBreak: TKExtEditPage;
 begin
-  Assert(Assigned(FFormPanel));
+  Assert(Assigned(FMainEditPanel));
   Assert(Assigned(FTabPanel));
   Assert(Assigned(FDataRecord));
 
   FinalizeCurrentEditPage;
 
   LPageBreak := TKExtEditPage.CreateAndAddTo(FTabPanel.Items);
-  LPageBreak.EditPanel := FFormPanel;
+  LPageBreak.MainEditPanel := FMainEditPanel;
   LPageBreak.DataRecord := FDataRecord;
   LPageBreak.UnexpandedTitle := ATitle;
+  LPageBreak.ReadPropertiesFrom(GetMainEditPage);
   LPageBreak.LabelWidth := FCurrentLabelWidth;
+  LPageBreak.PageIndex := FNextPageIndex;
+  Inc(FNextPageIndex);
   FCurrentEditPage := LPageBreak;
+
+  FOnlyRenderPageBreaks := True;
 
   Result := LPageBreak;
 end;
@@ -1155,6 +1264,8 @@ begin
     begin
       ASession := Session;
     end;
+  // Gotta start from 1 since page 0 is implicit.
+  FNextPageIndex := 1;
 end;
 
 function TKExtLayoutProcessor.CreateCompositeField(const AId: string): IKExtEditItem;
@@ -1181,6 +1292,17 @@ begin
   Result := LRow;
 end;
 
+function TKExtLayoutProcessor.CreateSpacer(const AId: string): IKExtEditItem;
+var
+  LSpacer: TKExtSpacer;
+begin
+  Assert(Assigned(FCurrentEditPage));
+
+  LSpacer := TKExtSpacer.Create(FCurrentEditPage);
+  LSpacer.Height := 30;
+  Result := LSpacer;
+end;
+
 destructor TKExtLayoutProcessor.Destroy;
 begin
   FreeAndNil(FEditContainers);
@@ -1204,13 +1326,6 @@ begin
     FDefaults.MsgTarget := OptionAsString(ANode, ['Qtip', 'Title', 'Under', 'Side'])
   else
     FCurrentEditPage.SetOption(ANode);
-end;
-
-procedure TKExtLayoutProcessor.SetMainEditPage(const AValue: TKExtEditPage);
-begin
-  FMainEditPage := AValue;
-  if Assigned(FMainEditPage) and not Assigned(FCurrentEditPage) then
-    FCurrentEditPage := FMainEditPage;
 end;
 
 procedure TKExtLayoutProcessor.SetOperation(const AValue: TKExtEditOperation);
@@ -1283,6 +1398,14 @@ begin
   AutoScroll := True;
 end;
 
+procedure TKExtEditPage.ReadPropertiesFrom(const AOther: TKExtEditPage);
+begin
+  Assert(Assigned(AOther));
+
+  LabelAlign := AOther.LabelAlign;
+  LabelWidth := AOther.LabelWidth;
+end;
+
 procedure TKExtEditPage.RefreshValue;
 var
   LTitle: string;
@@ -1296,19 +1419,20 @@ end;
 
 procedure TKExtEditPage.SetOption(const ANode: TEFNode);
 begin
+  // Don't forget to add any new options to the SupportedOptions method.
   if SameText(ANode.Name, 'LabelWidth') then
     LabelWidth := ANode.AsInteger
   else if SameText(ANode.Name, 'LabelAlign') then
   begin
-    Assert(Assigned(FEditPanel));
-    FEditPanel.LabelAlign := OptionAsLabelAlign(ANode.AsString);
+    Assert(Assigned(FMainEditPanel));
+    FMainEditPanel.LabelAlign := OptionAsLabelAlign(ANode.AsString);
   end
   else if SameText(ANode.Name, 'LabelSeparator') then
     LabelSeparator := ANode.AsString
   else if SameText(ANode.Name, 'LabelPad') then
   begin
-    Assert(Assigned(FEditPanel));
-    FEditPanel.LabelPad := Anode.AsInteger;
+    Assert(Assigned(FMainEditPanel));
+    FMainEditPanel.LabelPad := ANode.AsInteger;
   end
   else if SameText(ANode.Name, 'ImageName') then
     IconCls := Session.SetIconStyle('', ANode.AsString)
@@ -1325,6 +1449,11 @@ procedure TKExtEditPage.SetUnexpandedTitle(const AValue: string);
 begin
   FUnexpandedTitle := AValue;
   RefreshValue;
+end;
+
+class function TKExtEditPage.SupportedOptions: TArray<string>;
+begin
+  Result := ['LabelWidth', 'LabelAlign', 'LabelSeparator', 'LabelPad', 'ImageName'];
 end;
 
 function TKExtEditPage._AddRef: Integer;
@@ -1552,8 +1681,7 @@ begin
   AsExtFormField.StoreValue(AObjectName);
 end;
 
-procedure TKExtFormTextField.FieldChange(This: TExtFormField; NewValue: string;
-  OldValue: string);
+procedure TKExtFormTextField.FieldChange(This: TExtFormField; NewValue: string; OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
 end;
@@ -1596,8 +1724,7 @@ begin
   Result := Self;
 end;
 
-procedure TKExtFormTextArea.FieldChange(This: TExtFormField; NewValue,
-  OldValue: string);
+procedure TKExtFormTextArea.FieldChange(This: TExtFormField; NewValue, OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
 end;
@@ -1682,8 +1809,7 @@ begin
   Result := Self;
 end;
 
-procedure TKExtFormCheckbox.FieldChange(This: TExtFormField; NewValue,
-  OldValue: string);
+procedure TKExtFormCheckbox.FieldChange(This: TExtFormField; NewValue, OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
 end;
@@ -1723,8 +1849,7 @@ end;
 procedure TKExtFormCheckbox.StoreValue(const AObjectName: string);
 begin
   if not ReadOnly then
-    Session.ResponseItems.ExecuteJSCode(
-      AObjectName + '["' + Name + '"]=' + JSName + '.checked;');
+    Session.ResponseItems.ExecuteJSCode(AObjectName + '["' + Name + '"]=' + JSName + '.checked;');
 end;
 
 procedure TKExtFormCheckbox.SetFieldName(const AValue: string);
@@ -1886,7 +2011,7 @@ begin
   LDBQuery := Session.Config.DBConnections[FRecordField.ViewField.Table.DatabaseName].CreateDBQuery;
   try
     TKSQLBuilder.CreateAndExecute(
-      procedure (ASQLBuilder: TKSQLBuilder)
+      procedure(ASQLBuilder: TKSQLBuilder)
       begin
         ASQLBuilder.BuildLookupSelectStatement(FRecordField.ViewField, LDBQuery,
           ReplaceStr(Session.Query['query'], '''', ''''''), FRecordField.ParentRecord);
@@ -2351,8 +2476,7 @@ begin
   Result := Self;
 end;
 
-procedure TKExtFormNumericField.FieldChange(This: TExtFormField; NewValue,
-  OldValue: string);
+procedure TKExtFormNumericField.FieldChange(This: TExtFormField; NewValue, OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.JSFormatSettings);
 end;
@@ -2475,8 +2599,7 @@ begin
   inherited;
 end;
 
-procedure TKExtFormDateTimeField.FieldChange(This: TExtFormField; NewValue,
-  OldValue: string);
+procedure TKExtFormDateTimeField.FieldChange(This: TExtFormField; NewValue, OldValue: string);
 begin
   FRecordField.SetAsJSONValue(ConvertDateTime(NewValue), False, Session.Config.UserFormatSettings);
 end;
@@ -2596,8 +2719,7 @@ begin
   Result := Self;
 end;
 
-procedure TKExtFormTimeField.FieldChange(This: TExtFormField; NewValue,
-  OldValue: string);
+procedure TKExtFormTimeField.FieldChange(This: TExtFormField; NewValue, OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
 end;
@@ -2765,7 +2887,7 @@ begin
   FLastUploadedOriginalFileName := '';
 
   LFileNameField := FRecordField.ViewField.FileNameField;
-  if LFileNameField <> ''then
+  if LFileNameField <> '' then
   begin
     LFileNameFieldReference := FRecordField.ParentRecord.FieldByName(LFileNameField);
     // Must clear the field both now, to have an exact picture in real time, and later
@@ -2791,7 +2913,7 @@ var
   LFileNameFieldReference: TKViewTableField;
 begin
   LFileNameField := FRecordField.ViewField.FileNameField;
-  if LFileNameField <> ''then
+  if LFileNameField <> '' then
   begin
     LFileNameFieldReference := FRecordField.ParentRecord.FieldByName(LFileNameField);
     LFileNameFieldReference.DeleteNode('Sys/SetToNull');
@@ -2827,7 +2949,7 @@ begin
   FPictureView.Load(JSObject(Format('url:"%s"', [MethodURI(GetImageContent)])));
 end;
 
-procedure TKExtFormFileEditor.CreateGUI(const AViewField: TKViewField);
+procedure TKExtFormFileEditor.CreateGUI(const AViewField: TKVIewField);
 var
   LPanel: TExtPanel;
   LUploadButton: TKExtButton;
@@ -2846,8 +2968,9 @@ begin
   if LIsPicture then
   begin
     LPanel.Layout := lyColumn;
+    LPanel.Frame := True;
     FPictureView := TExtPanel.CreateAndAddTo(LPanel.Items);
-    FPictureView.Frame := True;
+    //FPictureView.Frame := True;
     FPictureView.OnAfterrender := PictureViewAfterRender;
 
     LToolbar := TKExtToolbar.CreateAndAddTo(LPanel.Items);
@@ -2963,7 +3086,7 @@ end;
 procedure TKExtFormFileEditor.SetOption(const ANode: TEFNode);
 begin
   if SameText(ANode.Name, 'CharWidth') then
-    TotalCharWidth := Anode.AsInteger
+    TotalCharWidth := ANode.AsInteger
   else if SameText(ANode.Name, 'Anchor') then
     Anchor := ANode.AsString
   else
@@ -2999,7 +3122,7 @@ begin
   LUploadFormField.Anchor := '0 5 0 0';
   LUploadButton := TKExtButton.CreateAndAddTo(LFormPanel.Buttons);
   LUploadButton.Text := _('Upload');
-  LUploadButton.SetIconAndScale('Upload', IfThen(Session.IsMobileBrowser,'medium', 'small'));
+  LUploadButton.SetIconAndScale('Upload', IfThen(Session.IsMobileBrowser, 'medium', 'small'));
 
   LSubmitAction := TExtFormActionSubmit.Create(FWindow);
   LSubmitAction.Url := MethodURI(Upload);
@@ -3033,7 +3156,8 @@ begin
         [FDescriptionField.JSName, _(EMPTY_DESCRIPTION), LMsg]))
     else if Assigned(FPictureView) then
       Session.ResponseItems.ExecuteJSCode(Self,
-        Format('if (%s.html.indexOf("<img" = -1) { alert("%s"); throw "validation error"; }', [FDescriptionField.JSName, LMsg]));
+        Format('if (%s.html.indexOf("<img" = -1) { alert("%s"); throw "validation error"; }',
+        [FDescriptionField.JSName, LMsg]));
   end;
 end;
 
@@ -3042,7 +3166,7 @@ var
   LFileName: string;
 begin
   LFileName := Session.FileUploadedFullName;
-  { TODO : Check the file against limitations such as type and size}
+  { TODO : Check the file against limitations such as type and size }
   if (LFileName <> '') and FileExists(LFileName) then
     FileUploaded(LFileName);
   { success:true or success:false + errors }
@@ -3165,8 +3289,7 @@ begin
   end;
 end;
 
-procedure TKExtFormFileBlobEditor.DownloadThumbnailedFile(
-  const AServerFileName, AClientFileName: string);
+procedure TKExtFormFileBlobEditor.DownloadThumbnailedFile(const AServerFileName, AClientFileName: string);
 var
   LStream: TStream;
 begin
@@ -3188,8 +3311,7 @@ var
 begin
   inherited;
   FLastUploadedOriginalFileName := ExtractFileName(AFileName);
-  FLastUploadedFullFileName := GetUniqueFileName(ExtractFilePath(AFileName),
-    ExtractFileExt(AFileName));
+  FLastUploadedFullFileName := GetUniqueFileName(ExtractFilePath(AFileName), ExtractFileExt(AFileName));
   // Don't rename: move, since the files could be on different drives.
   CopyFile(AFileName, FLastUploadedFullFileName);
   DeleteFile(AFileName);
@@ -3217,7 +3339,8 @@ begin
   if Result = '' then
     raise Exception.CreateFmt('Path not specified for file reference field %s.', [FRecordField.ViewField.FieldName]);
   if not DirectoryExists(Result) then
-    raise Exception.CreateFmt('Directory %s not found for file reference field %s.', [Result, FRecordField.ViewField.FieldName]);
+    raise Exception.CreateFmt('Directory %s not found for file reference field %s.',
+      [Result, FRecordField.ViewField.FieldName]);
 end;
 
 procedure TKExtFormFileReferenceEditor.ClearContents;
@@ -3243,8 +3366,7 @@ begin
   end;
 end;
 
-procedure TKExtFormFileReferenceEditor.DownloadThumbnailedFile(
-  const AServerFileName, AClientFileName: string);
+procedure TKExtFormFileReferenceEditor.DownloadThumbnailedFile(const AServerFileName, AClientFileName: string);
 var
   LStream: TFileStream;
 begin
@@ -3461,7 +3583,7 @@ begin
       if not AIsReadOnly then
       begin
         if AViewField.Size > 0 then
-          LTextArea.MaxLength  := AViewField.Size;
+          LTextArea.MaxLength := AViewField.Size;
         LTextArea.AllowBlank := not AViewField.IsRequired;
       end;
       LTextArea.Grow := False;
@@ -3757,18 +3879,17 @@ procedure TKEditItemList.EditorsByFieldName(const AFieldName: string;
   const AHandler: TProc<IKExtEditor>);
 begin
   EnumEditors(
-    function (AEditor: IKExtEditor): Boolean
+    function(AEditor: IKExtEditor): Boolean
     begin
       Result := SameText(AEditor.GetRecordField.ViewField.AliasedName, AFieldName);
     end,
     AHandler);
 end;
 
-procedure TKEditItemList.EditorsByViewField(const AViewField: TKVIewField;
-  const AHandler: TProc<IKExtEditor>);
+procedure TKEditItemList.EditorsByViewField(const AViewField: TKVIewField; const AHandler: TProc<IKExtEditor>);
 begin
   EnumEditors(
-    function (AEditor: IKExtEditor): Boolean
+    function(AEditor: IKExtEditor): Boolean
     begin
       Result := AEditor.GetRecordField.ViewField = AViewField;
     end,
@@ -3778,26 +3899,24 @@ end;
 procedure TKEditItemList.EditItemsById(const AId: string; const AHandler: TProc<IKExtEditItem>);
 begin
   EnumEditItems(
-    function (AEditItem: IKExtEditItem): Boolean
+    function(AEditItem: IKExtEditItem): Boolean
     begin
       Result := SameText(AEditItem.GetEditItemId, AId);
     end,
     AHandler);
 end;
 
-procedure TKEditItemList.EditorsByField(const AField: TKField;
-  const AHandler: TProc<IKExtEditor>);
+procedure TKEditItemList.EditorsByField(const AField: TKField; const AHandler: TProc<IKExtEditor>);
 begin
   EnumEditors(
-    function (AEditor: IKExteditor): Boolean
+    function(AEditor: IKExtEditor): Boolean
     begin
       Result := AEditor.GetRecordField = AField;
     end,
     AHandler);
 end;
 
-procedure TKEditItemList.EnumEditors(const APredicate: TFunc<IKExtEditor, Boolean>;
-  const AHandler: TProc<IKExtEditor>);
+procedure TKEditItemList.EnumEditors(const APredicate: TFunc<IKExtEditor, Boolean>; const AHandler: TProc<IKExtEditor>);
 var
   I: Integer;
   LEditorIntf: IKExtEditor;
@@ -3832,29 +3951,27 @@ end;
 procedure TKEditItemList.AllEditItems(const AHandler: TProc<IKExtEditItem>);
 begin
   EnumEditItems(
-    function (AEditItem: IKExteditItem): Boolean
+    function(AEditItem: IKExtEditItem): Boolean
     begin
       Result := True;
     end,
     AHandler);
 end;
 
-procedure TKEditItemList.AllEditors(
-  const AHandler: TProc<IKExtEditor>);
+procedure TKEditItemList.AllEditors(const AHandler: TProc<IKExtEditor>);
 begin
   EnumEditors(
-    function (AEditor: IKExtEditor): Boolean
+    function(AEditor: IKExtEditor): Boolean
     begin
       Result := True;
     end,
     AHandler);
 end;
 
-procedure TKEditItemList.AllNonEditors(
-  const AHandler: TProc<IKExtEditItem>);
+procedure TKEditItemList.AllNonEditors(const AHandler: TProc<IKExtEditItem>);
 begin
   EnumEditItems(
-    function (AEditItem: IKExteditItem): Boolean
+    function(AEditItem: IKExtEditItem): Boolean
     begin
       Result := not Supports(AEditItem, IKExtEditor);
     end,
@@ -3902,7 +4019,8 @@ var
   LKeyFieldNames: string;
 begin
   inherited;
-  LResultKeyValues := ARecord.GetFieldValuesAsString(FRecordField.ViewField.ModelField.ReferencedModel.GetKeyFieldNames, TKConfig.Instance.MultiFieldSeparator);
+  LResultKeyValues := ARecord.GetFieldValuesAsString(FRecordField.ViewField.ModelField.ReferencedModel.GetKeyFieldNames,
+    TKConfig.Instance.MultiFieldSeparator);
   LKeyFieldNames := Join(FRecordField.ViewField.ModelField.GetFieldNames, TKConfig.Instance.MultiFieldSeparator);
   FRecordField.ParentRecord.FieldByName(LKeyFieldNames).AsString := LResultKeyValues;
 end;
@@ -3979,6 +4097,37 @@ begin
             GetRawValue;
           end) + ';';
   end;
+end;
+
+{ TKExtSpacer }
+
+function TKExtSpacer.AsExtObject: TExtObject;
+begin
+  Result := Self;
+end;
+
+function TKExtSpacer.AsObject: TObject;
+begin
+  Result := Self;
+end;
+
+function TKExtSpacer.GetEditItemId: string;
+begin
+  Result := FEditItemId;
+end;
+
+procedure TKExtSpacer.RefreshValue;
+begin
+end;
+
+procedure TKExtSpacer.SetOption(const ANode: TEFNode);
+begin
+  if SameText(ANode.Name, 'Height') then
+    Height := ANode.AsInteger;
+end;
+
+procedure TKExtSpacer.SetTransientProperty(const APropertyName: string; const AValue: Variant);
+begin
 end;
 
 end.
