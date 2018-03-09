@@ -933,7 +933,7 @@ begin
   FFormPanel.LabelWidth := FORM_LABELWIDTH;
   FFormPanel.MonitorValid := True;
   FFormPanel.Cls := 'x-panel-mc'; // Sets correct theme background color.
-  FFormPanel.LabelAlign := FLabelAlign;
+  //FFormPanel.LabelAlign := FLabelAlign;
 
   LDetailStyle := GetDetailStyle;
   if ((ViewTable.DetailTableCount > 0) and SameText(LDetailStyle, 'Tabs')) or LayoutContainsPageBreaks then
@@ -949,6 +949,7 @@ begin
     if Config.GetBoolean('Sys/ShowIcon', True) then
       FMainPage.IconCls := Session.SetViewIconStyle(ViewTable.View);
     FMainPage.LabelAlign := FLabelAlign;
+    FMainPage.MainEditPanel := FFormPanel;
     FTabPanel.SetActiveTab(0);
     FTabPanel.OnTabChange := TabChange;
     FTabPanel.On('tabchange', FTabPanel.JSFunction(FTabPanel.JSName + '.doLayout();'));

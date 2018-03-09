@@ -79,8 +79,6 @@ type
   private
     FList: TList<TExtResponseItem>;
     FEmittedItems: TList<TExtResponseItem>;
-    function FindObjectCreateItem(const AObject: TExtObject): TExtCreateObject;
-    function GetObjectCreateItem(const AObject: TExtObject): TExtCreateObject;
     //procedure SortByDependency;
     function GetCount: Integer;
     function GetItem(I: Integer): TExtResponseItem;
@@ -139,6 +137,9 @@ type
     // Returns the first item with IsCode=True for the specified object, or
     // raises an exception.
     function GetLastCodeItem(const AObject: TExtObject): TExtResponseItem;
+
+    function FindObjectCreateItem(const AObject: TExtObject): TExtCreateObject;
+    function GetObjectCreateItem(const AObject: TExtObject): TExtCreateObject;
 
     property Items[I: Integer]: TExtResponseItem read GetItem; default;
     property Count: Integer read GetCount;

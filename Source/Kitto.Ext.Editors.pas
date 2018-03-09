@@ -112,12 +112,6 @@ type
     property MainEditPanel: TKExtEditPanel read FMainEditPanel write FMainEditPanel;
     property DataRecord: TKViewTableRecord read FDataRecord write FDataRecord;
     property UnexpandedTitle: string read FUnexpandedTitle write SetUnexpandedTitle;
-
-    /// <summary>
-    ///  Called when creating secondary pages to make sue that relevant
-    ///  properties such as LabelAlign are carried around through pages.
-    /// </summary>
-    procedure ReadPropertiesFrom(const AOther: TKExtEditPage);
   end;
 
   TKExtFormFieldSet = class(TExtFormFieldSet, IKExtEditItem, IKExtEditContainer)
@@ -654,13 +648,13 @@ type
     procedure ProcessLayoutNode(const ANode: TEFNode);
     property Session: TKExtSession read GetSession;
     function IsPageBreak(const ANode: TEFNode): Boolean;
-    function GetMainEditPage: TKExtEditPage;
+    //function GetMainEditPage: TKExtEditPage;
   public
     procedure AfterConstruction; override;
     destructor Destroy; override;
   private
     procedure SetOperation(const AValue: TKExtEditOperation);
-    procedure InitLabelPosAndWidth(const ANode: TEfTree);
+    procedure InitLabelAlignAndWidth(const ANode: TEfTree);
   public
     // Set all properties before calling the CreateEditors methods.
     property DataRecord: TKViewTableRecord read FDataRecord write FDataRecord;
@@ -883,17 +877,13 @@ begin
   raise EEFError.CreateFmt(_('Layout parsing error. %s.'), [AErrorMessage]);
 end;
 
-procedure TKExtLayoutProcessor.InitLabelPosAndWidth(const ANode: TEfTree);
+procedure TKExtLayoutProcessor.InitLabelAlignAndWidth(const ANode: TEfTree);
 var
   LNode: TEFNode;
 begin
   LNode := ANode.FindNode('LabelAlign');
   if Assigned(LNode) then
-  begin
     FCurrentLabelAlign := OptionAsLabelAlign(LNode.AsString);
-    if Assigned(FCurrentEditPage) then
-      FCurrentEditPage.LabelAlign := FCurrentLabelAlign;
-  end;
   LNode := ANode.FindNode('LabelWidth');
   if Assigned(LNode) then
     FCurrentLabelWidth := LNode.AsInteger;
@@ -933,7 +923,14 @@ begin
     end;
   end;
 
-  InitLabelPosAndWidth(ALayout);
+  InitLabelAlignAndWidth(ALayout);
+
+  if (APageIndex = 0) then
+  begin
+    Assert(Assigned(FCurrentEditPage));
+    FCurrentEditPage.LabelAlign := FCurrentLabelAlign;
+    FCurrentEditPage.LabelWidth := FCurrentLabelWidth;
+  end;
 
   for I := LChildIndex to ALayout.ChildCount - 1 do
   begin
@@ -962,8 +959,6 @@ var
 begin
   Assert(Assigned(FCurrentEditPage));
   Assert(Assigned(ANode));
-
-  InitLabelPosAndWidth(ANode);
 
   LNodeName := ANode.Name;
 
@@ -998,10 +993,10 @@ begin
     if Supports(FCurrentEditItem, IKExtEditContainer, LIntf) then
       FEditContainers.Push(LIntf);
   end
-  // Unknown name - must be an option.
   else if SameText(LNodeName, 'DisplayLabel') then
     // DisplayLabel is handled earlier by CreateEditItem, so we just ignore it here.
     Exit
+  // Unknown name - must be an option.
   else
   begin
     if ANode.AsString = '' then
@@ -1219,14 +1214,14 @@ begin
   Result := LFieldSet;
 end;
 
-function TKExtLayoutProcessor.GetMainEditPage: TKExtEditPage;
-begin
-  Assert(Assigned(FTabPanel));
-  Assert(FTabPanel.Items.Count > 0);
-  Assert(FTabPanel.Items[0] is TKExtEditPage);
-
-  Result := TKExtEditPage(FTabPanel.Items[0]);
-end;
+//function TKExtLayoutProcessor.GetMainEditPage: TKExtEditPage;
+//begin
+//  Assert(Assigned(FTabPanel));
+//  Assert(FTabPanel.Items.Count > 0);
+//  Assert(FTabPanel.Items[0] is TKExtEditPage);
+//
+//  Result := TKExtEditPage(FTabPanel.Items[0]);
+//end;
 
 function TKExtLayoutProcessor.CreatePageBreak(const ATitle: string): IKExtEditItem;
 var
@@ -1242,7 +1237,7 @@ begin
   LPageBreak.MainEditPanel := FMainEditPanel;
   LPageBreak.DataRecord := FDataRecord;
   LPageBreak.UnexpandedTitle := ATitle;
-  LPageBreak.ReadPropertiesFrom(GetMainEditPage);
+  LPageBreak.LabelAlign := FCurrentLabelAlign;
   LPageBreak.LabelWidth := FCurrentLabelWidth;
   LPageBreak.PageIndex := FNextPageIndex;
   Inc(FNextPageIndex);
@@ -1324,7 +1319,7 @@ begin
     FDefaults.LabelSeparator := ANode.AsString
   else if SameText(ANode.Name, 'MsgTarget') then
     FDefaults.MsgTarget := OptionAsString(ANode, ['Qtip', 'Title', 'Under', 'Side'])
-  else
+  else if Assigned(FCurrentEditPage) then
     FCurrentEditPage.SetOption(ANode);
 end;
 
@@ -1398,14 +1393,6 @@ begin
   AutoScroll := True;
 end;
 
-procedure TKExtEditPage.ReadPropertiesFrom(const AOther: TKExtEditPage);
-begin
-  Assert(Assigned(AOther));
-
-  LabelAlign := AOther.LabelAlign;
-  LabelWidth := AOther.LabelWidth;
-end;
-
 procedure TKExtEditPage.RefreshValue;
 var
   LTitle: string;
@@ -1419,14 +1406,15 @@ end;
 
 procedure TKExtEditPage.SetOption(const ANode: TEFNode);
 begin
+  // Only set options during the first rendering pass, when configs are still available.
+  if not Assigned(Session.ResponseItems.FindObjectCreateItem(Self)) then
+    Exit;
+
   // Don't forget to add any new options to the SupportedOptions method.
   if SameText(ANode.Name, 'LabelWidth') then
     LabelWidth := ANode.AsInteger
   else if SameText(ANode.Name, 'LabelAlign') then
-  begin
-    Assert(Assigned(FMainEditPanel));
-    FMainEditPanel.LabelAlign := OptionAsLabelAlign(ANode.AsString);
-  end
+    LabelAlign := OptionAsLabelAlign(ANode.AsString)
   else if SameText(ANode.Name, 'LabelSeparator') then
     LabelSeparator := ANode.AsString
   else if SameText(ANode.Name, 'LabelPad') then
@@ -1453,7 +1441,12 @@ end;
 
 class function TKExtEditPage.SupportedOptions: TArray<string>;
 begin
-  Result := ['LabelWidth', 'LabelAlign', 'LabelSeparator', 'LabelPad', 'ImageName'];
+  SetLength(Result, 5);
+  Result[0] := 'LabelWidth';
+  Result[1] := 'LabelAlign';
+  Result[2] := 'LabelSeparator';
+  Result[3] := 'LabelPad';
+  Result[4] := 'ImageName';
 end;
 
 function TKExtEditPage._AddRef: Integer;
