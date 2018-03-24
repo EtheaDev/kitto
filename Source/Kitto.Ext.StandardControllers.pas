@@ -22,9 +22,25 @@ interface
 
 uses
   Classes, SysUtils,
-  Kitto.Ext.Base, Kitto.Ext.DataTool;
+  Kitto.Ext.Base, Kitto.Ext.DataTool, Kitto.Metadata.Views;
 
 type
+  /// <summary>
+  ///  Opens a view through Session.DisplayView. Useful to add a
+  ///  view to a panel's toolbar with customized properties (such as
+  ///  DisplayLabel or ImageName).
+  ///  If no customization is needed, just add the view's name
+  ///  or definition under the ToolViews node.
+  /// </summary>
+  TKExtDisplayViewController = class(TKExtToolController)
+  private
+    FTargetView: TKView;
+    function GetTargetView: TKView;
+  protected
+    property TargetView: TKView read GetTargetView;
+    procedure ExecuteTool; override;
+  end;
+
   /// <summary>Logs the current user out ending the current session. Only
   /// useful if authentication is enabled.</summary>
   TKExtLogoutController = class(TKExtToolController)
@@ -680,7 +696,24 @@ procedure TKExtUploadFileController.ProcessUploadedFile(const AUploadedFileName:
 begin
 end;
 
+{ TKExtDisplayViewController }
+
+procedure TKExtDisplayViewController.ExecuteTool;
+begin
+  inherited;
+  Session.DisplayView(TargetView);
+end;
+
+function TKExtDisplayViewController.GetTargetView: TKView;
+begin
+  if not Assigned(FTargetView) then
+    FTargetView := Session.Config.Views.FindViewByNode(View.FindNode('Controller/View'));
+  Result := FTargetView;
+  Assert(Assigned(Result));
+end;
+
 initialization
+  TKExtControllerRegistry.Instance.RegisterClass('DisplayView', TKExtDisplayViewController);
   TKExtControllerRegistry.Instance.RegisterClass('Logout', TKExtLogoutController);
   TKExtControllerRegistry.Instance.RegisterClass('URL', TKExtURLController);
   TKExtControllerRegistry.Instance.RegisterClass('FilteredURL', TKExtFilteredURLController);
@@ -688,6 +721,7 @@ initialization
   TKExtControllerRegistry.Instance.RegisterClass('UploadFile', TKExtUploadFileController);
 
 finalization
+  TKExtControllerRegistry.Instance.UnregisterClass('DisplayView');
   TKExtControllerRegistry.Instance.UnregisterClass('Logout');
   TKExtControllerRegistry.Instance.UnregisterClass('URL');
   TKExtControllerRegistry.Instance.UnregisterClass('FilteredURL');

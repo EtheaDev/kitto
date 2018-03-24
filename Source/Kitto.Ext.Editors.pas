@@ -751,13 +751,12 @@ type
   end;
 
   TKEditItemList = class(TList<TObject>)
-  private
   public
-    procedure EnumEditors(const APredicate: TFunc<IKExtEditor, Boolean>; const AHandler: TProc<IKExtEditor>);
+    procedure EnumEditors(const APredicate: TFunc<IKExtEditor, Boolean>; const AHandler: TProc<IKExtEditor>; const AStartIndex: Integer = 0);
     procedure EditorsByViewField(const AViewField: TKVIewField; const AHandler: TProc<IKExtEditor>);
     procedure EditorsByFieldName(const AFieldName: string; const AHandler: TProc<IKExtEditor>);
     procedure EditorsByField(const AField: TKField; const AHandler: TProc<IKExtEditor>);
-    procedure AllEditors(const AHandler: TProc<IKExtEditor>);
+    procedure AllEditors(const AHandler: TProc<IKExtEditor>; const AStartIndex: Integer = 0);
     procedure EnumEditItems(const APredicate: TFunc<IKExtEditItem, Boolean>;
       const AHandler: TProc<IKExtEditItem>);
     procedure AllNonEditors(const AHandler: TProc<IKExtEditItem>);
@@ -1534,7 +1533,7 @@ begin
       On('afterrender', JSFunction(JSName + '.expand(true);'))
   end
   else if SameText(ANode.Name, 'Title') then
-    UnexpandedTitle := ANode.AsExpandedString
+    UnexpandedTitle := _(ANode.AsExpandedString)
   else
     InvalidOption(ANode);
 end;
@@ -3909,12 +3908,15 @@ begin
     AHandler);
 end;
 
-procedure TKEditItemList.EnumEditors(const APredicate: TFunc<IKExtEditor, Boolean>; const AHandler: TProc<IKExtEditor>);
+procedure TKEditItemList.EnumEditors(const APredicate: TFunc<IKExtEditor, Boolean>; const AHandler: TProc<IKExtEditor>;
+  const AStartIndex: Integer = 0);
 var
   I: Integer;
   LEditorIntf: IKExtEditor;
 begin
-  for I := 0 to Count - 1 do
+  Assert(AStartIndex >= 0);
+
+  for I := AStartIndex to Count - 1 do
   begin
     if Supports(Items[I], IKExtEditor, LEditorIntf) then
     begin
@@ -3951,14 +3953,15 @@ begin
     AHandler);
 end;
 
-procedure TKEditItemList.AllEditors(const AHandler: TProc<IKExtEditor>);
+procedure TKEditItemList.AllEditors(const AHandler: TProc<IKExtEditor>; const AStartIndex: Integer = 0);
 begin
   EnumEditors(
     function(AEditor: IKExtEditor): Boolean
     begin
       Result := True;
     end,
-    AHandler);
+    AHandler,
+    AStartIndex);
 end;
 
 procedure TKEditItemList.AllNonEditors(const AHandler: TProc<IKExtEditItem>);

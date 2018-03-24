@@ -50,6 +50,8 @@ type
     procedure SetContainer(const AValue: TExtContainer);
     property Container: TExtContainer read GetContainer write SetContainer;
 
+    function AsExtComponent: TExtComponent;
+
     /// <summary>
     ///  Returns True if the controller should be freed right after
     ///  calling Display because it does all its job inside that method, and

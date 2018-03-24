@@ -81,6 +81,7 @@ type
 
     property View: TKView read GetView write SetView;
     procedure Display;
+    function AsExtComponent: TExtComponent;
   published
     procedure PanelClosed;
     procedure WindowClosed;
@@ -97,7 +98,7 @@ type
     ///  Call this after adding the panel so that the window can hook its
     ///  beforeclose event and close itself.
     /// <summary>
-    procedure HookPanel(const APanel: TExtPanel);
+    procedure HookPanel(const APanel: TExtComponent);
   published
     procedure PanelClosed;
   end;
@@ -136,6 +137,7 @@ type
 
     property View: TKView read GetView write SetView;
     procedure Display;
+    function AsExtComponent: TExtComponent;
   end;
 
   /// <summary>
@@ -281,6 +283,7 @@ type
     function IsSynchronous: Boolean;
     property View: TKView read GetView write SetView;
     procedure Display;
+    function AsExtComponent: TExtComponent;
   end;
 
   /// <summary>
@@ -288,7 +291,7 @@ type
   ///  representation, yet can be used to render views, such as custom action
   ///  controllers.
   /// </summary>
-  TKExtControllerBase = class(TExtObject, IInterface, IEFInterface, IKExtController, IEFSubject, IEFObserver)
+  TKExtControllerBase = class(TExtComponent, IInterface, IEFInterface, IKExtController, IEFSubject, IEFObserver)
   private
     FSubjObserverImpl: TEFSubjectAndObserver;
     FView: TKView;
@@ -311,6 +314,7 @@ type
     function IsSynchronous: Boolean; virtual;
     property View: TKView read GetView write SetView;
     procedure Display;
+    function AsExtComponent: TExtComponent;
     property Config: TEFNode read GetConfig;
     procedure Apply(const AProc: TProc<IKExtController>); virtual;
 
@@ -436,6 +440,11 @@ type
     procedure ClearStatus; virtual;
   end;
 
+  TKExtLinkButton = class(TExtButton)
+  public
+    class function JSClassName: string; override;
+  end;
+
 function OptionAsLabelAlign(const AAlign: string): TExtContainerLabelAlign;
 function OptionAsGridColumnAlign(const AAlign: string): TExtGridColumnAlign;
 
@@ -472,6 +481,11 @@ begin
 end;
 
 { TKExtWindowControllerBase }
+
+function TKExtWindowControllerBase.AsExtComponent: TExtComponent;
+begin
+  Result := Self;
+end;
 
 function TKExtWindowControllerBase.AsObject: TObject;
 begin
@@ -524,9 +538,16 @@ begin
 end;
 
 procedure TKExtWindowControllerBase.DoDisplay;
+var
+  LStyle: TEFNode;
 begin
   Session.EnsureSupportFiles(TKExtControllerRegistry.Instance.FindClassId(Self.ClassType));
   Session.EnsureViewSupportFiles(View);
+
+  LStyle := Config.FindNode('Style');
+  if Assigned(LStyle) and (LStyle.AsString <> '') then
+    Style := LStyle.AsExpandedString;
+
   CreateSubController;
   Show;
 end;
@@ -743,6 +764,11 @@ end;
 
 { TKExtViewportControllerBase }
 
+function TKExtViewportControllerBase.AsExtComponent: TExtComponent;
+begin
+  Result := Self;
+end;
+
 function TKExtViewportControllerBase.AsObject: TObject;
 begin
   Result := Self;
@@ -866,11 +892,12 @@ end;
 
 { TKExtModalWindow }
 
-procedure TKExtModalWindow.HookPanel(const APanel: TExtPanel);
+procedure TKExtModalWindow.HookPanel(const APanel: TExtComponent);
 begin
   Assert(Assigned(APanel));
 
   APanel.On('close', Ajax(PanelClosed, ['Panel', APanel.JSName]));
+  APanel.On('beforedestroy', Ajax(PanelClosed, ['Panel', APanel.JSName]));
 end;
 
 procedure TKExtModalWindow.InitDefaults;
@@ -986,6 +1013,7 @@ var
   LHeightStr: string;
   LView: TKView;
   LBodyStyle: string;
+  LStyle: TEFNode;
 begin
   EnsureAllSupportFiles;
 
@@ -1050,6 +1078,10 @@ begin
   LBodyStyle := Config.GetExpandedString('BodyStyle');
   if LBodyStyle <> '' then
     BodyStyle := LBodyStyle;
+
+  LStyle := Config.FindNode('Style');
+  if Assigned(LStyle) and (LStyle.AsString <> '') then
+    Style := LStyle.AsExpandedString;
 end;
 
 procedure TKExtPanelControllerBase.ExecuteNamedAction(const AActionName: string);
@@ -1121,6 +1153,11 @@ end;
 
 procedure TKExtPanelControllerBase.AfterCreateTopToolbar;
 begin
+end;
+
+function TKExtPanelControllerBase.AsExtComponent: TExtComponent;
+begin
+  Result := Self;
 end;
 
 procedure TKExtPanelControllerBase.BeforeCreateTopToolbar;
@@ -1358,6 +1395,11 @@ begin
   AProc(Self);
 end;
 
+function TKExtControllerBase.AsExtComponent: TExtComponent;
+begin
+  Result := Self;
+end;
+
 function TKExtControllerBase.AsObject: TObject;
 begin
   Result := Self;
@@ -1521,10 +1563,15 @@ begin
   Assert(Assigned(FView));
   Assert(Assigned(FActionObserver));
 
-  LController := TKExtControllerFactory.Instance.CreateController(
-    Session.ObjectCatalog, FView, nil, nil, FActionObserver);
-  InitController(LController);
-  LController.Display;
+  if View.IsPersistent then
+    Session.DisplayView(View, FActionObserver)
+  else
+  begin
+    LController := TKExtControllerFactory.Instance.CreateController(
+      Session.ObjectCatalog, FView, nil, nil, FActionObserver);
+    InitController(LController);
+    LController.Display;
+  end;
 end;
 
 class procedure TKExtActionButton.ExecuteHandler(const AButton: TKExtButton);
@@ -1794,6 +1841,13 @@ begin
     if Items[I] is TKExtButton and not (TKExtButton(Items[I]).Hidden) then
       Inc(Result);
   end;
+end;
+
+{ TExtUxLinkButton }
+
+class function TKExtLinkButton.JSClassName: string;
+begin
+  Result := 'Ext.LinkButton';
 end;
 
 end.

@@ -97,7 +97,7 @@ type
     procedure InitSubController(const AController: IKExtController); override;
     procedure AddTopToolbarButtons; override;
     function AddTopToolbarButton(const AActionName, ADefaultTooltip, AImageName: string;
-  const ARequiresSelection: Boolean): TKExtButton;
+      const ARequiresSelection: Boolean): TKExtButton;
     property View: TKDataView read GetView;
     property ClientStore: TExtDataStore read FClientStore;
     property ClientReader: TExtDataJsonReader read FClientReader;
@@ -141,6 +141,7 @@ type
     procedure AddUsedViewField(const AViewField: TKViewField);
     function InitEditController(const AContainer: TExtContainer; const ARecord: TKViewTableRecord;
       const AEditMode: TKEditMode): IKExtController;
+    function ExpandExpression(const AExpression: string): string; virtual;
   public
     procedure AfterConstruction; override;
     destructor Destroy; override;
@@ -166,7 +167,7 @@ implementation
 
 uses
   StrUtils, Math, Types, Classes,
-  EF.StrUtils, EF.SysUtils, EF.Localization, EF.Types,
+  EF.StrUtils, EF.SysUtils, EF.Localization, EF.Types, EF.Macros,
   Kitto.AccessControl, Kitto.Config, Kitto.Rules, Kitto.SQL,
   Kitto.Ext.Session, KItto.Ext.Utils;
 
@@ -182,14 +183,20 @@ begin
   Assert(Assigned(ActionObserver));
 
   PerformBeforeExecute;
-  LController := TKExtControllerFactory.Instance.CreateController(
-    Session.ObjectCatalog, View, nil, nil, ActionObserver);
-  if LController.Config.GetBoolean('RequireSelection', True) then
-    FServerRecord := ServerStore.GetRecord(Session.GetQueries, Session.Config.JSFormatSettings, 0)
+
+  if View.IsPersistent then
+    Session.DisplayView(View, ActionObserver)
   else
-    FServerRecord := nil;
-  InitController(LController);
-  LController.Display;
+  begin
+    LController := TKExtControllerFactory.Instance.CreateController(
+      Session.ObjectCatalog, View, nil, nil, ActionObserver);
+    if LController.Config.GetBoolean('RequireSelection', True) then
+      FServerRecord := ServerStore.GetRecord(Session.GetQueries, Session.Config.JSFormatSettings, 0)
+    else
+      FServerRecord := nil;
+    InitController(LController);
+    LController.Display;
+  end;
 end;
 
 function TKExtDataActionButton.GetServerRecord: TKViewTableRecord;
@@ -234,6 +241,11 @@ begin
     FDupButton.PerformClick
   else
     inherited;
+end;
+
+function TKExtDataPanelController.ExpandExpression(const AExpression: string): string;
+begin
+  Result := TEFMacroExpansionEngine.Instance.Expand(AExpression);
 end;
 
 procedure TKExtDataPanelController.DefaultAction;
@@ -434,8 +446,7 @@ begin
   Result := ServerStore.GetRecord(Session.GetQueries, Session.Config.JSFormatSettings, IfThen(IsMultiSelect, 0, -1));
 end;
 
-function TKExtDataPanelController.FindViewLayout(
-  const ALayoutName: string): TKLayout;
+function TKExtDataPanelController.FindViewLayout(const ALayoutName: string): TKLayout;
 var
   LLayoutName: string;
   LLayoutNode: TEFNode;
@@ -443,7 +454,7 @@ begin
   LLayoutNode := ViewTable.FindNode('Controller/' + ALayoutName + '/Layout');
   if Assigned(LLayoutNode) then
   begin
-    LLayoutName := LLayoutNode.AsString;
+    LLayoutName := ExpandExpression(LLayoutNode.AsString);
     if LLayoutName <> '' then
       Result := View.Catalog.Layouts.FindLayout(LLayoutName)
     else
@@ -894,10 +905,10 @@ begin
   FVisibleActions.AddOrSetValue('Dup',
     IsActionSupported('Dup')
     and (FViewTable.GetBoolean('Controller/AllowDuplicating') or Config.GetBoolean('AllowDuplicating'))
-    and not FViewTable.GetBoolean('Controller/PreventAdding')
+    //and not FViewTable.GetBoolean('Controller/PreventAdding')
+    //and not Config.GetBoolean('PreventAdding')
     and not View.GetBoolean('IsReadOnly')
-    and not FViewTable.IsReadOnly
-    and not Config.GetBoolean('PreventAdding'));
+    and not FViewTable.IsReadOnly);
   FAllowedActions.AddOrSetValue('Dup', FVisibleActions['Dup'] and FViewTable.IsAccessGranted(ACM_ADD));
 
   FVisibleActions.AddOrSetValue('Edit',
@@ -1016,7 +1027,7 @@ procedure TKExtDataPanelController.CheckCanRead;
 begin
   Assert(ViewTable <> nil);
 
-  Session.Config.CheckAccessGranted(ViewTable.GetResourceURI, ACM_READ);
+  Session.Config.CheckAccessGranted(ViewTable.GetACURI, ACM_READ);
 end;
 
 procedure TKExtDataPanelController.SetFieldValue(const AField: TKViewTableField;

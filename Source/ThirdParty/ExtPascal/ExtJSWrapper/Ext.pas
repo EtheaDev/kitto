@@ -1834,7 +1834,7 @@ type
     FOnStatesave: TExtComponentOnStatesave;
     procedure SetFAllowDomMove(Value: Boolean);
     procedure SetFApplyTo(Value: string);
-    procedure SetFAutoEl(Value: TExtObject);
+    procedure SetAutoEl(const AValue: TExtObject);
     procedure SetFAutoShow(Value: Boolean);
     procedure SetFBubbleEvents(Value: TExtObjectList);
     procedure SetFClearCls(Value: string);
@@ -1963,7 +1963,7 @@ type
       Callback: TExtFunction = nil): TExtFunction;
     property AllowDomMove: Boolean read FAllowDomMove write SetFAllowDomMove;
     property ApplyTo: string read FApplyTo write SetFApplyTo;
-    property AutoEl: TExtObject read FAutoEl write SetFAutoEl;
+    property AutoEl: TExtObject read FAutoEl write SetAutoEl;
     property AutoShow: Boolean read FAutoShow write SetFAutoShow;
     property BubbleEvents: TExtObjectList read FBubbleEvents write SetFBubbleEvents;
     property ClearCls: string read FClearCls write SetFClearCls;
@@ -9362,10 +9362,10 @@ begin
   JSCode('applyTo:' + VarToJSON([Value]));
 end;
 
-procedure TExtComponent.SetFAutoEl(Value: TExtObject);
+procedure TExtComponent.SetAutoEl(const AValue: TExtObject);
 begin
-  FAutoEl := Value;
-  JSCode('autoEl:' + VarToJSON([Value, false]));
+  FAutoEl := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'autoEl', [AValue]);
 end;
 
 procedure TExtComponent.SetFAutoShow(Value: Boolean);

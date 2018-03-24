@@ -62,7 +62,7 @@ uses
 
 function TKExtChangePasswordWindow.GetPasswordHash(const AClearPassword: string): string;
 begin
-  if TKConfig.Instance.Authenticator.IsClearPassword then
+  if Session.Config.Authenticator.IsClearPassword then
     Result := AClearPassword
   else
     Result := GetStringHash(AClearPassword);
@@ -88,8 +88,9 @@ begin
   else
   begin
     try
-      TKConfig.Instance.Authenticator.Password := Session.Query['ConfirmNewPassword'];
+      Session.Config.Authenticator.Password := Session.Query['ConfirmNewPassword'];
       Close;
+      Session.Logout;
     except
       on E: Exception do
       begin
@@ -136,10 +137,10 @@ procedure TKExtChangePasswordWindow.InitDefaults;
 
 begin
   inherited;
-  FOldPasswordHash := TKConfig.Instance.Authenticator.Password;
+  FOldPasswordHash := Session.Config.Authenticator.Password;
 
   Modal := True;
-  Title := _(Session.Config.AppTitle);
+  Title := GetDefaultDisplayLabel;
   Width := 316;
   Height := 162;
   Maximized := Session.IsMobileBrowser;

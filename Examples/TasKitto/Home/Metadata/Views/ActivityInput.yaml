@@ -43,9 +43,6 @@ Controller: List
       ColumnBreak:
       Spacer:
         Width: 1
-      ColumnBreak:
-      ApplyButton: Apply search
-        ImageName: Find
   CenterController:
     AllowDuplicating: True
     AllowViewing: True

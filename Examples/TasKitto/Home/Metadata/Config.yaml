@@ -29,16 +29,34 @@ Databases:
       IsolationLevel: ReadCommitted
       Trim Char: False
 
-Auth: DB
+Auth: TasKitto
   IsClearPassword: True
   .Defaults:
     UserName: admin
     Password: admin
-  ReadUserCommandText: select USER_NAME, PASSWORD_HASH, FIRST_NAME, LAST_NAME from KITTO_USERS where IS_ACTIVE = 1 and UPPER(USER_NAME) = UPPER(:USER_NAME)
+  ReadUserCommandText: select USER_NAME, PASSWORD_HASH, EMAIL_ADDRESS, MUST_CHANGE_PASSWORD, FIRST_NAME, LAST_NAME from KITTO_USERS where IS_ACTIVE = 1 and UPPER(USER_NAME) = UPPER(:USER_NAME)
+  ValidatePassword:
+    Message: Min 8 with upper+lower+number+special chars
+    RegEx: ^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,16}$
+  ResetMailMessage:
+    From: <support@kitto.org>
+    Subject: Reset password required from %Config:AppTitle%
+    Body: |
+      You have requested a password reset. 
+      The new temporary password you need to use the next time you log in is #TempPassword#.
+      Best regards.
+      
+      The team of %Config:AppTitle%
+    HTMLBody: |
+      <p>You have requested a password reset.<br> 
+      The new temporary password you need to use the next time you log in is <b>#TempPassword#</b>.<br>
+      Best regards.</p>
+      </p>
+      <p>The team of <b>%Config:AppTitle%</b><p>
 
 AccessControl: Null
 
-Login: LoginView
+#Login: Login
 
 # Change this to use a custom view for the home page.
 # Alternatively, customize the Home view by replacing its controller.

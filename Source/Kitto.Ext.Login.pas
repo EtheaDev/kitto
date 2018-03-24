@@ -23,7 +23,7 @@ interface
 uses
   SysUtils,
   ExtPascal, Ext, ExtForm,
-  EF.Tree,
+  EF.Tree, EF.ObserverIntf,
   Kitto.Ext.Base, Kitto.Ext.BorderPanel;
 
 type
@@ -36,11 +36,13 @@ type
     FPassword: TExtFormTextField;
     FLanguage: TExtFormComboBox;
     FLocalStorageEnabled: TExtFormCheckbox;
+    FResetPasswordLink: TExtBoxComponent;
     FLoginButton: TKExtButton;
     FStatusBar: TKExtStatusBar;
     FLocalStorageMode: string;
     FLocalStorageAskUser: Boolean;
     FAfterLogin: TProc;
+    FResetPassword: TEFNode;
     function GetEnableButtonJS: string;
     function GetSubmitJS: string;
     function GetLocalStorageSaveJSCode(const AMode: string; const AAskUser: Boolean): string;
@@ -49,10 +51,10 @@ type
     procedure InitDefaults; override;
   public
     property AfterLogin: TProc read FAfterLogin write FAfterLogin;
-    procedure Display(const AEditWidth: Integer; const ALocalStorageOptions: TEFNode;
-      var ACurrentHeight: Integer);
+    procedure Display(const AEditWidth: Integer; const AConfig: TEFNode; var ACurrentHeight: Integer);
   published
     procedure DoLogin;
+    procedure DoResetPassword;
   end;
 
   // A login window, suitable as a stand-alone login interface.
@@ -75,7 +77,7 @@ uses
   Math,
   ExtPascalUtils,
   EF.Classes, EF.Localization, EF.Macros,
-  Kitto.Types,
+  Kitto.Types, Kitto.Utils,
   Kitto.Ext.Session, Kitto.Ext.Controller;
 
 { TKExtLoginWindow }
@@ -148,7 +150,7 @@ begin
       Close;
       NotifyObservers('LoggedIn');
     end;
-  LFormPanel.Display(LEditWidth, Config.FindNode('LocalStorage'), LHeight);
+  LFormPanel.Display(LEditWidth, Config, LHeight);
   Height := LHeight;
   inherited;
 end;
@@ -160,14 +162,11 @@ var
   LDummyHeight: Integer;
   LFormPanel: TKExtLoginFormPanel;
   LFormPanelBodyStyle: string;
-  LBodyStyle: string;
 begin
+  inherited;
   Frame := False;
   Border := False;
   Layout := lyFit;
-  LBodyStyle := Config.GetString('BodyStyle');
-  if LBodyStyle <> '' then
-    BodyStyle := LBodyStyle;
   Title := Config.GetString('Title');
   Width := Config.GetInteger('Width', 300);
   Height := Config.GetInteger('Height', 160);
@@ -186,8 +185,7 @@ begin
       NotifyObservers('LoggedIn');
     end;
   LDummyHeight := 0;
-  LFormPanel.Display(Config.GetInteger('FormPanel/EditWidth', 150), Config.FindNode('LocalStorage'), LDummyHeight);
-  inherited;
+  LFormPanel.Display(Config.GetInteger('FormPanel/EditWidth', 150), Config, LDummyHeight);
 end;
 
 { TKExtLoginFormPanel }
@@ -207,13 +205,13 @@ begin
     [FUserName.JSName, FPassword.JSName, FLoginButton.JSName, FLoginButton.JSName, FLoginButton.JSName]);
 end;
 
-procedure TKExtLoginFormPanel.Display(const AEditWidth: Integer; const ALocalStorageOptions: TEFNode;
-  var ACurrentHeight: Integer);
+procedure TKExtLoginFormPanel.Display(const AEditWidth: Integer; const AConfig: TEFNode; var ACurrentHeight: Integer);
 const
   CONTROL_HEIGHT = 30;
 var
   LLocalStorageAskUserDefault: Boolean;
   LLocalStorageAutoLogin: Boolean;
+  LLocalStorageOptions: TEFNode;
 begin
   FStatusBar := TKExtStatusBar.Create(Self);
   FStatusBar.DefaultText := '';
@@ -256,6 +254,19 @@ begin
     '  run: function() {' + GetEnableButtonJS + '},' + sLineBreak +
     '  interval: 500});', [JSName]));
 
+  FResetPassword := AConfig.FindNode('ResetPassword');
+  if Assigned(FResetPassword) and FResetPassword.AsBoolean then
+  begin
+    FResetPasswordLink := TExtBoxComponent.CreateAndAddTo(Items);
+    FResetPasswordLink.Html := Format(
+      '<div style="text-align:right;"><a href="#" onclick="%s">%s</a></div>',
+      [HTMLEncode(JSMethod(Ajax(DoResetPassword))), HTMLEncode(_('Password forgotten?'))]);
+    FResetPasswordLink.Width := AEditWidth + LabelWidth;
+    Inc(ACurrentHeight, CONTROL_HEIGHT);
+  end
+  else
+    FResetPasswordLink := nil;
+
   if Session.Config.LanguagePerSession then
   begin
     FLanguage := TExtFormComboBox.CreateAndAddTo(Items);
@@ -275,12 +286,13 @@ begin
   else
     FLanguage := nil;
 
-  if Assigned(ALocalStorageOptions) then
+  LLocalStorageOptions := AConfig.FindNode('LocalStorage');
+  if Assigned(LLocalStorageOptions) then
   begin
-    FLocalStorageMode := ALocalStorageOptions.GetString('Mode');
-    FLocalStorageAskUser := ALocalStorageOptions.GetBoolean('AskUser');
-    LLocalStorageAskUserDefault := ALocalStorageOptions.GetBoolean('AskUser/Default', True);
-    LLocalStorageAutoLogin := ALocalStorageOptions.GetBoolean('AutoLogin', False);
+    FLocalStorageMode := LLocalStorageOptions.GetString('Mode');
+    FLocalStorageAskUser := LLocalStorageOptions.GetBoolean('AskUser');
+    LLocalStorageAskUserDefault := LLocalStorageOptions.GetBoolean('AskUser/Default', True);
+    LLocalStorageAutoLogin := LLocalStorageOptions.GetBoolean('AutoLogin', False);
   end
   else
   begin
@@ -362,6 +374,15 @@ begin
     FStatusBar.SetErrorStatus(_('Invalid login.'));
     FPassword.Focus(False, 750);
   end;
+end;
+
+procedure TKExtLoginFormPanel.DoResetPassword;
+begin
+  Assert(Assigned(FResetPassword));
+
+  { TODO : Add a way to open standard/system views without needing to store them in a yaml file.
+    Maybe a json definition passed as a string? }
+  Session.DisplayView('ResetPassword');
 end;
 
 function TKExtLoginFormPanel.GetLocalStorageSaveJSCode(const AMode: string; const AAskUser: Boolean): string;

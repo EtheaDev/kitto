@@ -156,7 +156,6 @@ end;
 procedure TKExtLookupField.TriggerClick;
 var
   LView: TKView;
-  LSubject: IEFSubject;
 begin
   FreeAndNilEFIntf(FLookupController);
   Assert(Assigned(FViewField));
@@ -164,7 +163,7 @@ begin
   LView := FindLookupView(FViewField);
   Assert(Assigned(LView));
 
-  FLookupController := Session.DisplayNewController(LView, True,
+  FLookupController := Session.DisplayNewController(LView, Self, True,
     procedure (AWindow: TKExtControllerHostWindow)
     begin
       AWindow.Title := Format(_('Choose %s'), [FViewField.DisplayLabel]);
@@ -174,8 +173,6 @@ begin
       AController.Config.SetBoolean('Sys/LookupMode', True);
       AController.Config.SetString('Sys/LookupFilter', FViewField.LookupFilter);
     end);
-  if Supports(FLookupController, IEFSubject, LSubject) then
-    LSubject.AttachObserver(Self);
 end;
 
 procedure TKExtLookupField.ClearClick;

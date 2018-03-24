@@ -552,7 +552,6 @@ type
 
 var
   LFileExt: string;
-  LBytes: TBytes;
   Size: Longint;
   Header: TBytes;
   GraphicHeader: TPDoxGraphicHeader;

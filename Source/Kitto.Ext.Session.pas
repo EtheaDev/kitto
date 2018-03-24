@@ -193,8 +193,8 @@ type
     { IEFObserver }
     procedure UpdateObserver(const ASubject: IEFSubject; const AContext: string = '');
 
-    function DisplayNewController(const AView: TKView; const AForceModal: Boolean = False;
-      const AAfterCreateWindow: TProc<TKExtControllerHostWindow> = nil;
+    function DisplayNewController(const AView: TKView; const AObserver: IEFObserver = nil;
+      const AForceModal: Boolean = False; const AAfterCreateWindow: TProc<TKExtControllerHostWindow> = nil;
       const AAfterCreate: TProc<IKExtController> = nil): IKExtController;
   public
     function FindPageTemplate(const APageName: string): string;
@@ -218,8 +218,8 @@ type
     /// </summary>
     property StatusHost: TKExtStatusBar read FStatusHost write FStatusHost;
 
-    procedure DisplayView(const AName: string); overload;
-    procedure DisplayView(const AView: TKView); overload;
+    procedure DisplayView(const AName: string; const AObserver: IEFObserver = nil); overload;
+    procedure DisplayView(const AView: TKView; const AObserver: IEFObserver = nil); overload;
 
     procedure InitDefaultValues; override;
     procedure Home; override;
@@ -620,12 +620,20 @@ end;
 
 procedure TKExtSession.DisplayHomeView;
 var
-  LHomeView: TKView;
+  LView: TKView;
   LIntf: IKExtController;
 begin
   FreeAndNil(FHomeController);
-  LHomeView := GetHomeView;
-  FHomeController := TKExtControllerFactory.Instance.CreateController(ObjectCatalog, LHomeView, nil).AsObject;
+
+  if Config.Authenticator.MustChangePassword then
+  begin
+    LView := Config.Views.ViewByName('ChangePassword');
+    FAutoOpenViewName := '';
+  end
+  else
+    LView := GetHomeView;
+
+  FHomeController := TKExtControllerFactory.Instance.CreateController(ObjectCatalog, LView, nil).AsObject;
   if Supports(FHomeController, IKExtController, LIntf) then
     LIntf.Display;
   if FAutoOpenViewName <> '' then
@@ -633,6 +641,7 @@ begin
     DisplayView(FAutoOpenViewName);
     FAutoOpenViewName := '';
   end;
+
   if FHomeController is TExtContainer then
     TExtContainer(FHomeController).DoLayout;
 end;
@@ -696,8 +705,6 @@ end;
 procedure TKExtSession.DelayedHome;
 var
   LUserAgent: string;
-
-
 begin
   if IsMobileApple then
   begin
@@ -923,16 +930,16 @@ begin
   FUploadedFiles.Remove(AFileDescriptor);
 end;
 
-procedure TKExtSession.DisplayView(const AName: string);
+procedure TKExtSession.DisplayView(const AName: string; const AObserver: IEFObserver = nil);
 begin
   Assert(AName <> '');
 
-  DisplayView(Config.Views.ViewByName(AName));
+  DisplayView(Config.Views.ViewByName(AName), AObserver);
 end;
 
-function TKExtSession.DisplayNewController(const AView: TKView; const AForceModal: Boolean;
-  const AAfterCreateWindow: TProc<TKExtControllerHostWindow>;
-  const AAfterCreate: TProc<IKExtController>): IKExtController;
+function TKExtSession.DisplayNewController(const AView: TKView; const AObserver: IEFObserver = nil;
+  const AForceModal: Boolean = False; const AAfterCreateWindow: TProc<TKExtControllerHostWindow> = nil;
+  const AAfterCreate: TProc<IKExtController> = nil): IKExtController;
 var
   LIsSynchronous: Boolean;
   LIsModal: Boolean;
@@ -951,13 +958,14 @@ begin
     FControllerHostWindow := TKExtControllerHostWindow.Create(ObjectCatalog);
     if Assigned(AAfterCreateWindow) then
       AAfterCreateWindow(FControllerHostWindow);
-    Result := TKExtControllerFactory.Instance.CreateController(ObjectCatalog, AView, FControllerHostWindow);
+    Result := TKExtControllerFactory.Instance.CreateController(ObjectCatalog, AView, FControllerHostWindow, nil, AObserver);
     if Assigned(AAfterCreate) then
       AAfterCreate(Result);
     if not Result.Config.GetBoolean('Sys/SupportsContainer') then
       FreeAndNil(FControllerHostWindow)
     else
     begin
+      FControllerHostWindow.HookPanel(Result.AsExtComponent);
       FControllerHostWindow.Layout := lyFit;
       if FControllerHostWindow.Title = '' then
         FControllerHostWindow.Title := _(AView.DisplayLabel);
@@ -971,7 +979,7 @@ begin
   else
   begin
     Assert(Assigned(FViewHost));
-    Result := TKExtControllerFactory.Instance.CreateController(ObjectCatalog, AView, FViewHost.AsExtContainer);
+    Result := TKExtControllerFactory.Instance.CreateController(ObjectCatalog, AView, FViewHost.AsExtContainer, nil, AObserver);
     Assert(Result.Config.GetBoolean('Sys/SupportsContainer'));
   end;
   LIsSynchronous := Result.IsSynchronous;
@@ -1012,7 +1020,7 @@ begin
   end;
 end;
 
-procedure TKExtSession.DisplayView(const AView: TKView);
+procedure TKExtSession.DisplayView(const AView: TKView; const AObserver: IEFObserver = nil);
 var
   LController: IKExtController;
 begin
@@ -1022,12 +1030,12 @@ begin
   begin
     try
       if AView.GetBoolean('Controller/AllowMultipleInstances') then
-        LController := DisplayNewController(AView)
+        LController := DisplayNewController(AView, AObserver)
       else
       begin
         LController := FindOpenController(AView);
         if not Assigned(LController) then
-          LController := DisplayNewController(AView);
+          LController := DisplayNewController(AView, AObserver);
       end;
       if Assigned(LController) and Assigned(FViewHost) and LController.Config.GetBoolean('Sys/SupportsContainer') then
         SetActiveViewInViewHost(LController.AsObject);

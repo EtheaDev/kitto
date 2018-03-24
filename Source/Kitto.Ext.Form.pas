@@ -120,10 +120,11 @@ type
     function AddActionButton(const AUniqueId: string; const AView: TKView;
       const AToolbar: TKExtToolbar): TKExtActionButton; override;
     procedure TabChange(AThis: TExtTabPanel; ATab: TExtPanel);
-    procedure RefreshEditorValues;
+    procedure RefreshEditorValues(const AStartIndex: Integer = 0);
     procedure RefreshEditorFields;
     procedure CloseHostContainer; override;
     property StoreRecord: TKViewTableRecord read FStoreRecord write SetStoreRecord;
+    function ExpandExpression(const AExpression: string): string; override;
   public
     procedure LoadData; override;
     destructor Destroy; override;
@@ -325,6 +326,18 @@ begin
   end;
 end;
 
+function TKExtFormPanelController.ExpandExpression(const AExpression: string): string;
+var
+  LStoreRecord: TKViewTableRecord;
+begin
+  Result := inherited ExpandExpression(AExpression);
+  // This method is called earlier than when StoreRecord is available, so we
+  // read the config directly.
+  LStoreRecord := Config.GetObject('Sys/Record') as TKViewTableRecord;
+  if Assigned(LStoreRecord) then
+    Result := LStoreRecord.ExpandExpression(Result);
+end;
+
 function TKExtFormPanelController.CreateLayoutProcessor: TKExtLayoutProcessor;
 begin
   Result := TKExtLayoutProcessor.Create;
@@ -428,7 +441,7 @@ end;
 procedure TKExtFormPanelController.SetStoreRecord(const AValue: TKViewTableRecord);
 begin
   FStoreRecord := AValue;
-  Config.SetObject('Sys/Record', FStoreRecord);
+  //Config.SetObject('Sys/Record', FStoreRecord);
   if Assigned(FStoreRecord) then
   begin
     FStoreRecord.OnSetTransientProperty :=
@@ -480,14 +493,9 @@ var
       LDefaultValues.Merge(LCallerDefaultValues);
   end;
 
-  function IsCloned: Boolean;
-  begin
-    Result := SameText(FOperation, 'Add') and Assigned(FCloneValues);
-  end;
-
   procedure SwitchChangeNotificationsForDupAndClone(const AOn: Boolean);
   begin
-    if SameText(FOperation, 'Dup') or IsCloned then
+    if SameText(FOperation, 'Dup') or (SameText(FOperation, 'Add') and Assigned(FCloneValues)) then
     begin
       if AOn then
         StoreRecord.Store.EnableChangeNotifications
@@ -532,7 +540,7 @@ begin
           SwitchChangeNotificationsForDupAndClone(True);
         end;
 
-        ViewTable.Model.BeforeNewRecord(StoreRecord, IsCloned);
+        ViewTable.Model.BeforeNewRecord(StoreRecord, Assigned(FCloneValues));
         StoreRecord.ApplyNewRecordRules;
         ViewTable.Model.AfterNewRecord(StoreRecord);
       finally
@@ -552,7 +560,7 @@ begin
   end;
 end;
 
-procedure TKExtFormPanelController.RefreshEditorValues;
+procedure TKExtFormPanelController.RefreshEditorValues(const AStartIndex: Integer = 0);
 begin
   // Load data. Combo boxes can only have their raw value set after they're rendered.
   EditItems.AllEditors(
@@ -565,13 +573,14 @@ begin
       begin
         LFormField.RemoveAllListeners('afterrender');
         LFormField.On('afterrender', LFormField.JSFunction(
-          procedure()
+          procedure
           begin
             AEditor.RefreshValue;
           end));
       end;
       AEditor.RefreshValue;
-    end);
+    end,
+    AStartIndex);
 end;
 
 procedure TKExtFormPanelController.RefreshEditorFields;
@@ -933,7 +942,6 @@ begin
   FFormPanel.LabelWidth := FORM_LABELWIDTH;
   FFormPanel.MonitorValid := True;
   FFormPanel.Cls := 'x-panel-mc'; // Sets correct theme background color.
-  //FFormPanel.LabelAlign := FLabelAlign;
 
   LDetailStyle := GetDetailStyle;
   if ((ViewTable.DetailTableCount > 0) and SameText(LDetailStyle, 'Tabs')) or LayoutContainsPageBreaks then
@@ -973,6 +981,7 @@ var
   LDetailIndex: Integer;
   LActivableIntf: IKExtActivable;
   LLayoutProcessor: TKExtLayoutProcessor;
+  LItemCount: Integer;
 begin
   if Assigned(ATab) then
   begin
@@ -988,6 +997,7 @@ begin
     end
     else if (ATab is TKExtEditPage) and not TKExtEditPage(ATab).Rendered then
     begin
+      LItemCount := EditItems.Count;
       LLayoutProcessor := CreateLayoutProcessor;
       try
         LLayoutProcessor.CurrentEditPage := TKExtEditPage(ATab);
@@ -995,9 +1005,8 @@ begin
       finally
         FreeAndNil(LLayoutProcessor);
       end;
-      // Newly-generated editors must show the record values. Actually refreshing
-      // all editors currently; seems no big deal performance-wise.
-      RefreshEditorValues;
+      // Newly-generated editors must be refreshed to show the values.
+      RefreshEditorValues(LItemCount);
       // Handlers must be re-generated now as their code depends from newly added
       // editors (see GetConfirmJSCode).
       SetConfirmButtonHandlers;

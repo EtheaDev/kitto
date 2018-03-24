@@ -123,7 +123,7 @@ begin
   try
     LKey.Assign(ServerStore.Key);
     Assert(LKey.ChildCount > 0);
-    LRecordCount := Length(Split(Session.Queries.Values[LKey[0].Name], ','));
+    LRecordCount := Length(EF.StrUtils.Split(Session.Queries.Values[LKey[0].Name], ','));
     for I := 0 to LRecordCount - 1 do
       AProc(ServerStore.GetRecord(Session.GetQueries, Session.Config.JSFormatSettings, I));
   finally
