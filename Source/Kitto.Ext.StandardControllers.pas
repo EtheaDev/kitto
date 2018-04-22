@@ -152,7 +152,6 @@ type
   TKExtDownloadFileController = class(TKExtDataToolController)
   strict private
     FTempFileNames: TStrings;
-    FFileName: string;
     FStream: TStream;
     function GetClientFileName: string;
     function GetContentType: string;
@@ -161,6 +160,7 @@ type
       const AFileName: string; const AContentType: string);
     procedure PersistFile(const AStream: TStream);
   strict protected
+    FFileName: string;
     function GetPersistentFileName: string;
     procedure ExecuteTool; override;
     function GetFileExtension: string;
@@ -200,7 +200,7 @@ type
     /// the view or other level. Called through RTTI.</summary>
     class function GetDefaultImageName: string; override;
   published
-    procedure DownloadFile;
+    procedure DownloadFile;  virtual;
     procedure DownloadStream;
     property FileName: string read GetFileName;
     property ClientFileName: string read GetClientFileName;

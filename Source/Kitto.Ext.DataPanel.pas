@@ -362,7 +362,11 @@ begin
 end;
 
 procedure TKExtDataPanelController.DuplicateRecord;
+var
+  LRecord: TKViewTableRecord;
 begin
+  LRecord := GetCurrentViewRecord;
+  LRecord.ApplyDuplicateRecordRules;
   ShowEditWindow(GetCurrentViewRecord, emDupCurrentRecord);
 end;
 
@@ -905,8 +909,6 @@ begin
   FVisibleActions.AddOrSetValue('Dup',
     IsActionSupported('Dup')
     and (FViewTable.GetBoolean('Controller/AllowDuplicating') or Config.GetBoolean('AllowDuplicating'))
-    //and not FViewTable.GetBoolean('Controller/PreventAdding')
-    //and not Config.GetBoolean('PreventAdding')
     and not View.GetBoolean('IsReadOnly')
     and not FViewTable.IsReadOnly);
   FAllowedActions.AddOrSetValue('Dup', FVisibleActions['Dup'] and FViewTable.IsAccessGranted(ACM_ADD));

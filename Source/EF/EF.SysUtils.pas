@@ -701,6 +701,13 @@ function GetCurrentProcessMemory: Cardinal;
 /// extension (without the dot).</returns>
 function GetDataType(const ABytes: TBytes; const ADefault: string): string;
 
+/// <summary>
+///  Returns information about version numbers (Major, Minor, Release, Build
+///  registered into FileName (usually application file)
+/// </summary>
+procedure GetVerInfo( const FileName : string;
+  var MajorVersion, MinorVersion, Release, Build : integer);
+
 implementation
 
 uses
@@ -1788,4 +1795,41 @@ begin
   end;
 end;
 
+procedure GetVerInfo( const FileName : string;
+  var MajorVersion, MinorVersion, Release, Build : integer);
+type
+  cArray   = Array[1..$3FFF] of Char;
+  TLangInf = Array[1..2]     of Word;      // Language and charset identifiers
+
+var
+  InfoSize, Wnd: DWORD;
+  VerBuf: Pointer;
+  FI: PVSFixedFileInfo;
+  VerSize: DWORD;
+begin
+  MajorVersion := 0;
+  MinorVersion := 0;
+  Release := 0;
+  Build := 0;
+
+  InfoSize := GetFileVersionInfoSize(PChar(FileName), Wnd);
+  if InfoSize > 0 then
+  begin
+    GetMem(VerBuf, InfoSize);
+    try
+      if GetFileVersionInfo(PChar(FileName), Wnd, InfoSize, VerBuf) then
+      begin
+        if VerQueryValue(VerBuf, '\', Pointer(FI), VerSize) then
+        begin
+          MajorVersion := HIWORD(FI.dwFileVersionMS);
+          MinorVersion := LOWORD(FI.dwFileVersionMS);
+          Release := HIWORD(FI.dwFileVersionLS);
+          Build := LOWORD(FI.dwFileVersionLS);
+        end;
+      end;
+    finally
+      FreeMem(VerBuf);
+    end;
+  end;
+end;
 end.

@@ -26,7 +26,10 @@ unit EF.Macros;
 interface
 
 uses
-  SysUtils, Generics.Collections, Classes, Contnrs;
+  SysUtils
+  , Generics.Collections
+  , Classes
+  ;
 
 type
   TEFMacroExpansionEngine = class;
@@ -96,8 +99,7 @@ type
   public
     class property Instance: TEFMacroExpansionEngine read GetInstance;
 
-    class property OnGetInstance: TEFGetMacroExpansionEngine
-      read FOnGetInstance write FOnGetInstance;
+    class property OnGetInstance: TEFGetMacroExpansionEngine read FOnGetInstance write FOnGetInstance;
 
     /// <summary>
     ///   Expands all recognized macros in AString and returns the resulting
@@ -237,9 +239,11 @@ type
     function InternalExpand(const AString: string): string; override;
   end;
 
-  /// <summary>A macro expander that expands all environment variables. See
-  /// EF.SysUtils.ExpandEnvironmentVariables for details on format and case
-  /// sensitivity.</summary>
+  /// <summary>
+  ///  A macro expander that expands all environment variables. See
+  ///  EF.Sys.ExpandEnvironmentVariables for details on format and case
+  ///  sensitivity.
+  /// </summary>
   /// <example>%COMPUTERNAME% expands to the current computer's name.</example>
   /// <seealso cref="EF.SysUtils.ExpandEnvironmentVariables"></seealso>
   TEFEnvironmentVariableMacroExpander = class(TEFMacroExpander)
@@ -694,6 +698,8 @@ end;
 { TEFPathMacroExpander }
 
 function TEFPathMacroExpander.InternalExpand(const AString: string): string;
+var
+  LMajorVersion, LMinorVersion, LRelease, LBuild : integer;
 begin
   Result := inherited InternalExpand(AString);
   Result := ExpandMacros(Result, '%APP_PATH%', ExtractFilePath(ParamStr(0)));
@@ -702,6 +708,12 @@ begin
   Result := ExpandMacros(Result, '%APP_BASENAME%', ChangeFileExt(ExtractFileName(ParamStr(0)), ''));
   Result := ExpandMacros(Result, '%WIN_DIR%', IncludeTrailingPathDelimiter(SafeGetWindowsDirectory));
   Result := ExpandMacros(Result, '%SYS_DIR%', IncludeTrailingPathDelimiter(SafeGetSystemDirectory));
+  if (pos('%APP_VERSION%', AString) > 0) or (pos('%APP_VERSION_FULL%', AString) > 0) then
+  begin
+    GetVerInfo(ParamStr(0), LMajorVersion, LMinorVersion, LRelease, LBuild);
+    Result := ExpandMacros(Result, '%APP_VERSION%', Format('%d.%d',[LMajorVersion, LMinorVersion]));
+    Result := ExpandMacros(Result, '%APP_VERSION_FULL%', Format('%d.%d.%d',[LMajorVersion, LMinorVersion, LRelease]));
+  end;
 end;
 
 { TEFSysMacroExpander }

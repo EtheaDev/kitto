@@ -511,6 +511,7 @@ type
 
     procedure ApplyNewRecordRules;
     procedure ApplyEditRecordRules;
+    procedure ApplyDuplicateRecordRules;
     procedure ApplyBeforeRules;
     procedure ApplyAfterRules;
 
@@ -2544,6 +2545,15 @@ begin
     procedure (ARuleImpl: TKRuleImpl)
     begin
       ARuleImpl.EditRecord(Self);
+    end);
+end;
+
+procedure TKViewTableRecord.ApplyDuplicateRecordRules;
+begin
+  ViewTable.ApplyRules(
+    procedure (ARuleImpl: TKRuleImpl)
+    begin
+      ARuleImpl.DuplicateRecord(Self);
     end);
 end;
 

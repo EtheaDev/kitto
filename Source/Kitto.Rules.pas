@@ -187,6 +187,27 @@ type
     /// <remarks>
     ///  If an exception is raised, any change is lost.
     /// </remarks>
+    procedure DuplicateRecord(const ARecord: TKRecord); virtual;
+
+    /// <summary>
+    ///  <para>
+    ///   Called when creating a cloned a record in the user interface.
+    ///   Descendants should read the values in ARecord and call RaiseError
+    ///   (which will raise an exception with the default or a custom
+    ///   message) in order to stop the clone operation and display an error
+    ///   to the user.
+    ///  </para>
+    ///  <para>
+    ///   Descendants may also change values.
+    ///  </para>
+    /// </summary>
+    /// <param name="ARecord">
+    ///  The record being created. It is usually an instance of
+    ///  TKViewTableRecord.
+    /// </param>
+    /// <remarks>
+    ///  If an exception is raised, any change is lost.
+    /// </remarks>    ///
     procedure BeforeAdd(const ARecord: TKRecord); virtual;
 
     /// <summary>
@@ -437,6 +458,11 @@ end;
 procedure TKRuleImpl.EditRecord(const ARecord: TKRecord);
 begin
 end;
+
+procedure TKRuleImpl.DuplicateRecord(const ARecord: TKRecord);
+begin
+end;
+
 
 class function TKRuleImpl.GetClassId: string;
 begin

@@ -830,28 +830,34 @@ end;
 
 function IsChangeHandlerNeeded(const AViewTableField: TKViewTableField): Boolean;
 begin
+  { This method optimize some callbacks but reduce performances drammatically,
+    so it was removed! }
+  Result := True;
+  Exit;
   { TODO : Consider dependencies such as field names used in layout elements
-    (such as field set titles). In order to do that, build a dependency list/tree. }
+    (such as field set titles). In order to do that, build a dependency list/tree.
   if AViewTableField.ViewField.FileNameField <> '' then
     // Uploads always need the change handler.
     Result := True
-  else if AViewTableField.ViewField.HasRules then
-    Result := True
   else if AViewTableField.ViewField.DerivedFieldsExist then
     // Derived fields must be updated when source field changes.
+    Result := True
+  else if AViewTableField.ViewField.HasServerSideRules then
+    // Server-side rules need the change handler in order to be applied.
     Result := True
   else if AViewTableField.ViewField.GetBoolean('NotifyChange') then
     // Temporary, for cases not handled by this detector and setup manually.
     Result := True
   else if Length(AViewTableField.ViewField.Table.GetFilterByFields(
-    function(AFilterByViewField: TKFilterByViewField): Boolean
-    begin
-      Result := AFilterByViewField.SourceField = AViewTableField.ViewField;
-    end)) > 0 then
+      function (AFilterByViewField: TKFilterByViewField): Boolean
+      begin
+        Result := AFilterByViewField.SourceField = AViewTableField.ViewField;
+      end)) > 0 then
     // If any fields are filtered by this field, then the change must be notified.
     Result := True
   else
     Result := False;
+  }
 end;
 
 procedure InvalidTransientProperty(APropertyName: string; const AValue: Variant);

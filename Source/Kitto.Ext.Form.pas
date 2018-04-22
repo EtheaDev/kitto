@@ -896,13 +896,18 @@ begin
 
   EnableFieldChangeHandler(True);
 
-  if MatchText(FOperation, ['Add', 'Dup']) then
+  if SameText(FOperation, 'Add') then
     FIsReadOnly := ViewTable.GetBoolean('Controller/PreventAdding')
       or View.GetBoolean('IsReadOnly')
       or ViewTable.IsReadOnly
       or Config.GetBoolean('PreventAdding')
       or not ViewTable.IsAccessGranted(ACM_ADD)
-  else //Edit or View Mode
+  else if SameText(FOperation, 'Dup') then
+    FIsReadOnly :=
+      View.GetBoolean('IsReadOnly')
+      or ViewTable.IsReadOnly
+      or not ViewTable.IsAccessGranted(ACM_ADD)
+  else // Edit or View Mode
     FIsReadOnly := ViewTable.GetBoolean('Controller/PreventEditing')
       or View.GetBoolean('IsReadOnly')
       or ViewTable.IsReadOnly

@@ -88,3 +88,11 @@ Log:
     # Set this to false to disable this logger without deleting its configuration.
     IsEnabled: True
 
+Email:
+  SMTP:
+    Default:
+      HostName: smtp.gmail.com
+      UserName: name@gmail.com
+      Password: password
+      Port: 587
+      UseTLS: True

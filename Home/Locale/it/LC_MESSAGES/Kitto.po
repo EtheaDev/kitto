@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "POT-Creation-Date: 2016-10-25 10:37+0200\n"
-"PO-Revision-Date: 2016-10-25 10:39+0200\n"
+"PO-Revision-Date: 2018-03-26 18:25+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Basepath: ../../../../Source\n"
 "X-Poedit-SearchPath-0: .\n"
 
@@ -30,8 +30,7 @@ msgstr "Nome o indirizzo del mittente non specificato."
 msgid "Error deleting files from folder \"%s\"."
 msgstr "Errore durante la cancellazione dei file dalla cartella \"%s\"."
 
-#: EF/EF.SQL.pas:169 EF/EF.SQL.pas:198 EF/EF.SQL.pas:214 EF/EF.SQL.pas:255
-#: EF/EF.SQL.pas:293
+#: EF/EF.SQL.pas:169 EF/EF.SQL.pas:198 EF/EF.SQL.pas:214 EF/EF.SQL.pas:255 EF/EF.SQL.pas:293
 msgid "Unspecified table name."
 msgstr "Nome di tabella non specificato."
 
@@ -64,17 +63,13 @@ msgid "%s: SourcePath not set."
 msgstr "%s: Valore per SourcePath non specificato."
 
 #: EF/EF.SysUtils.pas:1542
-msgid ""
-"Error while removing folder \"%s\". Perhaps the folder is not empty or is in "
-"use."
+msgid "Error while removing folder \"%s\". Perhaps the folder is not empty or is in use."
 msgstr ""
-"Errore durante l'eliminazione della cartella \"%s\". Potrebbe non essere "
-"vuota oppure in uso."
+"Errore durante l'eliminazione della cartella \"%s\". Potrebbe non essere vuota oppure in uso."
 
 #: EF/EF.SysUtils.pas:1561 EF/EF.SysUtils.pas:1604
 msgid "Error \"%s\" while removing file \"%s\". The file might be in use."
-msgstr ""
-"Errore \"%s\" durante l'eliminazione del file \"%s\". Potrebbe essere in uso."
+msgstr "Errore \"%s\" durante l'eliminazione del file \"%s\". Potrebbe essere in uso."
 
 #: EF/EF.SysUtils.pas:1583
 msgid "The file \"%s\" might be in use."
@@ -86,12 +81,10 @@ msgstr "%s: Valore per DestinationPath non specificato."
 
 #. Recupero del messaggio di errore corretto per sollevare l'eccezione.
 #: EF/EF.SysUtils.pas:1669
-msgid ""
-"Error \"%s\" while copying from \"%s\" to \"%s\". The destination file might "
-"be in use."
+msgid "Error \"%s\" while copying from \"%s\" to \"%s\". The destination file might be in use."
 msgstr ""
-"Errore \"%s\" durante la copia da \"%s\" a \"%s\". Il file di destinazione "
-"potrebbe essere in uso."
+"Errore \"%s\" durante la copia da \"%s\" a \"%s\". Il file di destinazione potrebbe essere in "
+"uso."
 
 #: EF/EF.Tree.pas:2222 EF/EF.Tree.pas:2310
 msgid "Node %s not found."
@@ -113,6 +106,13 @@ msgstr "Query di autenticazione errata: %s"
 msgid "Error changing password."
 msgstr "Errore durante la modifica della password."
 
+msgid "Password forgotten?"
+msgstr "Password dimenticata?"
+
+msgid "A new temporary password was generated and sent to the specified e-mail address."
+msgstr ""
+"Una nuova password temporanea è stata generata ed inviata all'indirizzo mail specificato."
+
 #: Kitto.Auth.TextFile.pas:156
 msgid "File %s not found."
 msgstr "File %s non trovato."
@@ -129,19 +129,15 @@ msgstr "Risorsa %s non trovata."
 
 #: Kitto.Config.pas:619
 msgid "Access denied. The user is not allowed to perform this operation."
-msgstr ""
-"Accesso negato. L'utente non ha il permesso di effettuare questa operazione."
+msgstr "Accesso negato. L'utente non ha il permesso di effettuare questa operazione."
 
 #: Kitto.Config.pas:622
 msgid "Resource URI: %s; access mode: %s."
 msgstr "URI della risorsa: %s; modalità di accesso: %s."
 
 #: Kitto.Ext.AccordionPanel.pas:89
-msgid ""
-"AccordionPanel's SubViews node may only contain View or Controller subnodes."
-msgstr ""
-"Il nodo SubViews di un AccordionPanel può contenere solo sotto-nodi View o "
-"Controller."
+msgid "AccordionPanel's SubViews node may only contain View or Controller subnodes."
+msgstr "Il nodo SubViews di un AccordionPanel può contenere solo sotto-nodi View o Controller."
 
 #. alLeft, alRight, alCenter
 #: Kitto.Ext.Base.pas:458
@@ -237,8 +233,7 @@ msgstr "%s cancellato."
 msgid "Add %s"
 msgstr "Aggiungi %s"
 
-#: Kitto.Ext.DataPanel.pas:381 Kitto.Ext.DataPanel.pas:953
-#: Kitto.Ext.Form.pas:585
+#: Kitto.Ext.DataPanel.pas:381 Kitto.Ext.DataPanel.pas:953 Kitto.Ext.Form.pas:585
 msgid "Edit %s"
 msgstr "Modifica %s"
 
@@ -282,14 +277,12 @@ msgstr "Comando eseguito con successo."
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:133
 msgid "The Strength parameter passed to the Encrypt function was invalid"
-msgstr ""
-"Il livello di protezione passato alla funzione di crittazione non è valido"
+msgstr "Il livello di protezione passato alla funzione di crittazione non è valido"
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:134
 msgid "The Permissions parameter passed to the Encrypt function was invalid."
 msgstr ""
-"Il parametro dei permessi di protezione passato alla funzione di crittazione "
-"non è valido"
+"Il parametro dei permessi di protezione passato alla funzione di crittazione non è valido"
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:135
 msgid "The Encrypt function was used on a document that was already encrypted"
@@ -304,17 +297,13 @@ msgid "The SetInformation function failed because the document is encrypted"
 msgstr "La funzione SetInformation è fallita perché il documento è protetto"
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:138
-msgid ""
-"The Key parameter passed to the SetInformation function was out of range"
+msgid "The Key parameter passed to the SetInformation function was out of range"
 msgstr "Il parametro Key della funzione SetInformation è fuori dai limiti"
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:139
-msgid ""
-"An invalid combination of barcode and option was sent to the DrawBarcode "
-"function"
+msgid "An invalid combination of barcode and option was sent to the DrawBarcode function"
 msgstr ""
-"Una combinazione non valida di barcode e opzioni è stata inviata alla "
-"funzione DrawBarcode"
+"Una combinazione non valida di barcode e opzioni è stata inviata alla funzione DrawBarcode"
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:140
 msgid "Non-numeric characters were sent to DrawBarcode using EAN-13"
@@ -381,10 +370,8 @@ msgid "The function could not be used because the library is not unlocked"
 msgstr "La funzione non può essere usata perché la libreria non è sbloccata"
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:157
-msgid ""
-"Error unknown of Debenu Quick PDF Library (DebenuPDFLibraryLite1112.dll)"
-msgstr ""
-"Errore sconosciuto di Debenu Quick PDF Library (DebenuPDFLibraryLite1112.dll)"
+msgid "Error unknown of Debenu Quick PDF Library (DebenuPDFLibraryLite1112.dll)"
+msgstr "Errore sconosciuto di Debenu Quick PDF Library (DebenuPDFLibraryLite1112.dll)"
 
 #: Kitto.Ext.DebenuQuickPDFTools.pas:160
 msgid "Error on file \"%s\": %s"
@@ -443,8 +430,7 @@ msgstr "Carica file"
 msgid "Clear field"
 msgstr "Cancella campo"
 
-#: Kitto.Ext.Editors.pas:2893 Kitto.Ext.Editors.pas:2995
-#: Kitto.Ext.Editors.pas:3023
+#: Kitto.Ext.Editors.pas:2893 Kitto.Ext.Editors.pas:2995 Kitto.Ext.Editors.pas:3023
 msgid "Empty"
 msgstr "Vuoto"
 
@@ -685,9 +671,7 @@ msgstr "Errore: il file caricato non è del tipo corretto (%s)"
 
 #: Kitto.Ext.TabPanel.pas:216
 msgid "TabPanel's SubViews node may only contain View or Controller subnodes."
-msgstr ""
-"Il nodo SubViews di un TabPanel può contenere solo sotto-nodi View o "
-"Controller."
+msgstr "Il nodo SubViews di un TabPanel può contenere solo sotto-nodi View o Controller."
 
 #. KExtMainForm..PageControl..HomeTabSheet..Caption
 #: Kitto.Ext.TilePanel.pas:143 Kitto.Ext.MainFormUnit.dfm:433
@@ -758,9 +742,8 @@ msgstr "Applicazione Kitto"
 #. SearchForm..Font.Name
 #. SuggestForm..Font.Name
 #. SearchForm..Font.Name
-#: Kitto.Ext.MainFormUnit.dfm:11 Kitto.Ext.MainFormUnit.dfm:496
-#: Kitto.Ext.MainFormUnit.dfm:513 Kitto.Ext.MainFormUnit.dfm:539
-#: Kitto.Ext.MainFormUnit.dfm:580
+#: Kitto.Ext.MainFormUnit.dfm:11 Kitto.Ext.MainFormUnit.dfm:496 Kitto.Ext.MainFormUnit.dfm:513
+#: Kitto.Ext.MainFormUnit.dfm:539 Kitto.Ext.MainFormUnit.dfm:580
 #: ThirdParty/SuperObject/demos/googlesearch/main.dfm:11
 #: ThirdParty/SuperObject/demos/googlesuggest/main.dfm:11
 #: ThirdParty/SuperObject/demos/RTTI/main.dfm:11
