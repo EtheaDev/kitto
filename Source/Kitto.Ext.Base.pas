@@ -741,7 +741,10 @@ var
 begin
   LFullFileName := Session.Config.FindResourcePathName(AFileName);
   if LFullFileName <> '' then
-    LHtml := TEFMacroExpansionEngine.Instance.Expand(TextFileToString(LFullFileName, TEncoding.UTF8))
+  begin
+    LHtml := TextFileToString(LFullFileName, TEncoding.UTF8);
+    TEFMacroExpansionEngine.Instance.Expand(LHtml);
+  end
   else
     LHtml := '';
   if Assigned(APostProcessor) then
@@ -1115,7 +1118,7 @@ begin
   // A Tool may or may not have a confirmation message.
   LConfirmationMessage := AView.GetExpandedString('Controller/ConfirmationMessage');
   // Cleanup Linebreaks with <br> tag
-  LConfirmationMessage := StringReplace(LConfirmationMessage, sLineBreak, '<br>',[rfReplaceAll]);
+  ReplaceAllCaseSensitive(LConfirmationMessage, sLineBreak, '<br>');
   LConfirmationJS := GetConfirmCall(LConfirmationMessage, Result.ExecuteButtonAction);
   if LConfirmationMessage <> '' then
     Result.On('click', JSFunction(LConfirmationJS))

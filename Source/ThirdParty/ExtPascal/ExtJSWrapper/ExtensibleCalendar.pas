@@ -703,67 +703,80 @@ type
 
 implementation
 
-procedure TExtCalendarView.SetFDdCreateEventText(Value : String); begin
+procedure TExtCalendarView.SetFDdCreateEventText(Value : String);
+begin
   FDdCreateEventText := Value;
   JSCode('ddCreateEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFDdMoveEventText(Value : String); begin
+procedure TExtCalendarView.SetFDdMoveEventText(Value : String);
+begin
   FDdMoveEventText := Value;
   JSCode('ddMoveEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFDdResizeEventText(Value : String); begin
+procedure TExtCalendarView.SetFDdResizeEventText(Value : String);
+begin
   FDdResizeEventText := Value;
   JSCode('ddResizeEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFEnableAddFx(Value : Boolean); begin
+procedure TExtCalendarView.SetFEnableAddFx(Value : Boolean);
+begin
   FEnableAddFx := Value;
   JSCode('enableAddFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFEnableDD(Value : Boolean); begin
+procedure TExtCalendarView.SetFEnableDD(Value : Boolean);
+begin
   FEnableDD := Value;
   JSCode('enableDD:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFEnableFx(Value : Boolean); begin
+procedure TExtCalendarView.SetFEnableFx(Value : Boolean);
+begin
   FEnableFx := Value;
   JSCode('enableFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFEnableRemoveFx(Value : Boolean); begin
+procedure TExtCalendarView.SetFEnableRemoveFx(Value : Boolean);
+begin
   FEnableRemoveFx := Value;
   JSCode('enableRemoveFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFEnableUpdateFx(Value : Boolean); begin
+procedure TExtCalendarView.SetFEnableUpdateFx(Value : Boolean);
+begin
   FEnableUpdateFx := Value;
   JSCode('enableUpdateFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFMonitorResize(Value : Boolean); begin
+procedure TExtCalendarView.SetFMonitorResize(Value : Boolean);
+begin
   FMonitorResize := Value;
   JSCode('monitorResize:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFSpansHavePriority(Value : Boolean); begin
+procedure TExtCalendarView.SetFSpansHavePriority(Value : Boolean);
+begin
   FSpansHavePriority := Value;
   JSCode('spansHavePriority:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFStartDay(Value : Integer); begin
+procedure TExtCalendarView.SetFStartDay(Value : Integer);
+begin
   FStartDay := Value;
   JSCode('startDay:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFTrackMouseOver(Value : Boolean); begin
+procedure TExtCalendarView.SetFTrackMouseOver(Value : Boolean);
+begin
   FTrackMouseOver := Value;
   JSCode('trackMouseOver:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarView.SetFOnDatechange(Value : TExtCalendarViewOnDatechange); begin
+procedure TExtCalendarView.SetFOnDatechange(Value : TExtCalendarViewOnDatechange);
+begin
   if Assigned(FOnDatechange) then
     JSCode(JSName+'.events ["datechange"].listeners=[];');
   if Assigned(Value) then
@@ -771,7 +784,8 @@ procedure TExtCalendarView.SetFOnDatechange(Value : TExtCalendarViewOnDatechange
   FOnDatechange := Value;
 end;
 
-procedure TExtCalendarView.SetFOnDayout(Value : TExtCalendarViewOnDayout); begin
+procedure TExtCalendarView.SetFOnDayout(Value : TExtCalendarViewOnDayout);
+begin
   if Assigned(FOnDayout) then
     JSCode(JSName+'.events ["dayout"].listeners=[];');
   if Assigned(Value) then
@@ -779,7 +793,8 @@ procedure TExtCalendarView.SetFOnDayout(Value : TExtCalendarViewOnDayout); begin
   FOnDayout := Value;
 end;
 
-procedure TExtCalendarView.SetFOnDayover(Value : TExtCalendarViewOnDayover); begin
+procedure TExtCalendarView.SetFOnDayover(Value : TExtCalendarViewOnDayover);
+begin
   if Assigned(FOnDayover) then
     JSCode(JSName+'.events ["dayover"].listeners=[];');
   if Assigned(Value) then
@@ -787,7 +802,8 @@ procedure TExtCalendarView.SetFOnDayover(Value : TExtCalendarViewOnDayover); beg
   FOnDayover := Value;
 end;
 
-procedure TExtCalendarView.SetFOnEventclick(Value : TExtCalendarViewOnEventclick); begin
+procedure TExtCalendarView.SetFOnEventclick(Value : TExtCalendarViewOnEventclick);
+begin
   if Assigned(FOnEventclick) then
     JSCode(JSName+'.events ["eventclick"].listeners=[];');
   if Assigned(Value) then
@@ -795,7 +811,8 @@ procedure TExtCalendarView.SetFOnEventclick(Value : TExtCalendarViewOnEventclick
   FOnEventclick := Value;
 end;
 
-procedure TExtCalendarView.SetFOnEventdelete(Value : TExtCalendarViewOnEventdelete); begin
+procedure TExtCalendarView.SetFOnEventdelete(Value : TExtCalendarViewOnEventdelete);
+begin
   if Assigned(FOnEventdelete) then
     JSCode(JSName+'.events ["eventdelete"].listeners=[];');
   if Assigned(Value) then
@@ -803,7 +820,8 @@ procedure TExtCalendarView.SetFOnEventdelete(Value : TExtCalendarViewOnEventdele
   FOnEventdelete := Value;
 end;
 
-procedure TExtCalendarView.SetFOnEventmove(Value : TExtCalendarViewOnEventmove); begin
+procedure TExtCalendarView.SetFOnEventmove(Value : TExtCalendarViewOnEventmove);
+begin
   if Assigned(FOnEventmove) then
     JSCode(JSName+'.events ["eventmove"].listeners=[];');
   if Assigned(Value) then
@@ -811,7 +829,8 @@ procedure TExtCalendarView.SetFOnEventmove(Value : TExtCalendarViewOnEventmove);
   FOnEventmove := Value;
 end;
 
-procedure TExtCalendarView.SetFOnEventout(Value : TExtCalendarViewOnEventout); begin
+procedure TExtCalendarView.SetFOnEventout(Value : TExtCalendarViewOnEventout);
+begin
   if Assigned(FOnEventout) then
     JSCode(JSName+'.events ["eventout"].listeners=[];');
   if Assigned(Value) then
@@ -819,7 +838,8 @@ procedure TExtCalendarView.SetFOnEventout(Value : TExtCalendarViewOnEventout); b
   FOnEventout := Value;
 end;
 
-procedure TExtCalendarView.SetFOnEventover(Value : TExtCalendarViewOnEventover); begin
+procedure TExtCalendarView.SetFOnEventover(Value : TExtCalendarViewOnEventover);
+begin
   if Assigned(FOnEventover) then
     JSCode(JSName+'.events ["eventover"].listeners=[];');
   if Assigned(Value) then
@@ -827,7 +847,8 @@ procedure TExtCalendarView.SetFOnEventover(Value : TExtCalendarViewOnEventover);
   FOnEventover := Value;
 end;
 
-procedure TExtCalendarView.SetFOnEventsrendered(Value : TExtCalendarViewOnEventsrendered); begin
+procedure TExtCalendarView.SetFOnEventsrendered(Value : TExtCalendarViewOnEventsrendered);
+begin
   if Assigned(FOnEventsrendered) then
     JSCode(JSName+'.events ["eventsrendered"].listeners=[];');
   if Assigned(Value) then
@@ -835,7 +856,8 @@ procedure TExtCalendarView.SetFOnEventsrendered(Value : TExtCalendarViewOnEvents
   FOnEventsrendered := Value;
 end;
 
-procedure TExtCalendarView.SetFOnInitdrag(Value : TExtCalendarViewOnInitdrag); begin
+procedure TExtCalendarView.SetFOnInitdrag(Value : TExtCalendarViewOnInitdrag);
+begin
   if Assigned(FOnInitdrag) then
     JSCode(JSName+'.events ["initdrag"].listeners=[];');
   if Assigned(Value) then
@@ -843,7 +865,8 @@ procedure TExtCalendarView.SetFOnInitdrag(Value : TExtCalendarViewOnInitdrag); b
   FOnInitdrag := Value;
 end;
 
-procedure TExtCalendarView.SetFOnRangeselect(Value : TExtCalendarViewOnRangeselect); begin
+procedure TExtCalendarView.SetFOnRangeselect(Value : TExtCalendarViewOnRangeselect);
+begin
   if Assigned(FOnRangeselect) then
     JSCode(JSName+'.events ["rangeselect"].listeners=[];');
   if Assigned(Value) then
@@ -851,91 +874,109 @@ procedure TExtCalendarView.SetFOnRangeselect(Value : TExtCalendarViewOnRangesele
   FOnRangeselect := Value;
 end;
 
-class function TExtCalendarView.JSClassName : string; begin
+class function TExtCalendarView.JSClassName : string;
+      begin
   Result := 'Ext.calendar.CalendarView';
 end;
 
-function TExtCalendarView.GetEventEls(EventId : String) : TExtFunction; begin
+function TExtCalendarView.GetEventEls(EventId : String) : TExtFunction;
+begin
   JSCode(JSName + '.getEventEls(' + VarToJSON([EventId]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.GetEventIdFromEl(El : THTMLElement) : TExtFunction; begin
+function TExtCalendarView.GetEventIdFromEl(El : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.GetEventIdFromEl(' + VarToJSON([El, false]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.GetEventIdFromEl(El : String) : TExtFunction; begin
+function TExtCalendarView.GetEventIdFromEl(El : String) : TExtFunction;
+begin
   JSCode(JSName + '.getEventIdFromEl(' + VarToJSON([El]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.GetEventSelectorCls(EventId : String; ForSelect : Boolean) : TExtFunction; begin
+function TExtCalendarView.GetEventSelectorCls(EventId : String; ForSelect : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.getEventSelectorCls(' + VarToJSON([EventId, ForSelect]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.GetStartDate : TExtFunction; begin
+function TExtCalendarView.GetStartDate : TExtFunction;
+begin
   JSCode(JSName + '.getStartDate();', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.HighlightEvent(Els : TExtCompositeElement; Color : TExtObject = nil; O : TExtObject = nil) : TExtFunction; begin
+function TExtCalendarView.HighlightEvent(Els : TExtCompositeElement; Color : TExtObject = nil; O : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.highlightEvent(' + VarToJSON([Els, false, Color, false, O, false]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.IsToday : TExtFunction; begin
+function TExtCalendarView.IsToday : TExtFunction;
+begin
   JSCode(JSName + '.isToday();', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.MoveDays(Value : Integer) : TExtFunction; begin
+function TExtCalendarView.MoveDays(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.moveDays(' + VarToJSON([Value]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.MoveMonths(Value : Integer) : TExtFunction; begin
+function TExtCalendarView.MoveMonths(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.moveMonths(' + VarToJSON([Value]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.MoveNext : TExtFunction; begin
+function TExtCalendarView.MoveNext : TExtFunction;
+begin
   JSCode(JSName + '.moveNext();', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.MovePrev : TExtFunction; begin
+function TExtCalendarView.MovePrev : TExtFunction;
+begin
   JSCode(JSName + '.movePrev();', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.MoveTo(Dt : TDateTime) : TExtFunction; begin
+function TExtCalendarView.MoveTo(Dt : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.moveTo(' + VarToJSON([Dt]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.MoveToday : TExtFunction; begin
+function TExtCalendarView.MoveToday : TExtFunction;
+begin
   JSCode(JSName + '.moveToday();', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.MoveWeeks(Value : Integer) : TExtFunction; begin
+function TExtCalendarView.MoveWeeks(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.moveWeeks(' + VarToJSON([Value]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.SetStartDate(Dt : TDateTime) : TExtFunction; begin
+function TExtCalendarView.SetStartDate(Dt : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.setStartDate(' + VarToJSON([Dt]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-function TExtCalendarView.SetStore(Store : TExtDataStore) : TExtFunction; begin
+function TExtCalendarView.SetStore(Store : TExtDataStore) : TExtFunction;
+begin
   JSCode(JSName + '.setStore(' + VarToJSON([Store, false]) + ');', 'TExtCalendarView');
   Result := Self;
 end;
 
-procedure TExtCalendarView.HandleEvent(const AEvtName : string); begin
+procedure TExtCalendarView.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'datechange') and Assigned(FOnDatechange) then
     FOnDatechange(TExtCalendarView(ParamAsObject('This')), ParamAsTDateTime('StartDate'), ParamAsTDateTime('ViewStart'), ParamAsTDateTime('ViewEnd'))
@@ -961,31 +1002,37 @@ procedure TExtCalendarView.HandleEvent(const AEvtName : string); begin
     FOnRangeselect(TExtCalendarView(ParamAsObject('This')), TExtObject(ParamAsObject('Dates')), TExtFunction(ParamAsObject('Callback')));
 end;
 
-procedure TExtCalendarDateRangeField.SetFToText(Value : String); begin
+procedure TExtCalendarDateRangeField.SetFToText(Value : String);
+begin
   FToText := Value;
   JSCode('toText:' + VarToJSON([Value]));
 end;
 
-class function TExtCalendarDateRangeField.JSClassName : string; begin
+class function TExtCalendarDateRangeField.JSClassName : string;
+      begin
   Result := 'Ext.calendar.DateRangeField';
 end;
 
-function TExtCalendarDateRangeField.GetValue : TExtFunction; begin
+function TExtCalendarDateRangeField.GetValue : TExtFunction;
+begin
   JSCode(JSName + '.getValue();', 'TExtCalendarDateRangeField');
   Result := Self;
 end;
 
-function TExtCalendarDateRangeField.SetValue(V : TExtObjectList) : TExtFunction; begin
+function TExtCalendarDateRangeField.SetValue(V : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.SetValue(' + VarToJSON(V) + ');', 'TExtCalendarDateRangeField');
   Result := Self;
 end;
 
-function TExtCalendarDateRangeField.SetValue(V : TExtObject) : TExtFunction; begin
+function TExtCalendarDateRangeField.SetValue(V : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.SetValue(' + VarToJSON([V, false]) + ');', 'TExtCalendarDateRangeField');
   Result := Self;
 end;
 
-function TExtCalendarDateRangeField.SetValue(V : TDateTime) : TExtFunction; begin
+function TExtCalendarDateRangeField.SetValue(V : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.setValue(' + VarToJSON([V]) + ');', 'TExtCalendarDateRangeField');
   Result := Self;
 end;
@@ -1058,32 +1105,38 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'showNavBar', [Value]);
 end;
 
-procedure TExtensibleCalendarPanel.SetShowTime(Value : Boolean); begin
+procedure TExtensibleCalendarPanel.SetShowTime(Value : Boolean);
+begin
   FShowTime := Value;
   ExtSession.ResponseItems.SetConfigItem(Self, 'showTime', [Value]);
 end;
 
-procedure TExtensibleCalendarPanel.SetShowTodayText(Value : Boolean); begin
+procedure TExtensibleCalendarPanel.SetShowTodayText(Value : Boolean);
+begin
   FShowTodayText := Value;
   ExtSession.ResponseItems.SetConfigItem(Self, 'showTodayText', [Value]);
 end;
 
-procedure TExtensibleCalendarPanel.SetShowWeekView(Value : Boolean); begin
+procedure TExtensibleCalendarPanel.SetShowWeekView(Value : Boolean);
+begin
   FShowWeekView := Value;
   ExtSession.ResponseItems.SetConfigItem(Self, 'showWeekView', [Value]);
 end;
 
-procedure TExtensibleCalendarPanel.SetTodayText(Value : String); begin
+procedure TExtensibleCalendarPanel.SetTodayText(Value : String);
+begin
   FTodayText := Value;
   ExtSession.ResponseItems.SetConfigItem(Self, 'todayText', [Value]);
 end;
 
-procedure TExtensibleCalendarPanel.SetWeekText(Value : String); begin
+procedure TExtensibleCalendarPanel.SetWeekText(Value : String);
+begin
   FWeekText := Value;
   ExtSession.ResponseItems.SetConfigItem(Self, 'weekText', [Value]);
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnDatechange(Value : TExtensibleCalendarPanelOnDatechange); begin
+procedure TExtensibleCalendarPanel.SetFOnDatechange(Value : TExtensibleCalendarPanelOnDatechange);
+begin
   if Assigned(FOnDatechange) then
     JSCode(JSName+'.events ["datechange"].listeners=[];');
   if Assigned(Value) then
@@ -1091,7 +1144,8 @@ procedure TExtensibleCalendarPanel.SetFOnDatechange(Value : TExtensibleCalendarP
   FOnDatechange := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnDayclick(Value : TExtensibleCalendarPanelOnDayclick); begin
+procedure TExtensibleCalendarPanel.SetFOnDayclick(Value : TExtensibleCalendarPanelOnDayclick);
+begin
   if Assigned(FOnDayclick) then
     RemoveAllListeners('dayclick');
   if Assigned(Value) then
@@ -1099,7 +1153,8 @@ procedure TExtensibleCalendarPanel.SetFOnDayclick(Value : TExtensibleCalendarPan
   FOnDayclick := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventadd(Value : TExtensibleCalendarPanelOnEventadd); begin
+procedure TExtensibleCalendarPanel.SetFOnEventadd(Value : TExtensibleCalendarPanelOnEventadd);
+begin
   if Assigned(FOnEventadd) then
     JSCode(JSName+'.events ["eventadd"].listeners=[];');
   if Assigned(Value) then
@@ -1107,7 +1162,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventadd(Value : TExtensibleCalendarPan
   FOnEventadd := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventcancel(Value : TExtensibleCalendarPanelOnEventcancel); begin
+procedure TExtensibleCalendarPanel.SetFOnEventcancel(Value : TExtensibleCalendarPanelOnEventcancel);
+begin
   if Assigned(FOnEventcancel) then
     JSCode(JSName+'.events ["eventcancel"].listeners=[];');
   if Assigned(Value) then
@@ -1115,7 +1171,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventcancel(Value : TExtensibleCalendar
   FOnEventcancel := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventclick(Value : TExtensibleCalendarPanelOnEventclick); begin
+procedure TExtensibleCalendarPanel.SetFOnEventclick(Value : TExtensibleCalendarPanelOnEventclick);
+begin
   if Assigned(FOnEventclick) then
     JSCode(JSName+'.events ["eventclick"].listeners=[];');
   if Assigned(Value) then
@@ -1123,7 +1180,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventclick(Value : TExtensibleCalendarP
   FOnEventclick := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventdelete(Value : TExtensibleCalendarPanelOnEventdelete); begin
+procedure TExtensibleCalendarPanel.SetFOnEventdelete(Value : TExtensibleCalendarPanelOnEventdelete);
+begin
   if Assigned(FOnEventdelete) then
     JSCode(JSName+'.events ["eventdelete"].listeners=[];');
   if Assigned(Value) then
@@ -1131,7 +1189,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventdelete(Value : TExtensibleCalendar
   FOnEventdelete := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventmove(Value : TExtensibleCalendarPanelOnEventmove); begin
+procedure TExtensibleCalendarPanel.SetFOnEventmove(Value : TExtensibleCalendarPanelOnEventmove);
+begin
   if Assigned(FOnEventmove) then
     JSCode(JSName+'.events ["eventmove"].listeners=[];');
   if Assigned(Value) then
@@ -1139,7 +1198,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventmove(Value : TExtensibleCalendarPa
   FOnEventmove := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventout(Value : TExtensibleCalendarPanelOnEventout); begin
+procedure TExtensibleCalendarPanel.SetFOnEventout(Value : TExtensibleCalendarPanelOnEventout);
+begin
   if Assigned(FOnEventout) then
     JSCode(JSName+'.events ["eventout"].listeners=[];');
   if Assigned(Value) then
@@ -1147,7 +1207,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventout(Value : TExtensibleCalendarPan
   FOnEventout := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventover(Value : TExtensibleCalendarPanelOnEventover); begin
+procedure TExtensibleCalendarPanel.SetFOnEventover(Value : TExtensibleCalendarPanelOnEventover);
+begin
   if Assigned(FOnEventover) then
     JSCode(JSName+'.events ["eventover"].listeners=[];');
   if Assigned(Value) then
@@ -1155,7 +1216,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventover(Value : TExtensibleCalendarPa
   FOnEventover := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventresize(Value : TExtensibleCalendarPanelOnEventresize); begin
+procedure TExtensibleCalendarPanel.SetFOnEventresize(Value : TExtensibleCalendarPanelOnEventresize);
+begin
   if Assigned(FOnEventresize) then
     JSCode(JSName+'.events ["eventresize"].listeners=[];');
   if Assigned(Value) then
@@ -1163,7 +1225,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventresize(Value : TExtensibleCalendar
   FOnEventresize := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventsrendered(Value : TExtensibleCalendarPanelOnEventsrendered); begin
+procedure TExtensibleCalendarPanel.SetFOnEventsrendered(Value : TExtensibleCalendarPanelOnEventsrendered);
+begin
   if Assigned(FOnEventsrendered) then
     JSCode(JSName+'.events ["eventsrendered"].listeners=[];');
   if Assigned(Value) then
@@ -1171,7 +1234,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventsrendered(Value : TExtensibleCalen
   FOnEventsrendered := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnEventupdate(Value : TExtensibleCalendarPanelOnEventupdate); begin
+procedure TExtensibleCalendarPanel.SetFOnEventupdate(Value : TExtensibleCalendarPanelOnEventupdate);
+begin
   if Assigned(FOnEventupdate) then
     JSCode(JSName+'.events ["eventupdate"].listeners=[];');
   if Assigned(Value) then
@@ -1179,7 +1243,8 @@ procedure TExtensibleCalendarPanel.SetFOnEventupdate(Value : TExtensibleCalendar
   FOnEventupdate := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnInitdrag(Value : TExtensibleCalendarPanelOnInitdrag); begin
+procedure TExtensibleCalendarPanel.SetFOnInitdrag(Value : TExtensibleCalendarPanelOnInitdrag);
+begin
   if Assigned(FOnInitdrag) then
     JSCode(JSName+'.events ["initdrag"].listeners=[];');
   if Assigned(Value) then
@@ -1187,7 +1252,8 @@ procedure TExtensibleCalendarPanel.SetFOnInitdrag(Value : TExtensibleCalendarPan
   FOnInitdrag := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnRangeselect(Value : TExtensibleCalendarPanelOnRangeselect); begin
+procedure TExtensibleCalendarPanel.SetFOnRangeselect(Value : TExtensibleCalendarPanelOnRangeselect);
+begin
   if Assigned(FOnRangeselect) then
     JSCode(JSName+'.events ["rangeselect"].listeners=[];');
   if Assigned(Value) then
@@ -1195,7 +1261,8 @@ procedure TExtensibleCalendarPanel.SetFOnRangeselect(Value : TExtensibleCalendar
   FOnRangeselect := Value;
 end;
 
-procedure TExtensibleCalendarPanel.SetFOnViewchange(Value : TExtensibleCalendarPanelOnViewchange); begin
+procedure TExtensibleCalendarPanel.SetFOnViewchange(Value : TExtensibleCalendarPanelOnViewchange);
+begin
   if Assigned(FOnViewchange) then
     JSCode(JSName+'.events ["viewchange"].listeners=[];');
   if Assigned(Value) then
@@ -1215,31 +1282,37 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'jumpToText', [AValue]);
 end;
 
-class function TExtensibleCalendarPanel.JSClassName : string; begin
+class function TExtensibleCalendarPanel.JSClassName : string;
+      begin
   Result := 'Ext.ensible.cal.CalendarPanel';
 end;
 
-function TExtensibleCalendarPanel.GetActiveView : TExtFunction; begin
+function TExtensibleCalendarPanel.GetActiveView : TExtFunction;
+begin
   JSCode(JSName + '.getActiveView();', 'TExtensibleCalendarPanel');
   Result := Self;
 end;
 
-function TExtensibleCalendarPanel.HideEditForm : TExtFunction; begin
+function TExtensibleCalendarPanel.HideEditForm : TExtFunction;
+begin
   JSCode(JSName + '.hideEditForm();', 'TExtensibleCalendarPanel');
   Result := Self;
 end;
 
-function TExtensibleCalendarPanel.SetStartDate(Dt : TDateTime) : TExtFunction; begin
+function TExtensibleCalendarPanel.SetStartDate(Dt : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.setStartDate(' + VarToJSON([Dt]) + ');', 'TExtensibleCalendarPanel');
   Result := Self;
 end;
 
-function TExtensibleCalendarPanel.ShowEditForm(RecordJS : TExtCalendarEventRecord) : TExtFunction; begin
+function TExtensibleCalendarPanel.ShowEditForm(RecordJS : TExtCalendarEventRecord) : TExtFunction;
+begin
   JSCode(JSName + '.showEditForm(' + VarToJSON([RecordJS, false]) + ');', 'TExtensibleCalendarPanel');
   Result := Self;
 end;
 
-procedure TExtensibleCalendarPanel.HandleEvent(const AEvtName : string); begin
+procedure TExtensibleCalendarPanel.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'datechange') and Assigned(FOnDatechange) then
     FOnDatechange(TExtensibleCalendarPanel(ParamAsObject('This')), ParamAsTDateTime('StartDate'), ParamAsTDateTime('ViewStart'), ParamAsTDateTime('ViewEnd'))
@@ -1273,165 +1346,198 @@ procedure TExtensibleCalendarPanel.HandleEvent(const AEvtName : string); begin
     FOnViewchange(TExtensibleCalendarPanel(ParamAsObject('This')), TExtCalendarView(ParamAsObject('View')), TExtObject(ParamAsObject('Info')));
 end;
 
-class function TExtCalendarPicker.JSClassName : string; begin
+class function TExtCalendarPicker.JSClassName : string;
+      begin
   Result := 'Ext.calendar.CalendarPicker';
 end;
 
-class function TExtCalendarDayHeaderTemplate.JSClassName : string; begin
+class function TExtCalendarDayHeaderTemplate.JSClassName : string;
+      begin
   Result := 'Ext.calendar.DayHeaderTemplate';
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFAddEventCls(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFAddEventCls(Value : String);
+begin
   FAddEventCls := Value;
   JSCode('addEventCls:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFDayCount(Value : Integer); begin
+procedure TExtCalendarDayHeaderTemplate.SetFDayCount(Value : Integer);
+begin
   FDayCount := Value;
   JSCode('dayCount:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFDayText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFDayText(Value : String);
+begin
   FDayText := Value;
   JSCode('dayText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFDdCreateEventText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFDdCreateEventText(Value : String);
+begin
   FDdCreateEventText := Value;
   JSCode('ddCreateEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFDdMoveEventText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFDdMoveEventText(Value : String);
+begin
   FDdMoveEventText := Value;
   JSCode('ddMoveEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFDdResizeEventText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFDdResizeEventText(Value : String);
+begin
   FDdResizeEventText := Value;
   JSCode('ddResizeEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFEnableAddFx(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFEnableAddFx(Value : Boolean);
+begin
   FEnableAddFx := Value;
   JSCode('enableAddFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFEnableDD(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFEnableDD(Value : Boolean);
+begin
   FEnableDD := Value;
   JSCode('enableDD:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFEnableFx(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFEnableFx(Value : Boolean);
+begin
   FEnableFx := Value;
   JSCode('enableFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFEnableRemoveFx(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFEnableRemoveFx(Value : Boolean);
+begin
   FEnableRemoveFx := Value;
   JSCode('enableRemoveFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFEnableUpdateFx(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFEnableUpdateFx(Value : Boolean);
+begin
   FEnableUpdateFx := Value;
   JSCode('enableUpdateFx:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFMonitorResize(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFMonitorResize(Value : Boolean);
+begin
   FMonitorResize := Value;
   JSCode('monitorResize:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFMonthText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFMonthText(Value : String);
+begin
   FMonthText := Value;
   JSCode('monthText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFMoveEventCls(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFMoveEventCls(Value : String);
+begin
   FMoveEventCls := Value;
   JSCode('moveEventCls:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetShowDayView(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetShowDayView(Value : Boolean);
+begin
   FShowDayView := Value;
   JSCode('showDayView:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowHeader(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowHeader(Value : Boolean);
+begin
   FShowHeader := Value;
   JSCode('showHeader:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowMonthView(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowMonthView(Value : Boolean);
+begin
   FShowMonthView := Value;
   JSCode('showMonthView:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowNavBar(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowNavBar(Value : Boolean);
+begin
   FShowNavBar := Value;
   JSCode('showNavBar:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowTime(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowTime(Value : Boolean);
+begin
   FShowTime := Value;
   JSCode('showTime:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowTodayText(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowTodayText(Value : Boolean);
+begin
   FShowTodayText := Value;
   JSCode('showTodayText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowWeekLinks(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowWeekLinks(Value : Boolean);
+begin
   FShowWeekLinks := Value;
   JSCode('showWeekLinks:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowWeekNumbers(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowWeekNumbers(Value : Boolean);
+begin
   FShowWeekNumbers := Value;
   JSCode('showWeekNumbers:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFShowWeekView(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFShowWeekView(Value : Boolean);
+begin
   FShowWeekView := Value;
   JSCode('showWeekView:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFSpansHavePriority(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFSpansHavePriority(Value : Boolean);
+begin
   FSpansHavePriority := Value;
   JSCode('spansHavePriority:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFStartDay(Value : Integer); begin
+procedure TExtCalendarDayHeaderTemplate.SetFStartDay(Value : Integer);
+begin
   FStartDay := Value;
   JSCode('startDay:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFTodayText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFTodayText(Value : String);
+begin
   FTodayText := Value;
   JSCode('todayText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFToText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFToText(Value : String);
+begin
   FToText := Value;
   JSCode('toText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFTrackMouseOver(Value : Boolean); begin
+procedure TExtCalendarDayHeaderTemplate.SetFTrackMouseOver(Value : Boolean);
+begin
   FTrackMouseOver := Value;
   JSCode('trackMouseOver:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFWeekLinkOverClass(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFWeekLinkOverClass(Value : String);
+begin
   FWeekLinkOverClass := Value;
   JSCode('weekLinkOverClass:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFWeekText(Value : String); begin
+procedure TExtCalendarDayHeaderTemplate.SetFWeekText(Value : String);
+begin
   FWeekText := Value;
   JSCode('weekText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnDatechange(Value : TExtCalendarDayHeaderTemplateOnDatechange); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnDatechange(Value : TExtCalendarDayHeaderTemplateOnDatechange);
+begin
   if Assigned(FOnDatechange) then
     JSCode(JSName+'.events ["datechange"].listeners=[];');
   if Assigned(Value) then
@@ -1439,7 +1545,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnDatechange(Value : TExtCalendarDay
   FOnDatechange := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnDayclick(Value : TExtCalendarDayHeaderTemplateOnDayclick); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnDayclick(Value : TExtCalendarDayHeaderTemplateOnDayclick);
+begin
   if Assigned(FOnDayclick) then
     JSCode(JSName+'.events ["dayclick"].listeners=[];');
   if Assigned(Value) then
@@ -1447,7 +1554,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnDayclick(Value : TExtCalendarDayHe
   FOnDayclick := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnDayout(Value : TExtCalendarDayHeaderTemplateOnDayout); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnDayout(Value : TExtCalendarDayHeaderTemplateOnDayout);
+begin
   if Assigned(FOnDayout) then
     JSCode(JSName+'.events ["dayout"].listeners=[];');
   if Assigned(Value) then
@@ -1455,7 +1563,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnDayout(Value : TExtCalendarDayHead
   FOnDayout := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnDayover(Value : TExtCalendarDayHeaderTemplateOnDayover); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnDayover(Value : TExtCalendarDayHeaderTemplateOnDayover);
+begin
   if Assigned(FOnDayover) then
     JSCode(JSName+'.events ["dayover"].listeners=[];');
   if Assigned(Value) then
@@ -1463,7 +1572,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnDayover(Value : TExtCalendarDayHea
   FOnDayover := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEditdetails(Value : TExtCalendarDayHeaderTemplateOnEditdetails); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEditdetails(Value : TExtCalendarDayHeaderTemplateOnEditdetails);
+begin
   if Assigned(FOnEditdetails) then
     JSCode(JSName+'.events ["editdetails"].listeners=[];');
   if Assigned(Value) then
@@ -1471,7 +1581,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEditdetails(Value : TExtCalendarDa
   FOnEditdetails := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventadd(Value : TExtCalendarDayHeaderTemplateOnEventadd); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventadd(Value : TExtCalendarDayHeaderTemplateOnEventadd);
+begin
   if Assigned(FOnEventadd) then
     JSCode(JSName+'.events ["eventadd"].listeners=[];');
   if Assigned(Value) then
@@ -1479,7 +1590,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventadd(Value : TExtCalendarDayHe
   FOnEventadd := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventcancel(Value : TExtCalendarDayHeaderTemplateOnEventcancel); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventcancel(Value : TExtCalendarDayHeaderTemplateOnEventcancel);
+begin
   if Assigned(FOnEventcancel) then
     JSCode(JSName+'.events ["eventcancel"].listeners=[];');
   if Assigned(Value) then
@@ -1487,7 +1599,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventcancel(Value : TExtCalendarDa
   FOnEventcancel := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventclick(Value : TExtCalendarDayHeaderTemplateOnEventclick); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventclick(Value : TExtCalendarDayHeaderTemplateOnEventclick);
+begin
   if Assigned(FOnEventclick) then
     JSCode(JSName+'.events ["eventclick"].listeners=[];');
   if Assigned(Value) then
@@ -1495,7 +1608,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventclick(Value : TExtCalendarDay
   FOnEventclick := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventdelete(Value : TExtCalendarDayHeaderTemplateOnEventdelete); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventdelete(Value : TExtCalendarDayHeaderTemplateOnEventdelete);
+begin
   if Assigned(FOnEventdelete) then
     JSCode(JSName+'.events ["eventdelete"].listeners=[];');
   if Assigned(Value) then
@@ -1503,7 +1617,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventdelete(Value : TExtCalendarDa
   FOnEventdelete := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventmove(Value : TExtCalendarDayHeaderTemplateOnEventmove); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventmove(Value : TExtCalendarDayHeaderTemplateOnEventmove);
+begin
   if Assigned(FOnEventmove) then
     JSCode(JSName+'.events ["eventmove"].listeners=[];');
   if Assigned(Value) then
@@ -1511,7 +1626,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventmove(Value : TExtCalendarDayH
   FOnEventmove := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventout(Value : TExtCalendarDayHeaderTemplateOnEventout); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventout(Value : TExtCalendarDayHeaderTemplateOnEventout);
+begin
   if Assigned(FOnEventout) then
     JSCode(JSName+'.events ["eventout"].listeners=[];');
   if Assigned(Value) then
@@ -1519,7 +1635,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventout(Value : TExtCalendarDayHe
   FOnEventout := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventover(Value : TExtCalendarDayHeaderTemplateOnEventover); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventover(Value : TExtCalendarDayHeaderTemplateOnEventover);
+begin
   if Assigned(FOnEventover) then
     JSCode(JSName+'.events ["eventover"].listeners=[];');
   if Assigned(Value) then
@@ -1527,7 +1644,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventover(Value : TExtCalendarDayH
   FOnEventover := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventresize(Value : TExtCalendarDayHeaderTemplateOnEventresize); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventresize(Value : TExtCalendarDayHeaderTemplateOnEventresize);
+begin
   if Assigned(FOnEventresize) then
     JSCode(JSName+'.events ["eventresize"].listeners=[];');
   if Assigned(Value) then
@@ -1535,7 +1653,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventresize(Value : TExtCalendarDa
   FOnEventresize := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventsrendered(Value : TExtCalendarDayHeaderTemplateOnEventsrendered); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventsrendered(Value : TExtCalendarDayHeaderTemplateOnEventsrendered);
+begin
   if Assigned(FOnEventsrendered) then
     JSCode(JSName+'.events ["eventsrendered"].listeners=[];');
   if Assigned(Value) then
@@ -1543,7 +1662,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventsrendered(Value : TExtCalenda
   FOnEventsrendered := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnEventupdate(Value : TExtCalendarDayHeaderTemplateOnEventupdate); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnEventupdate(Value : TExtCalendarDayHeaderTemplateOnEventupdate);
+begin
   if Assigned(FOnEventupdate) then
     JSCode(JSName+'.events ["eventupdate"].listeners=[];');
   if Assigned(Value) then
@@ -1551,7 +1671,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnEventupdate(Value : TExtCalendarDa
   FOnEventupdate := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnInitdrag(Value : TExtCalendarDayHeaderTemplateOnInitdrag); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnInitdrag(Value : TExtCalendarDayHeaderTemplateOnInitdrag);
+begin
   if Assigned(FOnInitdrag) then
     JSCode(JSName+'.events ["initdrag"].listeners=[];');
   if Assigned(Value) then
@@ -1559,7 +1680,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnInitdrag(Value : TExtCalendarDayHe
   FOnInitdrag := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnRangeselect(Value : TExtCalendarDayHeaderTemplateOnRangeselect); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnRangeselect(Value : TExtCalendarDayHeaderTemplateOnRangeselect);
+begin
   if Assigned(FOnRangeselect) then
     JSCode(JSName+'.events ["rangeselect"].listeners=[];');
   if Assigned(Value) then
@@ -1567,7 +1689,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnRangeselect(Value : TExtCalendarDa
   FOnRangeselect := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnViewchange(Value : TExtCalendarDayHeaderTemplateOnViewchange); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnViewchange(Value : TExtCalendarDayHeaderTemplateOnViewchange);
+begin
   if Assigned(FOnViewchange) then
     JSCode(JSName+'.events ["viewchange"].listeners=[];');
   if Assigned(Value) then
@@ -1575,7 +1698,8 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnViewchange(Value : TExtCalendarDay
   FOnViewchange := Value;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.SetFOnWeekclick(Value : TExtCalendarDayHeaderTemplateOnWeekclick); begin
+procedure TExtCalendarDayHeaderTemplate.SetFOnWeekclick(Value : TExtCalendarDayHeaderTemplateOnWeekclick);
+begin
   if Assigned(FOnWeekclick) then
     JSCode(JSName+'.events ["weekclick"].listeners=[];');
   if Assigned(Value) then
@@ -1583,157 +1707,188 @@ procedure TExtCalendarDayHeaderTemplate.SetFOnWeekclick(Value : TExtCalendarDayH
   FOnWeekclick := Value;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetActiveView : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetActiveView : TExtFunction;
+begin
   JSCode(JSName + '.getActiveView();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetEventAllDayTemplate : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetEventAllDayTemplate : TExtFunction;
+begin
   JSCode(JSName + '.getEventAllDayTemplate();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetEventEls(EventId : String) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetEventEls(EventId : String) : TExtFunction;
+begin
   JSCode(JSName + '.getEventEls(' + VarToJSON([EventId]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetEventIdFromEl(El : THTMLElement) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetEventIdFromEl(El : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.GetEventIdFromEl(' + VarToJSON([El, false]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetEventIdFromEl(El : String) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetEventIdFromEl(El : String) : TExtFunction;
+begin
   JSCode(JSName + '.getEventIdFromEl(' + VarToJSON([El]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetEventSelectorCls(EventId : String; ForSelect : Boolean) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetEventSelectorCls(EventId : String; ForSelect : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.getEventSelectorCls(' + VarToJSON([EventId, ForSelect]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetStartDate : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetStartDate : TExtFunction;
+begin
   JSCode(JSName + '.getStartDate();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.GetValue : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.GetValue : TExtFunction;
+begin
   JSCode(JSName + '.getValue();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.HideEditForm : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.HideEditForm : TExtFunction;
+begin
   JSCode(JSName + '.hideEditForm();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.HighlightEvent(Els : TExtCompositeElement; Color : TExtObject = nil; O : TExtObject = nil) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.HighlightEvent(Els : TExtCompositeElement; Color : TExtObject = nil; O : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.highlightEvent(' + VarToJSON([Els, false, Color, false, O, false]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.IsToday : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.IsToday : TExtFunction;
+begin
   JSCode(JSName + '.isToday();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.MoveDays(Value : Integer) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.MoveDays(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.moveDays(' + VarToJSON([Value]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.MoveMonths(Value : Integer) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.MoveMonths(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.moveMonths(' + VarToJSON([Value]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.MoveNext : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.MoveNext : TExtFunction;
+begin
   JSCode(JSName + '.moveNext();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.MovePrev : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.MovePrev : TExtFunction;
+begin
   JSCode(JSName + '.movePrev();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.MoveTo(Dt : TDateTime) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.MoveTo(Dt : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.moveTo(' + VarToJSON([Dt]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.MoveToday : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.MoveToday : TExtFunction;
+begin
   JSCode(JSName + '.moveToday();', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.MoveWeeks(Value : Integer) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.MoveWeeks(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.moveWeeks(' + VarToJSON([Value]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.ScrollTo(Y : Integer; Defer : Boolean = false) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.ScrollTo(Y : Integer; Defer : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.scrollTo(' + VarToJSON([Y, Defer]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.SetStartDate(Dt : TDateTime) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.SetStartDate(Dt : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.setStartDate(' + VarToJSON([Dt]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.SetStore(Store : TExtDataStore) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.SetStore(Store : TExtDataStore) : TExtFunction;
+begin
   JSCode(JSName + '.setStore(' + VarToJSON([Store, false]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.SetValue(V : TExtObjectList) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.SetValue(V : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.SetValue(' + VarToJSON(V) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.SetValue(V : TExtObject) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.SetValue(V : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.SetValue(' + VarToJSON([V, false]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.SetValue(V : TDateTime) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.SetValue(V : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.setValue(' + VarToJSON([V]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.Show(O : TExtObject; AnimateTarget : String = '') : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.Show(O : TExtObject; AnimateTarget : String = '') : TExtFunction;
+begin
   JSCode(JSName + '.Show(' + VarToJSON([O, false, AnimateTarget]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.Show(O : TExtDataRecord; AnimateTarget : String = '') : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.Show(O : TExtDataRecord; AnimateTarget : String = '') : TExtFunction;
+begin
   JSCode(JSName + '.show(' + VarToJSON([O, false, AnimateTarget]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.ShowEditForm(RecordJS : TExtCalendarEventRecord) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.ShowEditForm(RecordJS : TExtCalendarEventRecord) : TExtFunction;
+begin
   JSCode(JSName + '.showEditForm(' + VarToJSON([RecordJS, false]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.Unregister(El : TExtObjectList) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.Unregister(El : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.Unregister(' + VarToJSON(El) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.Unregister(El : String) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.Unregister(El : String) : TExtFunction;
+begin
   JSCode(JSName + '.unregister(' + VarToJSON([El]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-function TExtCalendarDayHeaderTemplate.UpdateMsg(Msg : String) : TExtFunction; begin
+function TExtCalendarDayHeaderTemplate.UpdateMsg(Msg : String) : TExtFunction;
+begin
   JSCode(JSName + '.updateMsg(' + VarToJSON([Msg]) + ');', 'TExtCalendarDayHeaderTemplate');
   Result := Self;
 end;
 
-procedure TExtCalendarDayHeaderTemplate.HandleEvent(const AEvtName : string); begin
+procedure TExtCalendarDayHeaderTemplate.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'datechange') and Assigned(FOnDatechange) then
     FOnDatechange(TExtCalendarDayHeaderTemplate(ParamAsObject('This')), ParamAsTDateTime('StartDate'), ParamAsTDateTime('ViewStart'), ParamAsTDateTime('ViewEnd'))
@@ -1775,11 +1930,13 @@ procedure TExtCalendarDayHeaderTemplate.HandleEvent(const AEvtName : string); be
     FOnWeekclick(TExtCalendarDayHeaderTemplate(ParamAsObject('This')),ParamAsTDateTime('Dt'));
 end;
 
-class function TExtCalendarDayBodyTemplate.JSClassName : string; begin
+class function TExtCalendarDayBodyTemplate.JSClassName : string;
+      begin
   Result := 'Ext.calendar.DayBodyTemplate';
 end;
 
-procedure TExtCalendarDayBodyView.SetFOnDayclick(Value : TExtCalendarDayBodyViewOnDayclick); begin
+procedure TExtCalendarDayBodyView.SetFOnDayclick(Value : TExtCalendarDayBodyViewOnDayclick);
+begin
   if Assigned(FOnDayclick) then
     JSCode(JSName+'.events ["dayclick"].listeners=[];');
   if Assigned(Value) then
@@ -1787,7 +1944,8 @@ procedure TExtCalendarDayBodyView.SetFOnDayclick(Value : TExtCalendarDayBodyView
   FOnDayclick := Value;
 end;
 
-procedure TExtCalendarDayBodyView.SetFOnEventresize(Value : TExtCalendarDayBodyViewOnEventresize); begin
+procedure TExtCalendarDayBodyView.SetFOnEventresize(Value : TExtCalendarDayBodyViewOnEventresize);
+begin
   if Assigned(FOnEventresize) then
     JSCode(JSName+'.events ["eventresize"].listeners=[];');
   if Assigned(Value) then
@@ -1795,21 +1953,25 @@ procedure TExtCalendarDayBodyView.SetFOnEventresize(Value : TExtCalendarDayBodyV
   FOnEventresize := Value;
 end;
 
-class function TExtCalendarDayBodyView.JSClassName : string; begin
+class function TExtCalendarDayBodyView.JSClassName : string;
+      begin
   Result := 'Ext.calendar.DayBodyView';
 end;
 
-function TExtCalendarDayBodyView.GetEventAllDayTemplate : TExtFunction; begin
+function TExtCalendarDayBodyView.GetEventAllDayTemplate : TExtFunction;
+begin
   JSCode(JSName + '.getEventAllDayTemplate();', 'TExtCalendarDayBodyView');
   Result := Self;
 end;
 
-function TExtCalendarDayBodyView.ScrollTo(Y : Integer; Defer : Boolean = false) : TExtFunction; begin
+function TExtCalendarDayBodyView.ScrollTo(Y : Integer; Defer : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.scrollTo(' + VarToJSON([Y, Defer]) + ');', 'TExtCalendarDayBodyView');
   Result := Self;
 end;
 
-procedure TExtCalendarDayBodyView.HandleEvent(const AEvtName : string); begin
+procedure TExtCalendarDayBodyView.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'dayclick') and Assigned(FOnDayclick) then
     FOnDayclick(TExtCalendarDayBodyView(ParamAsObject('This')), ParamAsTDateTime('Dt'), ParamAsBoolean('Allday'), TExtElement(ParamAsObject('El')))
@@ -1817,11 +1979,13 @@ procedure TExtCalendarDayBodyView.HandleEvent(const AEvtName : string); begin
     FOnEventresize(TExtCalendarDayBodyView(ParamAsObject('This')), TExtCalendarEventRecord(ParamAsObject('Rec')));
 end;
 
-class function TExtCalendarBoxLayoutTemplate.JSClassName : string; begin
+class function TExtCalendarBoxLayoutTemplate.JSClassName : string;
+      begin
   Result := 'Ext.calendar.BoxLayoutTemplate';
 end;
 
-procedure TExtCalendarDayHeaderView.SetFOnDayclick(Value : TExtCalendarDayHeaderViewOnDayclick); begin
+procedure TExtCalendarDayHeaderView.SetFOnDayclick(Value : TExtCalendarDayHeaderViewOnDayclick);
+begin
   if Assigned(FOnDayclick) then
     JSCode(JSName+'.events ["dayclick"].listeners=[];');
   if Assigned(Value) then
@@ -1829,126 +1993,151 @@ procedure TExtCalendarDayHeaderView.SetFOnDayclick(Value : TExtCalendarDayHeader
   FOnDayclick := Value;
 end;
 
-class function TExtCalendarDayHeaderView.JSClassName : string; begin
+class function TExtCalendarDayHeaderView.JSClassName : string;
+      begin
   Result := 'Ext.calendar.DayHeaderView';
 end;
 
-procedure TExtCalendarDayHeaderView.HandleEvent(const AEvtName : string); begin
+procedure TExtCalendarDayHeaderView.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'dayclick') and Assigned(FOnDayclick) then
     FOnDayclick(TExtCalendarDayHeaderView(ParamAsObject('This')), ParamAsTDateTime('Dt'), ParamAsBoolean('Allday'), TExtElement(ParamAsObject('El')));
 end;
 
-procedure TExtCalendarDayView.SetFDayCount(Value : Integer); begin
+procedure TExtCalendarDayView.SetFDayCount(Value : Integer);
+begin
   FDayCount := Value;
   JSCode('dayCount:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayView.SetFDdCreateEventText(Value : String); begin
+procedure TExtCalendarDayView.SetFDdCreateEventText(Value : String);
+begin
   FDdCreateEventText := Value;
   JSCode('ddCreateEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayView.SetFDdMoveEventText(Value : String); begin
+procedure TExtCalendarDayView.SetFDdMoveEventText(Value : String);
+begin
   FDdMoveEventText := Value;
   JSCode('ddMoveEventText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayView.SetFShowTime(Value : Boolean); begin
+procedure TExtCalendarDayView.SetFShowTime(Value : Boolean);
+begin
   FShowTime := Value;
   JSCode('showTime:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayView.SetFShowTodayText(Value : Boolean); begin
+procedure TExtCalendarDayView.SetFShowTodayText(Value : Boolean);
+begin
   FShowTodayText := Value;
   JSCode('showTodayText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarDayView.SetFTodayText(Value : String); begin
+procedure TExtCalendarDayView.SetFTodayText(Value : String);
+begin
   FTodayText := Value;
   JSCode('todayText:' + VarToJSON([Value]));
 end;
 
-class function TExtCalendarDayView.JSClassName : string; begin
+class function TExtCalendarDayView.JSClassName : string;
+      begin
   Result := 'Ext.calendar.DayView';
 end;
 
-function TExtCalendarDayView.GetStartDate : TExtFunction; begin
+function TExtCalendarDayView.GetStartDate : TExtFunction;
+begin
   JSCode(JSName + '.getStartDate();', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-function TExtCalendarDayView.IsToday : TExtFunction; begin
+function TExtCalendarDayView.IsToday : TExtFunction;
+begin
   JSCode(JSName + '.isToday();', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-function TExtCalendarDayView.MoveDays(Value : Integer) : TExtFunction; begin
+function TExtCalendarDayView.MoveDays(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.moveDays(' + VarToJSON([Value]) + ');', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-function TExtCalendarDayView.MoveNext : TExtFunction; begin
+function TExtCalendarDayView.MoveNext : TExtFunction;
+begin
   JSCode(JSName + '.moveNext();', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-function TExtCalendarDayView.MovePrev : TExtFunction; begin
+function TExtCalendarDayView.MovePrev : TExtFunction;
+begin
   JSCode(JSName + '.movePrev();', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-function TExtCalendarDayView.MoveTo(Dt : TDateTime) : TExtFunction; begin
+function TExtCalendarDayView.MoveTo(Dt : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.moveTo(' + VarToJSON([Dt]) + ');', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-function TExtCalendarDayView.MoveToday : TExtFunction; begin
+function TExtCalendarDayView.MoveToday : TExtFunction;
+begin
   JSCode(JSName + '.moveToday();', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-function TExtCalendarDayView.SetStartDate(Dt : TDateTime) : TExtFunction; begin
+function TExtCalendarDayView.SetStartDate(Dt : TDateTime) : TExtFunction;
+begin
   JSCode(JSName + '.setStartDate(' + VarToJSON([Dt]) + ');', 'TExtCalendarDayView');
   Result := Self;
 end;
 
-procedure TExtCalendarMonthView.SetFShowHeader(Value : Boolean); begin
+procedure TExtCalendarMonthView.SetFShowHeader(Value : Boolean);
+begin
   FShowHeader := Value;
   JSCode('showHeader:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarMonthView.SetFShowTime(Value : Boolean); begin
+procedure TExtCalendarMonthView.SetFShowTime(Value : Boolean);
+begin
   FShowTime := Value;
   JSCode('showTime:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarMonthView.SetFShowTodayText(Value : Boolean); begin
+procedure TExtCalendarMonthView.SetFShowTodayText(Value : Boolean);
+begin
   FShowTodayText := Value;
   JSCode('showTodayText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarMonthView.SetFShowWeekLinks(Value : Boolean); begin
+procedure TExtCalendarMonthView.SetFShowWeekLinks(Value : Boolean);
+begin
   FShowWeekLinks := Value;
   JSCode('showWeekLinks:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarMonthView.SetFShowWeekNumbers(Value : Boolean); begin
+procedure TExtCalendarMonthView.SetFShowWeekNumbers(Value : Boolean);
+begin
   FShowWeekNumbers := Value;
   JSCode('showWeekNumbers:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarMonthView.SetFTodayText(Value : String); begin
+procedure TExtCalendarMonthView.SetFTodayText(Value : String);
+begin
   FTodayText := Value;
   JSCode('todayText:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarMonthView.SetFWeekLinkOverClass(Value : String); begin
+procedure TExtCalendarMonthView.SetFWeekLinkOverClass(Value : String);
+begin
   FWeekLinkOverClass := Value;
   JSCode('weekLinkOverClass:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarMonthView.SetFOnDayclick(Value : TExtCalendarMonthViewOnDayclick); begin
+procedure TExtCalendarMonthView.SetFOnDayclick(Value : TExtCalendarMonthViewOnDayclick);
+begin
   if Assigned(FOnDayclick) then
     JSCode(JSName+'.events ["dayclick"].listeners=[];');
   if Assigned(Value) then
@@ -1956,7 +2145,8 @@ procedure TExtCalendarMonthView.SetFOnDayclick(Value : TExtCalendarMonthViewOnDa
   FOnDayclick := Value;
 end;
 
-procedure TExtCalendarMonthView.SetFOnWeekclick(Value : TExtCalendarMonthViewOnWeekclick); begin
+procedure TExtCalendarMonthView.SetFOnWeekclick(Value : TExtCalendarMonthViewOnWeekclick);
+begin
   if Assigned(FOnWeekclick) then
     JSCode(JSName+'.events ["weekclick"].listeners=[];');
   if Assigned(Value) then
@@ -1964,11 +2154,13 @@ procedure TExtCalendarMonthView.SetFOnWeekclick(Value : TExtCalendarMonthViewOnW
   FOnWeekclick := Value;
 end;
 
-class function TExtCalendarMonthView.JSClassName : string; begin
+class function TExtCalendarMonthView.JSClassName : string;
+      begin
   Result := 'Ext.calendar.MonthView';
 end;
 
-procedure TExtCalendarMonthView.HandleEvent(const AEvtName : string); begin
+procedure TExtCalendarMonthView.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'dayclick') and Assigned(FOnDayclick) then
     FOnDayclick(TExtCalendarMonthView(ParamAsObject('This')), ParamAsTDateTime('Dt'), ParamAsBoolean('Allday'), TExtElement(ParamAsObject('El')))
@@ -1976,11 +2168,13 @@ procedure TExtCalendarMonthView.HandleEvent(const AEvtName : string); begin
     FOnWeekclick(TExtCalendarMonthView(ParamAsObject('This')), ParamAsTDateTime('Dt'));
 end;
 
-class function TExtCalendarMonthViewTemplate.JSClassName : string; begin
+class function TExtCalendarMonthViewTemplate.JSClassName : string;
+      begin
   Result := 'Ext.calendar.MonthViewTemplate';
 end;
 
-procedure TExtCalendarEventEditWindow.SetFOnEditdetails(Value : TExtCalendarEventEditWindowOnEditdetails); begin
+procedure TExtCalendarEventEditWindow.SetFOnEditdetails(Value : TExtCalendarEventEditWindowOnEditdetails);
+begin
   if Assigned(FOnEditdetails) then
     JSCode(JSName+'.events ["editdetails"].listeners=[];');
   if Assigned(Value) then
@@ -1988,7 +2182,8 @@ procedure TExtCalendarEventEditWindow.SetFOnEditdetails(Value : TExtCalendarEven
   FOnEditdetails := Value;
 end;
 
-procedure TExtCalendarEventEditWindow.SetFOnEventadd(Value : TExtCalendarEventEditWindowOnEventadd); begin
+procedure TExtCalendarEventEditWindow.SetFOnEventadd(Value : TExtCalendarEventEditWindowOnEventadd);
+begin
   if Assigned(FOnEventadd) then
     JSCode(JSName+'.events ["eventadd"].listeners=[];');
   if Assigned(Value) then
@@ -1996,7 +2191,8 @@ procedure TExtCalendarEventEditWindow.SetFOnEventadd(Value : TExtCalendarEventEd
   FOnEventadd := Value;
 end;
 
-procedure TExtCalendarEventEditWindow.SetFOnEventcancel(Value : TExtCalendarEventEditWindowOnEventcancel); begin
+procedure TExtCalendarEventEditWindow.SetFOnEventcancel(Value : TExtCalendarEventEditWindowOnEventcancel);
+begin
   if Assigned(FOnEventcancel) then
     JSCode(JSName+'.events ["eventcancel"].listeners=[];');
   if Assigned(Value) then
@@ -2004,7 +2200,8 @@ procedure TExtCalendarEventEditWindow.SetFOnEventcancel(Value : TExtCalendarEven
   FOnEventcancel := Value;
 end;
 
-procedure TExtCalendarEventEditWindow.SetFOnEventdelete(Value : TExtCalendarEventEditWindowOnEventdelete); begin
+procedure TExtCalendarEventEditWindow.SetFOnEventdelete(Value : TExtCalendarEventEditWindowOnEventdelete);
+begin
   if Assigned(FOnEventdelete) then
     JSCode(JSName+'.events ["eventdelete"].listeners=[];');
   if Assigned(Value) then
@@ -2012,7 +2209,8 @@ procedure TExtCalendarEventEditWindow.SetFOnEventdelete(Value : TExtCalendarEven
   FOnEventdelete := Value;
 end;
 
-procedure TExtCalendarEventEditWindow.SetFOnEventupdate(Value : TExtCalendarEventEditWindowOnEventupdate); begin
+procedure TExtCalendarEventEditWindow.SetFOnEventupdate(Value : TExtCalendarEventEditWindowOnEventupdate);
+begin
   if Assigned(FOnEventupdate) then
     JSCode(JSName+'.events ["eventupdate"].listeners=[];');
   if Assigned(Value) then
@@ -2020,21 +2218,25 @@ procedure TExtCalendarEventEditWindow.SetFOnEventupdate(Value : TExtCalendarEven
   FOnEventupdate := Value;
 end;
 
-class function TExtCalendarEventEditWindow.JSClassName : string; begin
+class function TExtCalendarEventEditWindow.JSClassName : string;
+      begin
   Result := 'Ext.calendar.EventEditWindow';
 end;
 
-function TExtCalendarEventEditWindow.Show(O : TExtObject; AnimateTarget : String = '') : TExtFunction; begin
+function TExtCalendarEventEditWindow.Show(O : TExtObject; AnimateTarget : String = '') : TExtFunction;
+begin
   JSCode(JSName + '.Show(' + VarToJSON([O, false, AnimateTarget]) + ');', 'TExtCalendarEventEditWindow');
   Result := Self;
 end;
 
-function TExtCalendarEventEditWindow.Show(O : TExtDataRecord; AnimateTarget : String = '') : TExtFunction; begin
+function TExtCalendarEventEditWindow.Show(O : TExtDataRecord; AnimateTarget : String = '') : TExtFunction;
+begin
   JSCode(JSName + '.show(' + VarToJSON([O, false, AnimateTarget]) + ');', 'TExtCalendarEventEditWindow');
   Result := Self;
 end;
 
-procedure TExtCalendarEventEditWindow.HandleEvent(const AEvtName : string); begin
+procedure TExtCalendarEventEditWindow.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'editdetails') and Assigned(FOnEditdetails) then
     FOnEditdetails(TExtCalendarEventEditWindow(ParamAsObject('This')), TExtCalendarEventRecord(ParamAsObject('Rec')))
@@ -2048,47 +2250,57 @@ procedure TExtCalendarEventEditWindow.HandleEvent(const AEvtName : string); begi
     FOnEventupdate(TExtCalendarEventEditWindow(ParamAsObject('This')), TExtCalendarEventRecord(ParamAsObject('Rec')));
 end;
 
-class function TExtCalendarEventMappings.JSClassName : string; begin
+class function TExtCalendarEventMappings.JSClassName : string;
+      begin
   Result := 'Ext.calendar.EventMappings';
 end;
 
-procedure TExtCalendarStatusProxy.SetFAddEventCls(Value : String); begin
+procedure TExtCalendarStatusProxy.SetFAddEventCls(Value : String);
+begin
   FAddEventCls := Value;
   JSCode('addEventCls:' + VarToJSON([Value]));
 end;
 
-procedure TExtCalendarStatusProxy.SetFMoveEventCls(Value : String); begin
+procedure TExtCalendarStatusProxy.SetFMoveEventCls(Value : String);
+begin
   FMoveEventCls := Value;
   JSCode('moveEventCls:' + VarToJSON([Value]));
 end;
 
-class function TExtCalendarStatusProxy.JSClassName : string; begin
+class function TExtCalendarStatusProxy.JSClassName : string;
+      begin
   Result := 'Ext.calendar.StatusProxy';
 end;
 
-function TExtCalendarStatusProxy.UpdateMsg(Msg : String) : TExtFunction; begin
+function TExtCalendarStatusProxy.UpdateMsg(Msg : String) : TExtFunction;
+begin
   JSCode(JSName + '.updateMsg(' + VarToJSON([Msg]) + ');', 'TExtCalendarStatusProxy');
   Result := Self;
 end;
 
-procedure TExtCalendarWeekView.SetFDayCount(Value : Integer); begin
+procedure TExtCalendarWeekView.SetFDayCount(Value : Integer);
+begin
   FDayCount := Value;
   JSCode('dayCount:' + VarToJSON([Value]));
 end;
 
-class function TExtCalendarWeekView.JSClassName : string; begin
+class function TExtCalendarWeekView.JSClassName : string;
+      begin
   Result := 'Ext.calendar.WeekView';
 end;
 
-class function TExtCalendarReminderField.JSClassName : string; begin
+class function TExtCalendarReminderField.JSClassName : string;
+      begin
   Result := 'Ext.calendar.ReminderField';
 end;
 
-class function TExtCalendarDayViewTemplate.JSClassName : string; begin
+class function TExtCalendarDayViewTemplate.JSClassName : string;
+      begin
   Result := 'Ext.calendar.DayViewTemplate';
 end;
 
-procedure TExtCalendarEventEditForm.SetFOnEventadd(Value : TExtCalendarEventEditFormOnEventadd); begin
+procedure TExtCalendarEventEditForm.SetFOnEventadd(Value : TExtCalendarEventEditFormOnEventadd);
+begin
   if Assigned(FOnEventadd) then
     JSCode(JSName+'.events ["eventadd"].listeners=[];');
   if Assigned(Value) then
@@ -2096,7 +2308,8 @@ procedure TExtCalendarEventEditForm.SetFOnEventadd(Value : TExtCalendarEventEdit
   FOnEventadd := Value;
 end;
 
-procedure TExtCalendarEventEditForm.SetFOnEventcancel(Value : TExtCalendarEventEditFormOnEventcancel); begin
+procedure TExtCalendarEventEditForm.SetFOnEventcancel(Value : TExtCalendarEventEditFormOnEventcancel);
+begin
   if Assigned(FOnEventcancel) then
     JSCode(JSName+'.events ["eventcancel"].listeners=[];');
   if Assigned(Value) then
@@ -2104,7 +2317,8 @@ procedure TExtCalendarEventEditForm.SetFOnEventcancel(Value : TExtCalendarEventE
   FOnEventcancel := Value;
 end;
 
-procedure TExtCalendarEventEditForm.SetFOnEventdelete(Value : TExtCalendarEventEditFormOnEventdelete); begin
+procedure TExtCalendarEventEditForm.SetFOnEventdelete(Value : TExtCalendarEventEditFormOnEventdelete);
+begin
   if Assigned(FOnEventdelete) then
     JSCode(JSName+'.events ["eventdelete"].listeners=[];');
   if Assigned(Value) then
@@ -2112,7 +2326,8 @@ procedure TExtCalendarEventEditForm.SetFOnEventdelete(Value : TExtCalendarEventE
   FOnEventdelete := Value;
 end;
 
-procedure TExtCalendarEventEditForm.SetFOnEventupdate(Value : TExtCalendarEventEditFormOnEventupdate); begin
+procedure TExtCalendarEventEditForm.SetFOnEventupdate(Value : TExtCalendarEventEditFormOnEventupdate);
+begin
   if Assigned(FOnEventupdate) then
     JSCode(JSName+'.events ["eventupdate"].listeners=[];');
   if Assigned(Value) then
@@ -2120,11 +2335,13 @@ procedure TExtCalendarEventEditForm.SetFOnEventupdate(Value : TExtCalendarEventE
   FOnEventupdate := Value;
 end;
 
-class function TExtCalendarEventEditForm.JSClassName : string; begin
+class function TExtCalendarEventEditForm.JSClassName : string;
+      begin
   Result := 'Ext.calendar.EventEditForm';
 end;
 
-procedure TExtCalendarEventEditForm.HandleEvent(const AEvtName : string); begin
+procedure TExtCalendarEventEditForm.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'eventadd') and Assigned(FOnEventadd) then
     FOnEventadd(TExtCalendarEventEditForm(ParamAsObject('This')), TExtCalendarEventRecord(ParamAsObject('Rec')))

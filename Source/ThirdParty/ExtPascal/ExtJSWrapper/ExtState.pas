@@ -93,22 +93,26 @@ begin
     Result := nil;
 end;
 
-procedure TExtStateProvider.SetFSlovak(Value : TExtObject); begin
+procedure TExtStateProvider.SetFSlovak(Value : TExtObject);
+begin
   FSlovak := Value;
     JSCode(JSName + '.slovak=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtStateProvider.SetFIndicatorText(Value : TExtObject); begin
+procedure TExtStateProvider.SetFIndicatorText(Value : TExtObject);
+begin
   FIndicatorText := Value;
     JSCode(JSName + '.indicatorText=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtStateProvider.SetFIndicatorText_(Value : TExtObject); begin
+procedure TExtStateProvider.SetFIndicatorText_(Value : TExtObject);
+begin
   FIndicatorText_ := Value;
     JSCode(JSName + '.indicatorText=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtStateProvider.SetFOnStatechange(Value : TExtStateProviderOnStatechange); begin
+procedure TExtStateProvider.SetFOnStatechange(Value : TExtStateProviderOnStatechange);
+begin
   if Assigned(FOnStatechange) then
     JSCode(JSName+'.events ["statechange"].listeners=[];');
   if Assigned(Value) then
@@ -116,145 +120,174 @@ procedure TExtStateProvider.SetFOnStatechange(Value : TExtStateProviderOnStatech
   FOnStatechange := Value;
 end;
 
-function TExtStateProvider.JSClassName : string; begin
+function TExtStateProvider.JSClassName : string;
+begin
   Result := 'Ext.state.Provider';
 end;
 
-function TExtStateProvider.IndicatorText__ : TExtFunction; begin
+function TExtStateProvider.IndicatorText__ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.IndicatorText___ : TExtFunction; begin
+function TExtStateProvider.IndicatorText___ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.IndicatorText____ : TExtFunction; begin
+function TExtStateProvider.IndicatorText____ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.IndicatorText_____ : TExtFunction; begin
+function TExtStateProvider.IndicatorText_____ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.IndicatorText______ : TExtFunction; begin
+function TExtStateProvider.IndicatorText______ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.IndicatorText_______ : TExtFunction; begin
+function TExtStateProvider.IndicatorText_______ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.IndicatorText________ : TExtFunction; begin
+function TExtStateProvider.IndicatorText________ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.IndicatorText_________ : TExtFunction; begin
+function TExtStateProvider.IndicatorText_________ : TExtFunction;
+begin
   JSCode(JSName + '.indicatorText();', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.Clear(Name : String) : TExtFunction; begin
+function TExtStateProvider.Clear(Name : String) : TExtFunction;
+begin
   JSCode(JSName + '.clear(' + VarToJSON([Name]) + ');', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.DecodeValue(Value : String) : TExtFunction; begin
+function TExtStateProvider.DecodeValue(Value : String) : TExtFunction;
+begin
   JSCode(JSName + '.decodeValue(' + VarToJSON([Value]) + ');', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.EncodeValue(Value : String) : TExtFunction; begin
+function TExtStateProvider.EncodeValue(Value : String) : TExtFunction;
+begin
   JSCode(JSName + '.encodeValue(' + VarToJSON([Value]) + ');', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.Get(Name : String; DefaultValue : String) : TExtFunction; begin
+function TExtStateProvider.Get(Name : String; DefaultValue : String) : TExtFunction;
+begin
   JSCode(JSName + '.get(' + VarToJSON([Name, DefaultValue]) + ');', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.SetJS(Name : String; Value : String) : TExtFunction; begin
+function TExtStateProvider.SetJS(Name : String; Value : String) : TExtFunction;
+begin
   JSCode(JSName + '.set(' + VarToJSON([Name, Value]) + ');', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.On(EventName : String; Handler : TExtFunction) : TExtFunction; begin
+function TExtStateProvider.On(EventName : String; Handler : TExtFunction) : TExtFunction;
+begin
   JSCode(JSName + '.on(' + VarToJSON([EventName, Handler, true]) + ');', 'TExtStateProvider');
   Result := Self;
 end;
 
-function TExtStateProvider.Un(EventName : String; Handler : TExtFunction) : TExtFunction; begin
+function TExtStateProvider.Un(EventName : String; Handler : TExtFunction) : TExtFunction;
+begin
   JSCode(JSName + '.un(' + VarToJSON([EventName, Handler, true]) + ');', 'TExtStateProvider');
   Result := Self;
 end;
 
-procedure TExtStateProvider.HandleEvent(const AEvtName : string); begin
+procedure TExtStateProvider.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'statechange') and Assigned(FOnStatechange) then
     FOnStatechange(TExtStateProvider(ParamAsObject('This')), ParamAsString('Key'), ParamAsString('Value'));
 end;
 
-function TExtStateManagerSingleton.JSClassName : string; begin
+function TExtStateManagerSingleton.JSClassName : string;
+begin
   Result := 'Ext.state.Manager';
 end;
 
-function TExtStateManagerSingleton.Clear(Name : String) : TExtFunction; begin
+function TExtStateManagerSingleton.Clear(Name : String) : TExtFunction;
+begin
   JSCode(JSName + '.clear(' + VarToJSON([Name]) + ');', 'TExtStateManagerSingleton');
   Result := Self;
 end;
 
-function TExtStateManagerSingleton.Get(Name : String; DefaultValue : String) : TExtFunction; begin
+function TExtStateManagerSingleton.Get(Name : String; DefaultValue : String) : TExtFunction;
+begin
   JSCode(JSName + '.get(' + VarToJSON([Name, DefaultValue]) + ');', 'TExtStateManagerSingleton');
   Result := Self;
 end;
 
-function TExtStateManagerSingleton.GetProvider : TExtFunction; begin
+function TExtStateManagerSingleton.GetProvider : TExtFunction;
+begin
   JSCode(JSName + '.getProvider();', 'TExtStateManagerSingleton');
   Result := Self;
 end;
 
-function TExtStateManagerSingleton.SetJS(Name : String; Value : String) : TExtFunction; begin
+function TExtStateManagerSingleton.SetJS(Name : String; Value : String) : TExtFunction;
+begin
   JSCode(JSName + '.set(' + VarToJSON([Name, Value]) + ');', 'TExtStateManagerSingleton');
   Result := Self;
 end;
 
-function TExtStateManagerSingleton.SetProvider(StateProvider : TExtStateProvider) : TExtFunction; begin
+function TExtStateManagerSingleton.SetProvider(StateProvider : TExtStateProvider) : TExtFunction;
+begin
   JSCode(JSName + '.setProvider(' + VarToJSON([StateProvider, false]) + ');', 'TExtStateManagerSingleton');
   Result := Self;
 end;
 
-procedure TExtStateCookieProvider.SetFDomain(Value : String); begin
+procedure TExtStateCookieProvider.SetFDomain(Value : String);
+begin
   FDomain := Value;
   JSCode('domain:' + VarToJSON([Value]));
 end;
 
-procedure TExtStateCookieProvider.SetFExpires(Value : TDateTime); begin
+procedure TExtStateCookieProvider.SetFExpires(Value : TDateTime);
+begin
   FExpires := Value;
   JSCode('expires:' + VarToJSON([Value]));
 end;
 
-procedure TExtStateCookieProvider.SetFPath(Value : String); begin
+procedure TExtStateCookieProvider.SetFPath(Value : String);
+begin
   FPath := Value;
   JSCode('path:' + VarToJSON([Value]));
 end;
 
-procedure TExtStateCookieProvider.SetFSecure(Value : Boolean); begin
+procedure TExtStateCookieProvider.SetFSecure(Value : Boolean);
+begin
   FSecure := Value;
   JSCode('secure:' + VarToJSON([Value]));
 end;
 
-function TExtStateCookieProvider.JSClassName : string; begin
+function TExtStateCookieProvider.JSClassName : string;
+begin
   Result := 'Ext.state.CookieProvider';
 end;
 
-procedure TExtStateCookieProvider.InitDefaults; begin
+procedure TExtStateCookieProvider.InitDefaults;
+begin
   inherited;
   FDomain := 'www';
   FPath := '/';

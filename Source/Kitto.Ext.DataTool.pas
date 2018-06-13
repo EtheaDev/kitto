@@ -157,7 +157,7 @@ begin
   if (LRecord = nil) and (ServerStore <> nil) and (ServerStore.RecordCount > 0) then
     LRecord := ServerStore.Records[0];
   if LRecord <> nil then
-    Result := LRecord.ExpandExpression(Result);
+    LRecord.ExpandExpression(Result);
 end;
 
 procedure TKExtDataToolController.ExecuteTool;

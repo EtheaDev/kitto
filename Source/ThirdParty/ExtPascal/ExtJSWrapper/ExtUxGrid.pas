@@ -159,17 +159,20 @@ begin
   Result := 'Ext.ux.grid.CheckColumn';
 end;
 
-procedure TExtUxGridGroupSummary.SetFSummaryRenderer(Value : TExtFunction); begin
+procedure TExtUxGridGroupSummary.SetFSummaryRenderer(Value : TExtFunction);
+begin
   FSummaryRenderer := Value;
   JSCode('summaryRenderer:' + VarToJSON([Value, true]));
 end;
 
-procedure TExtUxGridGroupSummary.SetFSummaryType(Value : string); begin
+procedure TExtUxGridGroupSummary.SetFSummaryType(Value : string);
+begin
   FSummaryType := Value;
   JSCode('summaryType:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridGroupSummary.SetFCalculations(Value : TExtObject); begin
+procedure TExtUxGridGroupSummary.SetFCalculations(Value : TExtObject);
+begin
   FCalculations := Value;
     JSCode(JSName + '.calculations=' + VarToJSON([Value, false]) + ';');
 end;
@@ -179,32 +182,38 @@ begin
   Result := 'Ext.ux.grid.GroupSummary';
 end;
 
-procedure TExtUxGridGroupSummary.InitDefaults; begin
+procedure TExtUxGridGroupSummary.InitDefaults;
+begin
   inherited;
   FCalculations := TExtObject.CreateInternal(Self, 'calculations');
 end;
 
-function TExtUxGridGroupSummary.ShowSummaryMsg(GroupValue : string; Msg : string) : TExtFunction; begin
+function TExtUxGridGroupSummary.ShowSummaryMsg(GroupValue : string; Msg : string) : TExtFunction;
+begin
   JSCode(JSName + '.showSummaryMsg(' + VarToJSON([GroupValue, Msg]) + ');', 'TExtUxGridGroupSummary');
   Result := Self;
 end;
 
-function TExtUxGridGroupSummary.ToggleSummaries(Visible : Boolean) : TExtFunction; begin
+function TExtUxGridGroupSummary.ToggleSummaries(Visible : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.toggleSummaries(' + VarToJSON([Visible]) + ');', 'TExtUxGridGroupSummary');
   Result := Self;
 end;
 
-procedure TExtUxGridRowExpander.SetFExpandOnDblClick(Value : Boolean); begin
+procedure TExtUxGridRowExpander.SetFExpandOnDblClick(Value : Boolean);
+begin
   FExpandOnDblClick := Value;
   JSCode('expandOnDblClick:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridRowExpander.SetFExpandOnEnter(Value : Boolean); begin
+procedure TExtUxGridRowExpander.SetFExpandOnEnter(Value : Boolean);
+begin
   FExpandOnEnter := Value;
   JSCode('expandOnEnter:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridRowExpander.SetFOnBeforecollapse(Value : TExtUxGridRowExpanderOnBeforecollapse); begin
+procedure TExtUxGridRowExpander.SetFOnBeforecollapse(Value : TExtUxGridRowExpanderOnBeforecollapse);
+begin
   if Assigned(FOnBeforecollapse) then
     JSCode(JSName+'.events ["beforecollapse"].listeners=[];');
   if Assigned(Value) then
@@ -212,7 +221,8 @@ procedure TExtUxGridRowExpander.SetFOnBeforecollapse(Value : TExtUxGridRowExpand
   FOnBeforecollapse := Value;
 end;
 
-procedure TExtUxGridRowExpander.SetFOnBeforeexpand(Value : TExtUxGridRowExpanderOnBeforeexpand); begin
+procedure TExtUxGridRowExpander.SetFOnBeforeexpand(Value : TExtUxGridRowExpanderOnBeforeexpand);
+begin
   if Assigned(FOnBeforeexpand) then
     JSCode(JSName+'.events ["beforeexpand"].listeners=[];');
   if Assigned(Value) then
@@ -220,7 +230,8 @@ procedure TExtUxGridRowExpander.SetFOnBeforeexpand(Value : TExtUxGridRowExpander
   FOnBeforeexpand := Value;
 end;
 
-procedure TExtUxGridRowExpander.SetFOnCollapse(Value : TExtUxGridRowExpanderOnCollapse); begin
+procedure TExtUxGridRowExpander.SetFOnCollapse(Value : TExtUxGridRowExpanderOnCollapse);
+begin
   if Assigned(FOnCollapse) then
     JSCode(JSName+'.events ["collapse"].listeners=[];');
   if Assigned(Value) then
@@ -228,7 +239,8 @@ procedure TExtUxGridRowExpander.SetFOnCollapse(Value : TExtUxGridRowExpanderOnCo
   FOnCollapse := Value;
 end;
 
-procedure TExtUxGridRowExpander.SetFOnExpand(Value : TExtUxGridRowExpanderOnExpand); begin
+procedure TExtUxGridRowExpander.SetFOnExpand(Value : TExtUxGridRowExpanderOnExpand);
+begin
   if Assigned(FOnExpand) then
     JSCode(JSName+'.events ["expand"].listeners=[];');
   if Assigned(Value) then
@@ -241,13 +253,15 @@ begin
   Result := 'Ext.ux.grid.RowExpander';
 end;
 
-procedure TExtUxGridRowExpander.InitDefaults; begin
+procedure TExtUxGridRowExpander.InitDefaults;
+begin
   inherited;
   FExpandOnDblClick := true;
   FExpandOnEnter := true;
 end;
 
-procedure TExtUxGridRowExpander.HandleEvent(const AEvtName : string); begin
+procedure TExtUxGridRowExpander.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforecollapse') and Assigned(FOnBeforecollapse) then
     FOnBeforecollapse(TExtUxGridRowExpander(ParamAsObject('This')), TExtObject(ParamAsObject('ExtDataRecord')), TExtObject(ParamAsObject('Body')), ParamAsInteger('RowIndex'))
@@ -264,42 +278,50 @@ begin
   Result := 'Ext.ux.grid.HybridSummary';
 end;
 
-function TExtUxGridHybridSummary.GetSummaryData(GroupValue : string) : TExtFunction; begin
+function TExtUxGridHybridSummary.GetSummaryData(GroupValue : string) : TExtFunction;
+begin
   JSCode(JSName + '.getSummaryData(' + VarToJSON([GroupValue]) + ');', 'TExtUxGridHybridSummary');
   Result := Self;
 end;
 
-function TExtUxGridHybridSummary.UpdateSummaryData(GroupValue : string; Data : TExtObject; SkipRefresh : Boolean = false) : TExtFunction; begin
+function TExtUxGridHybridSummary.UpdateSummaryData(GroupValue : string; Data : TExtObject; SkipRefresh : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.updateSummaryData(' + VarToJSON([GroupValue, Data, false, SkipRefresh]) + ');', 'TExtUxGridHybridSummary');
   Result := Self;
 end;
 
-procedure TExtUxGridBufferView.SetFBorderHeight(Value : Integer); begin
+procedure TExtUxGridBufferView.SetFBorderHeight(Value : Integer);
+begin
   FBorderHeight := Value;
   JSCode('borderHeight:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridBufferView.SetFCacheSize(Value : Integer); begin
+procedure TExtUxGridBufferView.SetFCacheSize(Value : Integer);
+begin
   FCacheSize := Value;
   JSCode('cacheSize:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridBufferView.SetFCleanDelay(Value : Integer); begin
+procedure TExtUxGridBufferView.SetFCleanDelay(Value : Integer);
+begin
   FCleanDelay := Value;
   JSCode('cleanDelay:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridBufferView.SetFRowHeight(Value : Integer); begin
+procedure TExtUxGridBufferView.SetFRowHeight(Value : Integer);
+begin
   FRowHeight := Value;
   JSCode('rowHeight:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridBufferView.SetFScrollDelay(Value : Boolean); begin
+procedure TExtUxGridBufferView.SetFScrollDelay(Value : Boolean);
+begin
   FScrollDelay := Value;
   JSCode('scrollDelay:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxGridBufferView.SetFScrollDelayNumber(Value : Integer); begin
+procedure TExtUxGridBufferView.SetFScrollDelayNumber(Value : Integer);
+begin
   FScrollDelayNumber := Value;
   JSCode('scrollDelay:' + VarToJSON([Value]));
 end;
@@ -309,7 +331,8 @@ begin
   Result := 'Ext.ux.grid.BufferView';
 end;
 
-procedure TExtUxGridBufferView.InitDefaults; begin
+procedure TExtUxGridBufferView.InitDefaults;
+begin
   inherited;
 end;
 
@@ -375,11 +398,13 @@ begin
   Result := 'Ext.ux.grid.RowEditor';
 end;
 
-procedure TExtUxGridRowEditor.InitDefaults; begin
+procedure TExtUxGridRowEditor.InitDefaults;
+begin
   inherited;
 end;
 
-procedure TExtUxGridRowEditor.HandleEvent(const AEvtName : string); begin
+procedure TExtUxGridRowEditor.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'afteredit') and Assigned(FOnAfterEdit) then
     FOnAfterEdit(TExtUxGridRowEditor(ParamAsObject('Roweditor')), TExtObject(ParamAsObject('Changes')), TExtDataRecord(ParamAsObject('R')), ParamAsInteger('RowIndex'))
@@ -394,7 +419,8 @@ begin
   Result := 'Ext.ux.grid.TableGrid';
 end;
 
-procedure TExtUxGridTableGrid.InitDefaults; begin
+procedure TExtUxGridTableGrid.InitDefaults;
+begin
   inherited;
 end;
 

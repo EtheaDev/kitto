@@ -30,26 +30,31 @@ type
 
 implementation
 
-procedure TExtUxLayoutRowLayout.SetFEnableTabbing(Value : Boolean); begin
+procedure TExtUxLayoutRowLayout.SetFEnableTabbing(Value : Boolean);
+begin
   FEnableTabbing := Value;
   JSCode('enableTabbing:' + VarToJSON([Value]));
 end;
 
-function TExtUxLayoutRowLayout.JSClassName : string; begin
+function TExtUxLayoutRowLayout.JSClassName : string;
+begin
   Result := 'Ext.ux.layout.RowLayout';
 end;
 
-function TExtUxLayoutRowLayout.SetActiveTab(Tab : string) : TExtFunction; begin
+function TExtUxLayoutRowLayout.SetActiveTab(Tab : string) : TExtFunction;
+begin
   JSCode(JSName + '.setActiveTab(' + VarToJSON([Tab]) + ');', 'TExtUxLayoutRowLayout');
   Result := Self;
 end;
 
-function TExtUxLayoutRowLayout.SetActiveTab(Tab : TExtPanel) : TExtFunction; begin
+function TExtUxLayoutRowLayout.SetActiveTab(Tab : TExtPanel) : TExtFunction;
+begin
   JSCode(JSName + '.setActiveTab(' + VarToJSON([Tab, false]) + ');', 'TExtUxLayoutRowLayout');
   Result := Self;
 end;
 
-function TExtUxLayoutCenterLayout.JSClassName : string; begin
+function TExtUxLayoutCenterLayout.JSClassName : string;
+begin
   Result := 'Ext.ux.layout.CenterLayout';
 end;
 

@@ -80,6 +80,7 @@ type
     function GetMaxRecords: Integer;
     function GetDefaultAutoOpen: Boolean;
     procedure SetURLFieldValues(const ARecord: TKViewTableRecord);
+    function HasURLFields: Boolean;
     procedure SetFieldValue(const AField: TKViewTableField; const AValue: TSuperAvlEntry);
     function FindValueByName(const AValues: ISuperObject; const AName: string): TSuperAvlEntry;
     function GetFieldFilterFunc: TKFieldFilterFunc;
@@ -141,7 +142,7 @@ type
     procedure AddUsedViewField(const AViewField: TKViewField);
     function InitEditController(const AContainer: TExtContainer; const ARecord: TKViewTableRecord;
       const AEditMode: TKEditMode): IKExtController;
-    function ExpandExpression(const AExpression: string): string; virtual;
+    procedure ExpandExpression(var AExpression: string); virtual;
   public
     procedure AfterConstruction; override;
     destructor Destroy; override;
@@ -243,9 +244,9 @@ begin
     inherited;
 end;
 
-function TKExtDataPanelController.ExpandExpression(const AExpression: string): string;
+procedure TKExtDataPanelController.ExpandExpression(var AExpression: string);
 begin
-  Result := TEFMacroExpansionEngine.Instance.Expand(AExpression);
+  TEFMacroExpansionEngine.Instance.Expand(AExpression);
 end;
 
 procedure TKExtDataPanelController.DefaultAction;
@@ -458,7 +459,8 @@ begin
   LLayoutNode := ViewTable.FindNode('Controller/' + ALayoutName + '/Layout');
   if Assigned(LLayoutNode) then
   begin
-    LLayoutName := ExpandExpression(LLayoutNode.AsString);
+    LLayoutName := LLayoutNode.AsString;
+    ExpandExpression(LLayoutName);
     if LLayoutName <> '' then
       Result := View.Catalog.Layouts.FindLayout(LLayoutName)
     else
@@ -515,7 +517,7 @@ begin
   // a selected row. We must handle all combinations.
   LConfirmationMessage := AView.GetExpandedString('Controller/ConfirmationMessage');
   // Cleanup Linebreaks with <br> tag
-  LConfirmationMessage := StringReplace(LConfirmationMessage, sLineBreak, '<br>',[rfReplaceAll]);
+  ReplaceAllCaseSensitive(LConfirmationMessage, sLineBreak, '<br>');
   LRequireSelection := AView.GetBoolean('Controller/RequireSelection', True);
 
   if LRequireSelection then
@@ -586,6 +588,16 @@ begin
   Result.On('exception', JSFunction('proxy, type, action, options, response, arg', 'loadError(type, action, response);'));
 end;
 
+function TKExtDataPanelController.HasURLFields: Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 0 to ViewTable.FieldCount - 1 do
+    if ViewTable.Fields[I].IsPicture then
+      Exit(True);
+end;
+
 procedure TKExtDataPanelController.SetURLFieldValues(const ARecord: TKViewTableRecord);
 var
   I: Integer;
@@ -640,6 +652,7 @@ procedure TKExtDataPanelController.DoGetRecordPage(const AStart, ALimit: Integer
 var
   LTotal: Integer;
   LData: string;
+  LForEachRecordProc: TProc<TEFNode>;
 begin
   try
     // Don't refresh if there are pending changes.
@@ -651,12 +664,17 @@ begin
     end
     else
     begin
-      LTotal := ViewTable.Model.LoadRecords(ServerStore, GetRecordPageFilter, GetOrderByClause, AStart, ALimit,
-        procedure (ARecord: TEFNode)
-        begin
-          Assert(ARecord is TKViewTableRecord);
-          SetURLFieldValues(TKViewTableRecord(ARecord));
-        end);
+      // Optimization: no URLFields, no need to execute the record proc.
+      if HasURLFields then
+        LForEachRecordProc :=
+          procedure (ARecord: TEFNode)
+          begin
+            Assert(ARecord is TKViewTableRecord);
+            SetURLFieldValues(TKViewTableRecord(ARecord));
+          end
+      else
+        LForEachRecordProc := nil;
+      LTotal := ViewTable.Model.LoadRecords(ServerStore, GetRecordPageFilter, GetOrderByClause, AStart, ALimit, LForEachRecordProc);
       if AFillResponse then
       begin
         if (AStart <> 0) or (ALimit <> 0) then

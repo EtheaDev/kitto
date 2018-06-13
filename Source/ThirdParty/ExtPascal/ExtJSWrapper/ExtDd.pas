@@ -474,91 +474,109 @@ begin
     Result := nil;
 end;
 
-procedure TExtDdDragDrop.SetFAvailable(Value : Boolean); begin
+procedure TExtDdDragDrop.SetFAvailable(Value : Boolean);
+begin
   FAvailable := Value;
   JSCode(JSName + '.available=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFDefaultPadding(Value : TExtObject); begin
+procedure TExtDdDragDrop.SetFDefaultPadding(Value : TExtObject);
+begin
   FDefaultPadding := Value;
     JSCode(JSName + '.defaultPadding=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFGroups(Value : TExtObject); begin
+procedure TExtDdDragDrop.SetFGroups(Value : TExtObject);
+begin
   FGroups := Value;
     JSCode(JSName + '.groups=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFHasOuterHandles(Value : Boolean); begin
+procedure TExtDdDragDrop.SetFHasOuterHandles(Value : Boolean);
+begin
   FHasOuterHandles := Value;
   JSCode(JSName + '.hasOuterHandles=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFId(Value : String); begin
+procedure TExtDdDragDrop.SetFId(Value : String);
+begin
   FId := Value;
   JSCode(JSName + '.id=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFIgnoreSelf(Value : Boolean); begin
+procedure TExtDdDragDrop.SetFIgnoreSelf(Value : Boolean);
+begin
   FIgnoreSelf := Value;
   JSCode(JSName + '.ignoreSelf=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFInvalidHandleClasses(Value : TExtObjectList); begin
+procedure TExtDdDragDrop.SetFInvalidHandleClasses(Value : TExtObjectList);
+begin
   FInvalidHandleClasses := Value;
     JSCode(JSName + '.invalidHandleClasses=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFInvalidHandleIds(Value : TExtObject); begin
+procedure TExtDdDragDrop.SetFInvalidHandleIds(Value : TExtObject);
+begin
   FInvalidHandleIds := Value;
     JSCode(JSName + '.invalidHandleIds=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFInvalidHandleTypes(Value : TExtObject); begin
+procedure TExtDdDragDrop.SetFInvalidHandleTypes(Value : TExtObject);
+begin
   FInvalidHandleTypes := Value;
     JSCode(JSName + '.invalidHandleTypes=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFIsTarget(Value : Boolean); begin
+procedure TExtDdDragDrop.SetFIsTarget(Value : Boolean);
+begin
   FIsTarget := Value;
   JSCode(JSName + '.isTarget=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFMaintainOffset(Value : Boolean); begin
+procedure TExtDdDragDrop.SetFMaintainOffset(Value : Boolean);
+begin
   FMaintainOffset := Value;
   JSCode(JSName + '.maintainOffset=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFMoveOnly(Value : Boolean); begin
+procedure TExtDdDragDrop.SetFMoveOnly(Value : Boolean);
+begin
   FMoveOnly := Value;
   JSCode(JSName + '.moveOnly=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFPadding(Value : TArrayOfInteger); begin
+procedure TExtDdDragDrop.SetFPadding(Value : TArrayOfInteger);
+begin
   FPadding := Value;
   JSCode(JSName + '.padding=' + ArrayToJSON(Value) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFPrimaryButtonOnly(Value : Boolean); begin
+procedure TExtDdDragDrop.SetFPrimaryButtonOnly(Value : Boolean);
+begin
   FPrimaryButtonOnly := Value;
   JSCode(JSName + '.primaryButtonOnly=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFXTicks(Value : TArrayOfInteger); begin
+procedure TExtDdDragDrop.SetFXTicks(Value : TArrayOfInteger);
+begin
   FXTicks := Value;
   JSCode(JSName + '.xTicks=' + ArrayToJSON(Value) + ';');
 end;
 
-procedure TExtDdDragDrop.SetFYTicks(Value : TArrayOfInteger); begin
+procedure TExtDdDragDrop.SetFYTicks(Value : TArrayOfInteger);
+begin
   FYTicks := Value;
   JSCode(JSName + '.yTicks=' + ArrayToJSON(Value) + ';');
 end;
 
-class function TExtDdDragDrop.JSClassName : string; begin
+class function TExtDdDragDrop.JSClassName : string;
+      begin
   Result := 'Ext.dd.DragDrop';
 end;
 
-procedure TExtDdDragDrop.InitDefaults; begin
+procedure TExtDdDragDrop.InitDefaults;
+begin
   inherited;
   FDefaultPadding := TExtObject.CreateInternal(Self, 'defaultPadding');
   FGroups := TExtObject.CreateInternal(Self, 'groups');
@@ -567,527 +585,633 @@ procedure TExtDdDragDrop.InitDefaults; begin
   FInvalidHandleTypes := TExtObject.CreateInternal(Self, 'invalidHandleTypes');
 end;
 
-function TExtDdDragDrop.AddInvalidHandleClass(CssClass : String) : TExtFunction; begin
+function TExtDdDragDrop.AddInvalidHandleClass(CssClass : String) : TExtFunction;
+begin
   JSCode(JSName + '.addInvalidHandleClass(' + VarToJSON([CssClass]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.AddInvalidHandleId(Id : String) : TExtFunction; begin
+function TExtDdDragDrop.AddInvalidHandleId(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.addInvalidHandleId(' + VarToJSON([Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.AddInvalidHandleType(TagName : String) : TExtFunction; begin
+function TExtDdDragDrop.AddInvalidHandleType(TagName : String) : TExtFunction;
+begin
   JSCode(JSName + '.addInvalidHandleType(' + VarToJSON([TagName]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.AddToGroup(SGroup : String) : TExtFunction; begin
+function TExtDdDragDrop.AddToGroup(SGroup : String) : TExtFunction;
+begin
   JSCode(JSName + '.addToGroup(' + VarToJSON([SGroup]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.ApplyConfig : TExtFunction; begin
+function TExtDdDragDrop.ApplyConfig : TExtFunction;
+begin
   JSCode(JSName + '.applyConfig();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.ClearConstraints : TExtFunction; begin
+function TExtDdDragDrop.ClearConstraints : TExtFunction;
+begin
   JSCode(JSName + '.clearConstraints();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.ClearTicks : TExtFunction; begin
+function TExtDdDragDrop.ClearTicks : TExtFunction;
+begin
   JSCode(JSName + '.clearTicks();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.ConstrainTo(ConstrainTo : String; Pad : TExtObject = nil; InContent : Boolean = false) : TExtFunction; begin
+function TExtDdDragDrop.ConstrainTo(ConstrainTo : String; Pad : TExtObject = nil; InContent : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.constrainTo(' + VarToJSON([ConstrainTo, Pad, false, InContent]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.ConstrainTo(ConstrainTo : String; Pad : Integer; InContent : Boolean = false) : TExtFunction; begin
+function TExtDdDragDrop.ConstrainTo(ConstrainTo : String; Pad : Integer; InContent : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.constrainTo(' + VarToJSON([ConstrainTo, Pad, InContent]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.EndDrag(E : TEvent) : TExtFunction; begin
+function TExtDdDragDrop.EndDrag(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.endDrag(' + VarToJSON([E, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.GetDragEl : TExtFunction; begin
+function TExtDdDragDrop.GetDragEl : TExtFunction;
+begin
   JSCode(JSName + '.getDragEl();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.GetEl : TExtFunction; begin
+function TExtDdDragDrop.GetEl : TExtFunction;
+begin
   JSCode(JSName + '.getEl();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.Init(The : TId; SGroup : String; Config : TExtObject = nil) : TExtFunction; begin
+function TExtDdDragDrop.Init(The : TId; SGroup : String; Config : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.init(' + VarToJSON([The, false, SGroup, Config, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.InitTarget(The : TId; SGroup : String; Config : TExtObject = nil) : TExtFunction; begin
+function TExtDdDragDrop.InitTarget(The : TId; SGroup : String; Config : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.initTarget(' + VarToJSON([The, false, SGroup, Config, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.IsLocked : TExtFunction; begin
+function TExtDdDragDrop.IsLocked : TExtFunction;
+begin
   JSCode(JSName + '.isLocked();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.IsValidHandleChild(Node : THTMLElement) : TExtFunction; begin
+function TExtDdDragDrop.IsValidHandleChild(Node : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.isValidHandleChild(' + VarToJSON([Node, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.Lock : TExtFunction; begin
+function TExtDdDragDrop.Lock : TExtFunction;
+begin
   JSCode(JSName + '.lock();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnAvailable : TExtFunction; begin
+function TExtDdDragDrop.OnAvailable : TExtFunction;
+begin
   JSCode(JSName + '.onAvailable();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDrag(E : TEvent) : TExtFunction; begin
+function TExtDdDragDrop.OnDrag(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.onDrag(' + VarToJSON([E, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragDrop(E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragDrop.OnDragDrop(E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.onDragDrop(' + VarToJSON([E, false, Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragDrop(E : TEvent; Id : TExtObjectList) : TExtFunction; begin
+function TExtDdDragDrop.OnDragDrop(E : TEvent; Id : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.onDragDrop(' + VarToJSON([E, false]) + ',' + VarToJSON(Id) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragEnter(E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragDrop.OnDragEnter(E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.onDragEnter(' + VarToJSON([E, false, Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragEnter(E : TEvent; Id : TExtObjectList) : TExtFunction; begin
+function TExtDdDragDrop.OnDragEnter(E : TEvent; Id : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.onDragEnter(' + VarToJSON([E, false]) + ',' + VarToJSON(Id) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragOut(E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragDrop.OnDragOut(E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.onDragOut(' + VarToJSON([E, false, Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragOut(E : TEvent; Id : TExtObjectList) : TExtFunction; begin
+function TExtDdDragDrop.OnDragOut(E : TEvent; Id : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.onDragOut(' + VarToJSON([E, false]) + ',' + VarToJSON(Id) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragOver(E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragDrop.OnDragOver(E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.onDragOver(' + VarToJSON([E, false, Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnDragOver(E : TEvent; Id : TExtObjectList) : TExtFunction; begin
+function TExtDdDragDrop.OnDragOver(E : TEvent; Id : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.onDragOver(' + VarToJSON([E, false]) + ',' + VarToJSON(Id) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnInvalidDrop(E : TEvent) : TExtFunction; begin
+function TExtDdDragDrop.OnInvalidDrop(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.onInvalidDrop(' + VarToJSON([E, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnMouseDown(E : TEvent) : TExtFunction; begin
+function TExtDdDragDrop.OnMouseDown(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.onMouseDown(' + VarToJSON([E, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.OnMouseUp(E : TEvent) : TExtFunction; begin
+function TExtDdDragDrop.OnMouseUp(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.onMouseUp(' + VarToJSON([E, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.RemoveFromGroup(SGroup : String) : TExtFunction; begin
+function TExtDdDragDrop.RemoveFromGroup(SGroup : String) : TExtFunction;
+begin
   JSCode(JSName + '.removeFromGroup(' + VarToJSON([SGroup]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.RemoveInvalidHandleClass(CssClass : String) : TExtFunction; begin
+function TExtDdDragDrop.RemoveInvalidHandleClass(CssClass : String) : TExtFunction;
+begin
   JSCode(JSName + '.removeInvalidHandleClass(' + VarToJSON([CssClass]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.RemoveInvalidHandleId(Id : String) : TExtFunction; begin
+function TExtDdDragDrop.RemoveInvalidHandleId(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.removeInvalidHandleId(' + VarToJSON([Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.RemoveInvalidHandleType(TagName : String) : TExtFunction; begin
+function TExtDdDragDrop.RemoveInvalidHandleType(TagName : String) : TExtFunction;
+begin
   JSCode(JSName + '.removeInvalidHandleType(' + VarToJSON([TagName]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.ResetConstraints(MaintainOffset : Boolean) : TExtFunction; begin
+function TExtDdDragDrop.ResetConstraints(MaintainOffset : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.resetConstraints(' + VarToJSON([MaintainOffset]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.SetDragElId(Id : String) : TExtFunction; begin
+function TExtDdDragDrop.SetDragElId(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.setDragElId(' + VarToJSON([Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.SetHandleElId(Id : String) : TExtFunction; begin
+function TExtDdDragDrop.SetHandleElId(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.setHandleElId(' + VarToJSON([Id]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.SetInitPosition(DiffX : Integer; DiffY : Integer) : TExtFunction; begin
+function TExtDdDragDrop.SetInitPosition(DiffX : Integer; DiffY : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setInitPosition(' + VarToJSON([DiffX, DiffY]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.SetOuterHandleElId(The : TId) : TExtFunction; begin
+function TExtDdDragDrop.SetOuterHandleElId(The : TId) : TExtFunction;
+begin
   JSCode(JSName + '.setOuterHandleElId(' + VarToJSON([The, false]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.SetPadding(ITop : Integer; IRight : Integer; IBot : Integer; ILeft : Integer) : TExtFunction; begin
+function TExtDdDragDrop.SetPadding(ITop : Integer; IRight : Integer; IBot : Integer; ILeft : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setPadding(' + VarToJSON([ITop, IRight, IBot, ILeft]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.SetXConstraint(ILeft : Integer; IRight : Integer; ITickSize : Integer) : TExtFunction; begin
+function TExtDdDragDrop.SetXConstraint(ILeft : Integer; IRight : Integer; ITickSize : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setXConstraint(' + VarToJSON([ILeft, IRight, ITickSize]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.SetYConstraint(IUp : Integer; IDown : Integer; ITickSize : Integer) : TExtFunction; begin
+function TExtDdDragDrop.SetYConstraint(IUp : Integer; IDown : Integer; ITickSize : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setYConstraint(' + VarToJSON([IUp, IDown, ITickSize]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.StartDrag(X : Integer; Y : Integer) : TExtFunction; begin
+function TExtDdDragDrop.StartDrag(X : Integer; Y : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.startDrag(' + VarToJSON([X, Y]) + ');', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.ToString : TExtFunction; begin
+function TExtDdDragDrop.ToString : TExtFunction;
+begin
   JSCode(JSName + '.toString();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.Unlock : TExtFunction; begin
+function TExtDdDragDrop.Unlock : TExtFunction;
+begin
   JSCode(JSName + '.unlock();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-function TExtDdDragDrop.Unreg : TExtFunction; begin
+function TExtDdDragDrop.Unreg : TExtFunction;
+begin
   JSCode(JSName + '.unreg();', 'TExtDdDragDrop');
   Result := Self;
 end;
 
-procedure TExtDdDragDropMgrSingleton.SetFClickPixelThresh(Value : Integer); begin
+procedure TExtDdDragDropMgrSingleton.SetFClickPixelThresh(Value : Integer);
+begin
   FClickPixelThresh := Value;
   JSCode(JSName + '.clickPixelThresh=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDropMgrSingleton.SetFClickTimeThresh(Value : Integer); begin
+procedure TExtDdDragDropMgrSingleton.SetFClickTimeThresh(Value : Integer);
+begin
   FClickTimeThresh := Value;
   JSCode(JSName + '.clickTimeThresh=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDropMgrSingleton.SetFMode(Value : Integer); begin
+procedure TExtDdDragDropMgrSingleton.SetFMode(Value : Integer);
+begin
   FMode := Value;
   JSCode(JSName + '.mode=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDropMgrSingleton.SetFPreventDefault(Value : Boolean); begin
+procedure TExtDdDragDropMgrSingleton.SetFPreventDefault(Value : Boolean);
+begin
   FPreventDefault := Value;
   JSCode(JSName + '.preventDefault=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDropMgrSingleton.SetFStopPropagation(Value : Boolean); begin
+procedure TExtDdDragDropMgrSingleton.SetFStopPropagation(Value : Boolean);
+begin
   FStopPropagation := Value;
   JSCode(JSName + '.stopPropagation=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDragDropMgrSingleton.SetFUseCache(Value : Boolean); begin
+procedure TExtDdDragDropMgrSingleton.SetFUseCache(Value : Boolean);
+begin
   FUseCache := Value;
   JSCode(JSName + '.useCache=' + VarToJSON([Value]) + ';');
 end;
 
-class function TExtDdDragDropMgrSingleton.JSClassName : string; begin
+class function TExtDdDragDropMgrSingleton.JSClassName : string;
+      begin
   Result := 'Ext.dd.DragDropMgr';
 end;
 
-class function TExtDdDragDropMgrSingleton.INTERSECT : Integer; begin
+class function TExtDdDragDropMgrSingleton.INTERSECT : Integer;
+      begin
   Result := 0
 end;
 
-class function TExtDdDragDropMgrSingleton.POINT : Integer; begin
+class function TExtDdDragDropMgrSingleton.POINT : Integer;
+      begin
   Result := 0
 end;
 
-function TExtDdDragDropMgrSingleton.GetBestMatch(Dds : TExtObjectList) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.GetBestMatch(Dds : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.getBestMatch(' + VarToJSON(Dds) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.GetCss(Id : String) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.GetCss(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.getCss(' + VarToJSON([Id]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.GetDDById(Id : String) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.GetDDById(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.getDDById(' + VarToJSON([Id]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.GetElement(Id : String) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.GetElement(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.getElement(' + VarToJSON([Id]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.GetLocation(ODD : TExtDdDragDrop) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.GetLocation(ODD : TExtDdDragDrop) : TExtFunction;
+begin
   JSCode(JSName + '.getLocation(' + VarToJSON([ODD, false]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.GetRelated(P_oDD : TExtDdDragDrop; BTargetsOnly : Boolean) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.GetRelated(P_oDD : TExtDdDragDrop; BTargetsOnly : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.getRelated(' + VarToJSON([P_oDD, false, BTargetsOnly]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.IsDragDrop(Id : String) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.IsDragDrop(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.isDragDrop(' + VarToJSON([Id]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.IsHandle(Id : String) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.IsHandle(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.isHandle(' + VarToJSON([Id]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.IsLegalTarget(ODD : TExtDdDragDrop; OTargetDD : TExtDdDragDrop) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.IsLegalTarget(ODD : TExtDdDragDrop; OTargetDD : TExtDdDragDrop) : TExtFunction;
+begin
   JSCode(JSName + '.isLegalTarget(' + VarToJSON([ODD, false, OTargetDD, false]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.IsLocked : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.IsLocked : TExtFunction;
+begin
   JSCode(JSName + '.isLocked();', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.IsTypeOfDD(The : TExtObject) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.IsTypeOfDD(The : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.isTypeOfDD(' + VarToJSON([The, false]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.Lock : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.Lock : TExtFunction;
+begin
   JSCode(JSName + '.lock();', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.RefreshCache(Groups : TExtObject) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.RefreshCache(Groups : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.refreshCache(' + VarToJSON([Groups, false]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.RegDragDrop(ODD : TExtDdDragDrop; SGroup : String) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.RegDragDrop(ODD : TExtDdDragDrop; SGroup : String) : TExtFunction;
+begin
   JSCode(JSName + '.regDragDrop(' + VarToJSON([ODD, false, SGroup]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.RegHandle(SDDId : String; SHandleId : String) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.RegHandle(SDDId : String; SHandleId : String) : TExtFunction;
+begin
   JSCode(JSName + '.regHandle(' + VarToJSON([SDDId, SHandleId]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.StartDrag(X : Integer; Y : Integer) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.StartDrag(X : Integer; Y : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.startDrag(' + VarToJSON([X, Y]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.StopEvent(E : TEvent) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.StopEvent(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.stopEvent(' + VarToJSON([E, false]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.Unlock : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.Unlock : TExtFunction;
+begin
   JSCode(JSName + '.unlock();', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-function TExtDdDragDropMgrSingleton.VerifyEl(El : THTMLElement) : TExtFunction; begin
+function TExtDdDragDropMgrSingleton.VerifyEl(El : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.verifyEl(' + VarToJSON([El, false]) + ');', 'TExtDdDragDropMgrSingleton');
   Result := Self;
 end;
 
-procedure TExtDdPanelProxy.SetFInsertProxy(Value : Boolean); begin
+procedure TExtDdPanelProxy.SetFInsertProxy(Value : Boolean);
+begin
   FInsertProxy := Value;
   JSCode('insertProxy:' + VarToJSON([Value]));
 end;
 
-class function TExtDdPanelProxy.JSClassName : string; begin
+class function TExtDdPanelProxy.JSClassName : string;
+      begin
   Result := 'Ext.dd.PanelProxy';
 end;
 
-procedure TExtDdPanelProxy.InitDefaults; begin
+procedure TExtDdPanelProxy.InitDefaults;
+begin
   inherited;
   FInsertProxy := true;
 end;
 
-function TExtDdPanelProxy.GetEl : TExtFunction; begin
+function TExtDdPanelProxy.GetEl : TExtFunction;
+begin
   JSCode(JSName + '.getEl();', 'TExtDdPanelProxy');
   Result := Self;
 end;
 
-function TExtDdPanelProxy.GetGhost : TExtFunction; begin
+function TExtDdPanelProxy.GetGhost : TExtFunction;
+begin
   JSCode(JSName + '.getGhost();', 'TExtDdPanelProxy');
   Result := Self;
 end;
 
-function TExtDdPanelProxy.GetProxy : TExtFunction; begin
+function TExtDdPanelProxy.GetProxy : TExtFunction;
+begin
   JSCode(JSName + '.getProxy();', 'TExtDdPanelProxy');
   Result := Self;
 end;
 
-function TExtDdPanelProxy.Hide : TExtFunction; begin
+function TExtDdPanelProxy.Hide : TExtFunction;
+begin
   JSCode(JSName + '.hide();', 'TExtDdPanelProxy');
   Result := Self;
 end;
 
-function TExtDdPanelProxy.MoveProxy(ParentNode : THTMLElement; Before : THTMLElement = nil) : TExtFunction; begin
+function TExtDdPanelProxy.MoveProxy(ParentNode : THTMLElement; Before : THTMLElement = nil) : TExtFunction;
+begin
   JSCode(JSName + '.moveProxy(' + VarToJSON([ParentNode, false, Before, false]) + ');', 'TExtDdPanelProxy');
   Result := Self;
 end;
 
-function TExtDdPanelProxy.Show : TExtFunction; begin
+function TExtDdPanelProxy.Show : TExtFunction;
+begin
   JSCode(JSName + '.show();', 'TExtDdPanelProxy');
   Result := Self;
 end;
 
-procedure TExtDdStatusProxy.SetFDropAllowed(Value : String); begin
+procedure TExtDdStatusProxy.SetFDropAllowed(Value : String);
+begin
   FDropAllowed := Value;
   JSCode('dropAllowed:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdStatusProxy.SetFDropNotAllowed(Value : String); begin
+procedure TExtDdStatusProxy.SetFDropNotAllowed(Value : String);
+begin
   FDropNotAllowed := Value;
   JSCode('dropNotAllowed:' + VarToJSON([Value]));
 end;
 
-class function TExtDdStatusProxy.JSClassName : string; begin
+class function TExtDdStatusProxy.JSClassName : string;
+      begin
   Result := 'Ext.dd.StatusProxy';
 end;
 
-procedure TExtDdStatusProxy.InitDefaults; begin
+procedure TExtDdStatusProxy.InitDefaults;
+begin
   inherited;
   FDropAllowed := 'x-dd-drop-ok';
   FDropNotAllowed := 'x-dd-drop-nodrop';
 end;
 
-function TExtDdStatusProxy.GetEl : TExtFunction; begin
+function TExtDdStatusProxy.GetEl : TExtFunction;
+begin
   JSCode(JSName + '.getEl();', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.GetGhost : TExtFunction; begin
+function TExtDdStatusProxy.GetGhost : TExtFunction;
+begin
   JSCode(JSName + '.getGhost();', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Hide(Clear : Boolean) : TExtFunction; begin
+function TExtDdStatusProxy.Hide(Clear : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.hide(' + VarToJSON([Clear]) + ');', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Repair(Xy : TExtObjectList; Callback : TExtFunction; Scope : TExtObject) : TExtFunction; begin
+function TExtDdStatusProxy.Repair(Xy : TExtObjectList; Callback : TExtFunction; Scope : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.repair(' + VarToJSON(Xy) + ',' + VarToJSON([Callback, true, Scope, false]) + ');', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Reset(ClearGhost : Boolean) : TExtFunction; begin
+function TExtDdStatusProxy.Reset(ClearGhost : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.reset(' + VarToJSON([ClearGhost]) + ');', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.SetStatus(CssClass : String) : TExtFunction; begin
+function TExtDdStatusProxy.SetStatus(CssClass : String) : TExtFunction;
+begin
   JSCode(JSName + '.setStatus(' + VarToJSON([CssClass]) + ');', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Show : TExtFunction; begin
+function TExtDdStatusProxy.Show : TExtFunction;
+begin
   JSCode(JSName + '.show();', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Stop : TExtFunction; begin
+function TExtDdStatusProxy.Stop : TExtFunction;
+begin
   JSCode(JSName + '.stop();', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Sync : TExtFunction; begin
+function TExtDdStatusProxy.Sync : TExtFunction;
+begin
   JSCode(JSName + '.sync();', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Update(Html : String) : TExtFunction; begin
+function TExtDdStatusProxy.Update(Html : String) : TExtFunction;
+begin
   JSCode(JSName + '.update(' + VarToJSON([Html]) + ');', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-function TExtDdStatusProxy.Update(Html : THTMLElement) : TExtFunction; begin
+function TExtDdStatusProxy.Update(Html : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.update(' + VarToJSON([Html, false]) + ');', 'TExtDdStatusProxy');
   Result := Self;
 end;
 
-procedure TExtDdScrollManagerSingleton.SetFAnimDuration(Value : Integer); begin
+procedure TExtDdScrollManagerSingleton.SetFAnimDuration(Value : Integer);
+begin
   FAnimDuration := Value;
   JSCode(JSName + '.animDuration=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdScrollManagerSingleton.SetFAnimate(Value : Boolean); begin
+procedure TExtDdScrollManagerSingleton.SetFAnimate(Value : Boolean);
+begin
   FAnimate := Value;
   JSCode(JSName + '.animate=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdScrollManagerSingleton.SetFFrequency(Value : Integer); begin
+procedure TExtDdScrollManagerSingleton.SetFFrequency(Value : Integer);
+begin
   FFrequency := Value;
   JSCode(JSName + '.frequency=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdScrollManagerSingleton.SetFHthresh(Value : Integer); begin
+procedure TExtDdScrollManagerSingleton.SetFHthresh(Value : Integer);
+begin
   FHthresh := Value;
   JSCode(JSName + '.hthresh=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdScrollManagerSingleton.SetFIncrement(Value : Integer); begin
+procedure TExtDdScrollManagerSingleton.SetFIncrement(Value : Integer);
+begin
   FIncrement := Value;
   JSCode(JSName + '.increment=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdScrollManagerSingleton.SetFVthresh(Value : Integer); begin
+procedure TExtDdScrollManagerSingleton.SetFVthresh(Value : Integer);
+begin
   FVthresh := Value;
   JSCode(JSName + '.vthresh=' + VarToJSON([Value]) + ';');
 end;
 
-class function TExtDdScrollManagerSingleton.JSClassName : string; begin
+class function TExtDdScrollManagerSingleton.JSClassName : string;
+      begin
   Result := 'Ext.dd.ScrollManager';
 end;
 
-procedure TExtDdScrollManagerSingleton.InitDefaults; begin
+procedure TExtDdScrollManagerSingleton.InitDefaults;
+begin
   inherited;
   FAnimDuration := 4;
   FAnimate := true;
@@ -1097,106 +1221,127 @@ procedure TExtDdScrollManagerSingleton.InitDefaults; begin
   FVthresh := 25;
 end;
 
-function TExtDdScrollManagerSingleton.RefreshCache : TExtFunction; begin
+function TExtDdScrollManagerSingleton.RefreshCache : TExtFunction;
+begin
   JSCode(JSName + '.refreshCache();', 'TExtDdScrollManagerSingleton');
   Result := Self;
 end;
 
-function TExtDdScrollManagerSingleton.Register(El : String) : TExtFunction; begin
+function TExtDdScrollManagerSingleton.Register(El : String) : TExtFunction;
+begin
   JSCode(JSName + '.register(' + VarToJSON([El]) + ');', 'TExtDdScrollManagerSingleton');
   Result := Self;
 end;
 
-function TExtDdScrollManagerSingleton.Register(El : TExtObjectList) : TExtFunction; begin
+function TExtDdScrollManagerSingleton.Register(El : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.register(' + VarToJSON(El) + ');', 'TExtDdScrollManagerSingleton');
   Result := Self;
 end;
 
-function TExtDdScrollManagerSingleton.Unregister(El : String) : TExtFunction; begin
+function TExtDdScrollManagerSingleton.Unregister(El : String) : TExtFunction;
+begin
   JSCode(JSName + '.unregister(' + VarToJSON([El]) + ');', 'TExtDdScrollManagerSingleton');
   Result := Self;
 end;
 
-function TExtDdScrollManagerSingleton.Unregister(El : TExtObjectList) : TExtFunction; begin
+function TExtDdScrollManagerSingleton.Unregister(El : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.unregister(' + VarToJSON(El) + ');', 'TExtDdScrollManagerSingleton');
   Result := Self;
 end;
 
-class function TExtDdRegistrySingleton.JSClassName : string; begin
+class function TExtDdRegistrySingleton.JSClassName : string;
+      begin
   Result := 'Ext.dd.Registry';
 end;
 
-function TExtDdRegistrySingleton.GetHandle(Id : String) : TExtFunction; begin
+function TExtDdRegistrySingleton.GetHandle(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.getHandle(' + VarToJSON([Id]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.GetHandle(Id : THTMLElement) : TExtFunction; begin
+function TExtDdRegistrySingleton.GetHandle(Id : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.getHandle(' + VarToJSON([Id, false]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.GetHandleFromEvent(E : TEvent) : TExtFunction; begin
+function TExtDdRegistrySingleton.GetHandleFromEvent(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.getHandleFromEvent(' + VarToJSON([E, false]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.GetTarget(Id : String) : TExtFunction; begin
+function TExtDdRegistrySingleton.GetTarget(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.getTarget(' + VarToJSON([Id]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.GetTarget(Id : THTMLElement) : TExtFunction; begin
+function TExtDdRegistrySingleton.GetTarget(Id : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.getTarget(' + VarToJSON([Id, false]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.GetTargetFromEvent(E : TEvent) : TExtFunction; begin
+function TExtDdRegistrySingleton.GetTargetFromEvent(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.getTargetFromEvent(' + VarToJSON([E, false]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.Register(Element : String; Data : TExtObject = nil) : TExtFunction; begin
+function TExtDdRegistrySingleton.Register(Element : String; Data : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.register(' + VarToJSON([Element, Data, false]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.Register(Element : THTMLElement; Data : TExtObject = nil) : TExtFunction; begin
+function TExtDdRegistrySingleton.Register(Element : THTMLElement; Data : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.register(' + VarToJSON([Element, false, Data, false]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.Unregister(Element : String) : TExtFunction; begin
+function TExtDdRegistrySingleton.Unregister(Element : String) : TExtFunction;
+begin
   JSCode(JSName + '.unregister(' + VarToJSON([Element]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-function TExtDdRegistrySingleton.Unregister(Element : THTMLElement) : TExtFunction; begin
+function TExtDdRegistrySingleton.Unregister(Element : THTMLElement) : TExtFunction;
+begin
   JSCode(JSName + '.unregister(' + VarToJSON([Element, false]) + ');', 'TExtDdRegistrySingleton');
   Result := Self;
 end;
 
-procedure TExtDdDragTracker.SetFActive(Value : Boolean); begin
+procedure TExtDdDragTracker.SetFActive(Value : Boolean);
+begin
   FActive := Value;
   JSCode('active:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragTracker.SetFAutoStart(Value : Boolean); begin
+procedure TExtDdDragTracker.SetFAutoStart(Value : Boolean);
+begin
   FAutoStart := Value;
   JSCode('autoStart:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragTracker.SetFAutoStartNumber(Value : Integer); begin
+procedure TExtDdDragTracker.SetFAutoStartNumber(Value : Integer);
+begin
   FAutoStartNumber := Value;
   JSCode('autoStart:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragTracker.SetFTolerance(Value : Integer); begin
+procedure TExtDdDragTracker.SetFTolerance(Value : Integer);
+begin
   FTolerance := Value;
   JSCode('tolerance:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragTracker.SetFOnDrag_(Value : TExtDdDragTrackerOnDrag_); begin
+procedure TExtDdDragTracker.SetFOnDrag_(Value : TExtDdDragTrackerOnDrag_);
+begin
   if Assigned(FOnDrag_) then
     JSCode(JSName+'.events ["drag"].listeners=[];');
   if Assigned(Value) then
@@ -1204,7 +1349,8 @@ procedure TExtDdDragTracker.SetFOnDrag_(Value : TExtDdDragTrackerOnDrag_); begin
   FOnDrag_ := Value;
 end;
 
-procedure TExtDdDragTracker.SetFOnDragend(Value : TExtDdDragTrackerOnDragend); begin
+procedure TExtDdDragTracker.SetFOnDragend(Value : TExtDdDragTrackerOnDragend);
+begin
   if Assigned(FOnDragend) then
     JSCode(JSName+'.events ["dragend"].listeners=[];');
   if Assigned(Value) then
@@ -1212,7 +1358,8 @@ procedure TExtDdDragTracker.SetFOnDragend(Value : TExtDdDragTrackerOnDragend); b
   FOnDragend := Value;
 end;
 
-procedure TExtDdDragTracker.SetFOnDragstart(Value : TExtDdDragTrackerOnDragstart); begin
+procedure TExtDdDragTracker.SetFOnDragstart(Value : TExtDdDragTrackerOnDragstart);
+begin
   if Assigned(FOnDragstart) then
     JSCode(JSName+'.events ["dragstart"].listeners=[];');
   if Assigned(Value) then
@@ -1220,7 +1367,8 @@ procedure TExtDdDragTracker.SetFOnDragstart(Value : TExtDdDragTrackerOnDragstart
   FOnDragstart := Value;
 end;
 
-procedure TExtDdDragTracker.SetFOnMousedown(Value : TExtDdDragTrackerOnMousedown); begin
+procedure TExtDdDragTracker.SetFOnMousedown(Value : TExtDdDragTrackerOnMousedown);
+begin
   if Assigned(FOnMousedown) then
     JSCode(JSName+'.events ["mousedown"].listeners=[];');
   if Assigned(Value) then
@@ -1228,7 +1376,8 @@ procedure TExtDdDragTracker.SetFOnMousedown(Value : TExtDdDragTrackerOnMousedown
   FOnMousedown := Value;
 end;
 
-procedure TExtDdDragTracker.SetFOnMousemove(Value : TExtDdDragTrackerOnMousemove); begin
+procedure TExtDdDragTracker.SetFOnMousemove(Value : TExtDdDragTrackerOnMousemove);
+begin
   if Assigned(FOnMousemove) then
     JSCode(JSName+'.events ["mousemove"].listeners=[];');
   if Assigned(Value) then
@@ -1236,7 +1385,8 @@ procedure TExtDdDragTracker.SetFOnMousemove(Value : TExtDdDragTrackerOnMousemove
   FOnMousemove := Value;
 end;
 
-procedure TExtDdDragTracker.SetFOnMouseup(Value : TExtDdDragTrackerOnMouseup); begin
+procedure TExtDdDragTracker.SetFOnMouseup(Value : TExtDdDragTrackerOnMouseup);
+begin
   if Assigned(FOnMouseup) then
     JSCode(JSName+'.events ["mouseup"].listeners=[];');
   if Assigned(Value) then
@@ -1244,36 +1394,43 @@ procedure TExtDdDragTracker.SetFOnMouseup(Value : TExtDdDragTrackerOnMouseup); b
   FOnMouseup := Value;
 end;
 
-class function TExtDdDragTracker.JSClassName : string; begin
+class function TExtDdDragTracker.JSClassName : string;
+      begin
   Result := 'Ext.dd.DragTracker';
 end;
 
-function TExtDdDragTracker.GetDragTarget : TExtFunction; begin
+function TExtDdDragTracker.GetDragTarget : TExtFunction;
+begin
   JSCode(JSName + '.getDragTarget();', 'TExtDdDragTracker');
   Result := Self;
 end;
 
-function TExtDdDragTracker.OnBeforeStart(E : TExtEventObjectSingleton) : TExtFunction; begin
+function TExtDdDragTracker.OnBeforeStart(E : TExtEventObjectSingleton) : TExtFunction;
+begin
   JSCode(JSName + '.onBeforeStart(' + VarToJSON([E, false]) + ');', 'TExtDdDragTracker');
   Result := Self;
 end;
 
-function TExtDdDragTracker.OnDrag(E : TExtEventObjectSingleton) : TExtFunction; begin
+function TExtDdDragTracker.OnDrag(E : TExtEventObjectSingleton) : TExtFunction;
+begin
   JSCode(JSName + '.onDrag(' + VarToJSON([E, false]) + ');', 'TExtDdDragTracker');
   Result := Self;
 end;
 
-function TExtDdDragTracker.OnEnd(E : TExtEventObjectSingleton) : TExtFunction; begin
+function TExtDdDragTracker.OnEnd(E : TExtEventObjectSingleton) : TExtFunction;
+begin
   JSCode(JSName + '.onEnd(' + VarToJSON([E, false]) + ');', 'TExtDdDragTracker');
   Result := Self;
 end;
 
-function TExtDdDragTracker.OnStart(Xy : TExtObjectList) : TExtFunction; begin
+function TExtDdDragTracker.OnStart(Xy : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.onStart(' + VarToJSON(Xy) + ');', 'TExtDdDragTracker');
   Result := Self;
 end;
 
-procedure TExtDdDragTracker.HandleEvent(const AEvtName : string); begin
+procedure TExtDdDragTracker.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'drag') and Assigned(FOnDrag_) then
     FOnDrag_(TExtDdDragTracker(ParamAsObject('This')), TExtObject(ParamAsObject('E')))
@@ -1289,7 +1446,8 @@ procedure TExtDdDragTracker.HandleEvent(const AEvtName : string); begin
     FOnMouseup(TExtDdDragTracker(ParamAsObject('This')), TExtObject(ParamAsObject('E')));
 end;
 
-class function TExtDdDDTarget.JSClassName : string; begin
+class function TExtDdDDTarget.JSClassName : string;
+      begin
   Result := 'Ext.dd.DDTarget';
 end;
 
@@ -1299,12 +1457,14 @@ begin
   inherited Create(AOwner);
 end;
 
-procedure TExtDdDD.SetFScroll(Value : Boolean); begin
+procedure TExtDdDD.SetFScroll(Value : Boolean);
+begin
   FScroll := Value;
   JSCode(JSName + '.scroll=' + VarToJSON([Value]) + ';');
 end;
 
-class function TExtDdDD.JSClassName : string; begin
+class function TExtDdDD.JSClassName : string;
+      begin
   Result := 'Ext.dd.DD';
 end;
 
@@ -1314,328 +1474,394 @@ begin
   inherited Create(AOwner);
 end;
 
-function TExtDdDD.AlignElWithMouse(El : THTMLElement; IPageX : Integer; IPageY : Integer) : TExtFunction; begin
+function TExtDdDD.AlignElWithMouse(El : THTMLElement; IPageX : Integer; IPageY : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.alignElWithMouse(' + VarToJSON([El, false, IPageX, IPageY]) + ');', 'TExtDdDD');
   Result := Self;
 end;
 
-function TExtDdDD.ApplyConfig : TExtFunction; begin
+function TExtDdDD.ApplyConfig : TExtFunction;
+begin
   JSCode(JSName + '.applyConfig();', 'TExtDdDD');
   Result := Self;
 end;
 
-function TExtDdDD.AutoOffset(IPageX : Integer; IPageY : Integer) : TExtFunction; begin
+function TExtDdDD.AutoOffset(IPageX : Integer; IPageY : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.autoOffset(' + VarToJSON([IPageX, IPageY]) + ');', 'TExtDdDD');
   Result := Self;
 end;
 
-function TExtDdDD.B4Drag : TExtFunction; begin
+function TExtDdDD.B4Drag : TExtFunction;
+begin
   JSCode(JSName + '.b4Drag();', 'TExtDdDD');
   Result := Self;
 end;
 
-function TExtDdDD.B4MouseDown : TExtFunction; begin
+function TExtDdDD.B4MouseDown : TExtFunction;
+begin
   JSCode(JSName + '.b4MouseDown();', 'TExtDdDD');
   Result := Self;
 end;
 
-function TExtDdDD.CachePosition(The : TIPageX; The_ : TIPageY) : TExtFunction; begin
+function TExtDdDD.CachePosition(The : TIPageX; The_ : TIPageY) : TExtFunction;
+begin
   JSCode(JSName + '.cachePosition(' + VarToJSON([The, false, The_, false]) + ');', 'TExtDdDD');
   Result := Self;
 end;
 
-function TExtDdDD.SetDelta(IDeltaX : Integer; IDeltaY : Integer) : TExtFunction; begin
+function TExtDdDD.SetDelta(IDeltaX : Integer; IDeltaY : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setDelta(' + VarToJSON([IDeltaX, IDeltaY]) + ');', 'TExtDdDD');
   Result := Self;
 end;
 
-function TExtDdDD.SetDragElPos(IPageX : Integer; IPageY : Integer) : TExtFunction; begin
+function TExtDdDD.SetDragElPos(IPageX : Integer; IPageY : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setDragElPos(' + VarToJSON([IPageX, IPageY]) + ');', 'TExtDdDD');
   Result := Self;
 end;
 
-procedure TExtDdDDProxy.SetFCenterFrame(Value : Boolean); begin
+procedure TExtDdDDProxy.SetFCenterFrame(Value : Boolean);
+begin
   FCenterFrame := Value;
   JSCode(JSName + '.centerFrame=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtDdDDProxy.SetFResizeFrame(Value : Boolean); begin
+procedure TExtDdDDProxy.SetFResizeFrame(Value : Boolean);
+begin
   FResizeFrame := Value;
   JSCode(JSName + '.resizeFrame=' + VarToJSON([Value]) + ';');
 end;
 
-class function TExtDdDDProxy.JSClassName : string; begin
+class function TExtDdDDProxy.JSClassName : string;
+      begin
   Result := 'Ext.dd.DDProxy';
 end;
 
-class function TExtDdDDProxy.DragElId : String; begin
+class function TExtDdDDProxy.DragElId : String;
+      begin
   Result := ''
 end;
 
-function TExtDdDDProxy.CreateFrame : TExtFunction; begin
+function TExtDdDDProxy.CreateFrame : TExtFunction;
+begin
   JSCode(JSName + '.createFrame();', 'TExtDdDDProxy');
   Result := Self;
 end;
 
-function TExtDdDDProxy.InitFrame : TExtFunction; begin
+function TExtDdDDProxy.InitFrame : TExtFunction;
+begin
   JSCode(JSName + '.initFrame();', 'TExtDdDDProxy');
   Result := Self;
 end;
 
-procedure TExtDdDropTarget.SetFDdGroup(Value : String); begin
+procedure TExtDdDropTarget.SetFDdGroup(Value : String);
+begin
   FDdGroup := Value;
   JSCode('ddGroup:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDropTarget.SetFDropAllowed(Value : String); begin
+procedure TExtDdDropTarget.SetFDropAllowed(Value : String);
+begin
   FDropAllowed := Value;
   JSCode('dropAllowed:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDropTarget.SetFDropNotAllowed(Value : String); begin
+procedure TExtDdDropTarget.SetFDropNotAllowed(Value : String);
+begin
   FDropNotAllowed := Value;
   JSCode('dropNotAllowed:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDropTarget.SetFOverClass(Value : String); begin
+procedure TExtDdDropTarget.SetFOverClass(Value : String);
+begin
   FOverClass := Value;
   JSCode('overClass:' + VarToJSON([Value]));
 end;
 
-class function TExtDdDropTarget.JSClassName : string; begin
+class function TExtDdDropTarget.JSClassName : string;
+      begin
   Result := 'Ext.dd.DropTarget';
 end;
 
-procedure TExtDdDropTarget.InitDefaults; begin
+procedure TExtDdDropTarget.InitDefaults;
+begin
   inherited;
   FDropAllowed := 'x-dd-drop-ok';
   FDropNotAllowed := 'x-dd-drop-nodrop';
 end;
 
-function TExtDdDropTarget.NotifyDrop(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropTarget.NotifyDrop(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyDrop(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropTarget');
   Result := Self;
 end;
 
-function TExtDdDropTarget.NotifyEnter(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropTarget.NotifyEnter(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyEnter(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropTarget');
   Result := Self;
 end;
 
-function TExtDdDropTarget.NotifyOut(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropTarget.NotifyOut(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyOut(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropTarget');
   Result := Self;
 end;
 
-function TExtDdDropTarget.NotifyOver(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropTarget.NotifyOver(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyOver(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropTarget');
   Result := Self;
 end;
 
-class function TExtDdDropZone.JSClassName : string; begin
+class function TExtDdDropZone.JSClassName : string;
+      begin
   Result := 'Ext.dd.DropZone';
 end;
 
-procedure TExtDdDropZone.InitDefaults; begin
+procedure TExtDdDropZone.InitDefaults;
+begin
   inherited;
 end;
 
-function TExtDdDropZone.GetTargetFromEvent(E : TEvent) : TExtFunction; begin
+function TExtDdDropZone.GetTargetFromEvent(E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.getTargetFromEvent(' + VarToJSON([E, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.NotifyDrop(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.NotifyDrop(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyDrop(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.NotifyEnter(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.NotifyEnter(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyEnter(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.NotifyOut(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.NotifyOut(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyOut(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.NotifyOver(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.NotifyOver(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.notifyOver(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.OnContainerDrop(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.OnContainerDrop(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.onContainerDrop(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.OnContainerOver(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.OnContainerOver(Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.onContainerOver(' + VarToJSON([Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.OnNodeDrop(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.OnNodeDrop(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.onNodeDrop(' + VarToJSON([NodeData, false, Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.OnNodeEnter(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.OnNodeEnter(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.onNodeEnter(' + VarToJSON([NodeData, false, Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.OnNodeOut(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.OnNodeOut(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.onNodeOut(' + VarToJSON([NodeData, false, Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-function TExtDdDropZone.OnNodeOver(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction; begin
+function TExtDdDropZone.OnNodeOver(NodeData : TExtObject; Source : TExtDdDragSource; E : TEvent; Data : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.onNodeOver(' + VarToJSON([NodeData, false, Source, false, E, false, Data, false]) + ');', 'TExtDdDropZone');
   Result := Self;
 end;
 
-procedure TExtDdDragSource.SetFDdGroup(Value : String); begin
+procedure TExtDdDragSource.SetFDdGroup(Value : String);
+begin
   FDdGroup := Value;
   JSCode('ddGroup:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragSource.SetFDropAllowed(Value : String); begin
+procedure TExtDdDragSource.SetFDropAllowed(Value : String);
+begin
   FDropAllowed := Value;
   JSCode('dropAllowed:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragSource.SetFDropNotAllowed(Value : String); begin
+procedure TExtDdDragSource.SetFDropNotAllowed(Value : String);
+begin
   FDropNotAllowed := Value;
   JSCode('dropNotAllowed:' + VarToJSON([Value]));
 end;
 
-class function TExtDdDragSource.JSClassName : string; begin
+class function TExtDdDragSource.JSClassName : string;
+      begin
   Result := 'Ext.dd.DragSource';
 end;
 
-procedure TExtDdDragSource.InitDefaults; begin
+procedure TExtDdDragSource.InitDefaults;
+begin
   inherited;
   FDropAllowed := 'x-dd-drop-ok';
   FDropNotAllowed := 'x-dd-drop-nodrop';
 end;
 
-function TExtDdDragSource.AfterDragDrop(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.AfterDragDrop(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.afterDragDrop(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.AfterDragEnter(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.AfterDragEnter(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.afterDragEnter(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.AfterDragOut(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.AfterDragOut(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.afterDragOut(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.AfterDragOver(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.AfterDragOver(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.afterDragOver(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.AfterInvalidDrop(E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.AfterInvalidDrop(E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.afterInvalidDrop(' + VarToJSON([E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.BeforeDragDrop(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.BeforeDragDrop(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.beforeDragDrop(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.BeforeDragEnter(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.BeforeDragEnter(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.beforeDragEnter(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.BeforeDragOut(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.BeforeDragOut(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.beforeDragOut(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.BeforeDragOver(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.BeforeDragOver(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.beforeDragOver(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.BeforeInvalidDrop(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction; begin
+function TExtDdDragSource.BeforeInvalidDrop(Target : TExtDdDragDrop; E : TEvent; Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.beforeInvalidDrop(' + VarToJSON([Target, false, E, false, Id]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.GetDragData : TExtFunction; begin
+function TExtDdDragSource.GetDragData : TExtFunction;
+begin
   JSCode(JSName + '.getDragData();', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.GetProxy : TExtFunction; begin
+function TExtDdDragSource.GetProxy : TExtFunction;
+begin
   JSCode(JSName + '.getProxy();', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.HideProxy : TExtFunction; begin
+function TExtDdDragSource.HideProxy : TExtFunction;
+begin
   JSCode(JSName + '.hideProxy();', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.OnBeforeDrag(Data : TExtObject; E : TEvent) : TExtFunction; begin
+function TExtDdDragSource.OnBeforeDrag(Data : TExtObject; E : TEvent) : TExtFunction;
+begin
   JSCode(JSName + '.onBeforeDrag(' + VarToJSON([Data, false, E, false]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-function TExtDdDragSource.OnStartDrag(X : Integer; Y : Integer) : TExtFunction; begin
+function TExtDdDragSource.OnStartDrag(X : Integer; Y : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.onStartDrag(' + VarToJSON([X, Y]) + ');', 'TExtDdDragSource');
   Result := Self;
 end;
 
-procedure TExtDdDragZone.SetFContainerScroll(Value : Boolean); begin
+procedure TExtDdDragZone.SetFContainerScroll(Value : Boolean);
+begin
   FContainerScroll := Value;
   JSCode('containerScroll:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragZone.SetFHlColor(Value : String); begin
+procedure TExtDdDragZone.SetFHlColor(Value : String);
+begin
   FHlColor := Value;
   JSCode('hlColor:' + VarToJSON([Value]));
 end;
 
-procedure TExtDdDragZone.SetFDragData(Value : TExtObject); begin
+procedure TExtDdDragZone.SetFDragData(Value : TExtObject);
+begin
   FDragData := Value;
     JSCode(JSName + '.dragData=' + VarToJSON([Value, false]) + ';');
 end;
 
-class function TExtDdDragZone.JSClassName : string; begin
+class function TExtDdDragZone.JSClassName : string;
+      begin
   Result := 'Ext.dd.DragZone';
 end;
 
-procedure TExtDdDragZone.InitDefaults; begin
+procedure TExtDdDragZone.InitDefaults;
+begin
   inherited;
   FHlColor := 'c3daf9';
   FDragData := TExtObject.CreateInternal(Self, 'dragData');
 end;
 
-function TExtDdDragZone.AfterRepair : TExtFunction; begin
+function TExtDdDragZone.AfterRepair : TExtFunction;
+begin
   JSCode(JSName + '.afterRepair();', 'TExtDdDragZone');
   Result := Self;
 end;
 
-function TExtDdDragZone.GetDragData(E : TEventObject) : TExtFunction; begin
+function TExtDdDragZone.GetDragData(E : TEventObject) : TExtFunction;
+begin
   JSCode(JSName + '.getDragData(' + VarToJSON([E, false]) + ');', 'TExtDdDragZone');
   Result := Self;
 end;
 
-function TExtDdDragZone.GetRepairXY(E : TEventObject) : TExtFunction; begin
+function TExtDdDragZone.GetRepairXY(E : TEventObject) : TExtFunction;
+begin
   JSCode(JSName + '.getRepairXY(' + VarToJSON([E, false]) + ');', 'TExtDdDragZone');
   Result := Self;
 end;
 
-function TExtDdDragZone.OnInitDrag(X : Integer; Y : Integer) : TExtFunction; begin
+function TExtDdDragZone.OnInitDrag(X : Integer; Y : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.onInitDrag(' + VarToJSON([X, Y]) + ');', 'TExtDdDragZone');
   Result := Self;
 end;

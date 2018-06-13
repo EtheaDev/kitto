@@ -37,31 +37,38 @@ type
 
 implementation
 
-function TExtUxTreeColumnNodeUI.JSClassName : string; begin
+function TExtUxTreeColumnNodeUI.JSClassName : string;
+begin
   Result := 'Ext.ux.tree.ColumnNodeUI';
 end;
 
-function TExtUxTreeXmlTreeLoader.JSClassName : string; begin
+function TExtUxTreeXmlTreeLoader.JSClassName : string;
+begin
   Result := 'Ext.ux.tree.XmlTreeLoader';
 end;
 
-class function TExtUxTreeXmlTreeLoader.XML_NODE_ELEMENT : Integer; begin
+class function TExtUxTreeXmlTreeLoader.XML_NODE_ELEMENT : Integer;
+      begin
   Result := 0
 end;
 
-class function TExtUxTreeXmlTreeLoader.XML_NODE_TEXT : Integer; begin
+class function TExtUxTreeXmlTreeLoader.XML_NODE_TEXT : Integer;
+      begin
   Result := 0
 end;
 
-procedure TExtUxTreeXmlTreeLoader.InitDefaults; begin
+procedure TExtUxTreeXmlTreeLoader.InitDefaults;
+begin
   inherited;
 end;
 
-function TExtUxTreeColumnTree.JSClassName : string; begin
+function TExtUxTreeColumnTree.JSClassName : string;
+begin
   Result := 'Ext.ux.tree.ColumnTree';
 end;
 
-procedure TExtUxTreeColumnTree.InitDefaults; begin
+procedure TExtUxTreeColumnTree.InitDefaults;
+begin
   inherited;
 end;
 

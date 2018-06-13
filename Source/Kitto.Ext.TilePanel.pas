@@ -421,7 +421,8 @@ begin
       LImageURL := Session.Config.FindImageURL(SmartConcat(LImageName, '_', 'large'));
       if LImageURL = '' then
         LImageURL := Session.Config.FindImageURL(LImageName);
-      LCustomStyle := LCustomStyle + Format('background-image: url(&quot;%s&quot);', [LImageURL]);
+      if LImageURL <> '' then
+        LCustomStyle := LCustomStyle + Format('background-image: url(&quot;%s&quot);', [LImageURL]);
     end;
   end;
   AddAttributeToStyle(LCustomStyle, 'Style', '%s;');

@@ -18,7 +18,8 @@ type
 
 implementation
 
-function TExtUxDataPagingMemoryProxy.JSClassName : string; begin
+function TExtUxDataPagingMemoryProxy.JSClassName : string;
+begin
   Result := 'Ext.ux.data.PagingMemoryProxy';
 end;
 

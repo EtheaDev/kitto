@@ -139,87 +139,104 @@ type
 
 implementation
 
-procedure TExtSliderThumb.SetFConstrain(Value : Boolean); begin
+procedure TExtSliderThumb.SetFConstrain(Value : Boolean);
+begin
   FConstrain := Value;
   JSCode('constrain:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderThumb.SetFSlider(Value : TExtSliderMultiSlider); begin
+procedure TExtSliderThumb.SetFSlider(Value : TExtSliderMultiSlider);
+begin
   FSlider := Value;
     JSCode('slider:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtSliderThumb.SetFSlider_(Value : TExtSliderMultiSlider); begin
+procedure TExtSliderThumb.SetFSlider_(Value : TExtSliderMultiSlider);
+begin
   FSlider_ := Value;
     JSCode(JSName + '.slider=' + VarToJSON([Value, false]) + ';');
 end;
 
-function TExtSliderThumb.JSClassName : string; begin
+function TExtSliderThumb.JSClassName : string;
+begin
   Result := 'Ext.slider.Thumb';
 end;
 
-procedure TExtSliderThumb.InitDefaults; begin
+procedure TExtSliderThumb.InitDefaults;
+begin
   inherited;
   FSlider := TExtSliderMultiSlider.CreateInternal(Self, 'slider');
   FSlider_ := TExtSliderMultiSlider.CreateInternal(Self, 'slider');
 end;
 
-function TExtSliderThumb.Disable : TExtFunction; begin
+function TExtSliderThumb.Disable : TExtFunction;
+begin
   JSCode(JSName + '.disable();', 'TExtSliderThumb');
   Result := Self;
 end;
 
-function TExtSliderThumb.Enable : TExtFunction; begin
+function TExtSliderThumb.Enable : TExtFunction;
+begin
   JSCode(JSName + '.enable();', 'TExtSliderThumb');
   Result := Self;
 end;
 
-function TExtSliderThumb.InitEvents : TExtFunction; begin
+function TExtSliderThumb.InitEvents : TExtFunction;
+begin
   JSCode(JSName + '.initEvents();', 'TExtSliderThumb');
   Result := Self;
 end;
 
-function TExtSliderThumb.Render : TExtFunction; begin
+function TExtSliderThumb.Render : TExtFunction;
+begin
   JSCode(JSName + '.render();', 'TExtSliderThumb');
   Result := Self;
 end;
 
-procedure TExtSliderMultiSlider.SetFAnimate(Value : Boolean); begin
+procedure TExtSliderMultiSlider.SetFAnimate(Value : Boolean);
+begin
   FAnimate := Value;
   JSCode('animate:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFClickToChange(Value : Boolean); begin
+procedure TExtSliderMultiSlider.SetFClickToChange(Value : Boolean);
+begin
   FClickToChange := Value;
   JSCode('clickToChange:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFConstrainThumbs(Value : Boolean); begin
+procedure TExtSliderMultiSlider.SetFConstrainThumbs(Value : Boolean);
+begin
   FConstrainThumbs := Value;
   JSCode('constrainThumbs:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFDecimalPrecision(Value : Integer); begin
+procedure TExtSliderMultiSlider.SetFDecimalPrecision(Value : Integer);
+begin
   FDecimalPrecision := Value;
   JSCode('decimalPrecision:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFDecimalPrecisionBoolean(Value : Boolean); begin
+procedure TExtSliderMultiSlider.SetFDecimalPrecisionBoolean(Value : Boolean);
+begin
   FDecimalPrecisionBoolean := Value;
   JSCode('decimalPrecision:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFIncrement(Value : Integer); begin
+procedure TExtSliderMultiSlider.SetFIncrement(Value : Integer);
+begin
   FIncrement := Value;
   JSCode('increment:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFKeyIncrement(Value : Integer); begin
+procedure TExtSliderMultiSlider.SetFKeyIncrement(Value : Integer);
+begin
   FKeyIncrement := Value;
   JSCode('keyIncrement:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFMaxValue(Value : Integer); begin
+procedure TExtSliderMultiSlider.SetFMaxValue(Value : Integer);
+begin
   FMaxValue := Value;
   if not ConfigAvailable(JSName) then
     SetMaxValue(Value)
@@ -227,7 +244,8 @@ procedure TExtSliderMultiSlider.SetFMaxValue(Value : Integer); begin
     JSCode('maxValue:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFMinValue(Value : Integer); begin
+procedure TExtSliderMultiSlider.SetFMinValue(Value : Integer);
+begin
   FMinValue := Value;
   if not ConfigAvailable(JSName) then
     SetMinValue(Value)
@@ -235,7 +253,8 @@ procedure TExtSliderMultiSlider.SetFMinValue(Value : Integer); begin
     JSCode('minValue:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFValue(Value : Integer); begin
+procedure TExtSliderMultiSlider.SetFValue(Value : Integer);
+begin
   FValue := Value;
   if not ConfigAvailable(JSName) then
     SetValue(Value, 0, false)
@@ -243,27 +262,32 @@ procedure TExtSliderMultiSlider.SetFValue(Value : Integer); begin
     JSCode('value:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFVertical(Value : Boolean); begin
+procedure TExtSliderMultiSlider.SetFVertical(Value : Boolean);
+begin
   FVertical := Value;
   JSCode('vertical:' + VarToJSON([Value]));
 end;
 
-procedure TExtSliderMultiSlider.SetFDragging(Value : Boolean); begin
+procedure TExtSliderMultiSlider.SetFDragging(Value : Boolean);
+begin
   FDragging := Value;
   JSCode(JSName + '.dragging=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtSliderMultiSlider.SetFThumbs(Value : TExtObjectList); begin
+procedure TExtSliderMultiSlider.SetFThumbs(Value : TExtObjectList);
+begin
   FThumbs := Value;
     JSCode(JSName + '.thumbs=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtSliderMultiSlider.SetFValues(Value : TExtObjectList); begin
+procedure TExtSliderMultiSlider.SetFValues(Value : TExtObjectList);
+begin
   FValues := Value;
     JSCode(JSName + '.values=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtSliderMultiSlider.SetFOnBeforechange(Value : TExtSliderMultiSliderOnBeforechange); begin
+procedure TExtSliderMultiSlider.SetFOnBeforechange(Value : TExtSliderMultiSliderOnBeforechange);
+begin
   if Assigned(FOnBeforechange) then
     JSCode(JSName+'.events ["beforechange"].listeners=[];');
   if Assigned(Value) then
@@ -271,7 +295,8 @@ procedure TExtSliderMultiSlider.SetFOnBeforechange(Value : TExtSliderMultiSlider
   FOnBeforechange := Value;
 end;
 
-procedure TExtSliderMultiSlider.SetFOnChange(Value : TExtSliderMultiSliderOnChange); begin
+procedure TExtSliderMultiSlider.SetFOnChange(Value : TExtSliderMultiSliderOnChange);
+begin
   if Assigned(FOnChange) then
     JSCode(JSName+'.events ["change"].listeners=[];');
   if Assigned(Value) then
@@ -279,7 +304,8 @@ procedure TExtSliderMultiSlider.SetFOnChange(Value : TExtSliderMultiSliderOnChan
   FOnChange := Value;
 end;
 
-procedure TExtSliderMultiSlider.SetFOnChangecomplete(Value : TExtSliderMultiSliderOnChangecomplete); begin
+procedure TExtSliderMultiSlider.SetFOnChangecomplete(Value : TExtSliderMultiSliderOnChangecomplete);
+begin
   if Assigned(FOnChangecomplete) then
     JSCode(JSName+'.events ["changecomplete"].listeners=[];');
   if Assigned(Value) then
@@ -287,7 +313,8 @@ procedure TExtSliderMultiSlider.SetFOnChangecomplete(Value : TExtSliderMultiSlid
   FOnChangecomplete := Value;
 end;
 
-procedure TExtSliderMultiSlider.SetFOnDrag(Value : TExtSliderMultiSliderOnDrag); begin
+procedure TExtSliderMultiSlider.SetFOnDrag(Value : TExtSliderMultiSliderOnDrag);
+begin
   if Assigned(FOnDrag) then
     JSCode(JSName+'.events ["drag"].listeners=[];');
   if Assigned(Value) then
@@ -295,7 +322,8 @@ procedure TExtSliderMultiSlider.SetFOnDrag(Value : TExtSliderMultiSliderOnDrag);
   FOnDrag := Value;
 end;
 
-procedure TExtSliderMultiSlider.SetFOnDragend(Value : TExtSliderMultiSliderOnDragend); begin
+procedure TExtSliderMultiSlider.SetFOnDragend(Value : TExtSliderMultiSliderOnDragend);
+begin
   if Assigned(FOnDragend) then
     JSCode(JSName+'.events ["dragend"].listeners=[];');
   if Assigned(Value) then
@@ -303,7 +331,8 @@ procedure TExtSliderMultiSlider.SetFOnDragend(Value : TExtSliderMultiSliderOnDra
   FOnDragend := Value;
 end;
 
-procedure TExtSliderMultiSlider.SetFOnDragstart(Value : TExtSliderMultiSliderOnDragstart); begin
+procedure TExtSliderMultiSlider.SetFOnDragstart(Value : TExtSliderMultiSliderOnDragstart);
+begin
   if Assigned(FOnDragstart) then
     JSCode(JSName+'.events ["dragstart"].listeners=[];');
   if Assigned(Value) then
@@ -311,52 +340,62 @@ procedure TExtSliderMultiSlider.SetFOnDragstart(Value : TExtSliderMultiSliderOnD
   FOnDragstart := Value;
 end;
 
-function TExtSliderMultiSlider.JSClassName : string; begin
+function TExtSliderMultiSlider.JSClassName : string;
+begin
   Result := 'Ext.slider.MultiSlider';
 end;
 
-procedure TExtSliderMultiSlider.InitDefaults; begin
+procedure TExtSliderMultiSlider.InitDefaults;
+begin
   inherited;
   FThumbs := TExtObjectList.CreateAsAttribute(Self, 'thumbs');
   FValues := TExtObjectList.CreateAsAttribute(Self, 'values');
 end;
 
-function TExtSliderMultiSlider.AddThumb(Value : Integer) : TExtFunction; begin
+function TExtSliderMultiSlider.AddThumb(Value : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.addThumb(' + VarToJSON([Value]) + ');', 'TExtSliderMultiSlider');
   Result := Self;
 end;
 
-function TExtSliderMultiSlider.GetValue(Index : Integer) : TExtFunction; begin
+function TExtSliderMultiSlider.GetValue(Index : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.getValue(' + VarToJSON([Index]) + ');', 'TExtSliderMultiSlider');
   Result := Self;
 end;
 
-function TExtSliderMultiSlider.GetValues : TExtFunction; begin
+function TExtSliderMultiSlider.GetValues : TExtFunction;
+begin
   JSCode(JSName + '.getValues();', 'TExtSliderMultiSlider');
   Result := Self;
 end;
 
-function TExtSliderMultiSlider.SetMaxValue(Val : Integer) : TExtFunction; begin
+function TExtSliderMultiSlider.SetMaxValue(Val : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setMaxValue(' + VarToJSON([Val]) + ');', 'TExtSliderMultiSlider');
   Result := Self;
 end;
 
-function TExtSliderMultiSlider.SetMinValue(Val : Integer) : TExtFunction; begin
+function TExtSliderMultiSlider.SetMinValue(Val : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setMinValue(' + VarToJSON([Val]) + ');', 'TExtSliderMultiSlider');
   Result := Self;
 end;
 
-function TExtSliderMultiSlider.SetValue(Index : Integer; Value : Integer; Animate : Boolean) : TExtFunction; begin
+function TExtSliderMultiSlider.SetValue(Index : Integer; Value : Integer; Animate : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.setValue(' + VarToJSON([Index, Value, Animate]) + ');', 'TExtSliderMultiSlider');
   Result := Self;
 end;
 
-function TExtSliderMultiSlider.SyncThumb : TExtFunction; begin
+function TExtSliderMultiSlider.SyncThumb : TExtFunction;
+begin
   JSCode(JSName + '.syncThumb();', 'TExtSliderMultiSlider');
   Result := Self;
 end;
 
-procedure TExtSliderMultiSlider.HandleEvent(const AEvtName : string); begin
+procedure TExtSliderMultiSlider.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforechange') and Assigned(FOnBeforechange) then
     FOnBeforechange(TExtSlider(ParamAsObject('Slider')), ParamAsInteger('NewValue'), ParamAsInteger('OldValue'))
@@ -372,38 +411,46 @@ procedure TExtSliderMultiSlider.HandleEvent(const AEvtName : string); begin
     FOnDragstart(TExtSlider(ParamAsObject('Slider')), ExtEventObject);
 end;
 
-function TExtSliderSingleSlider.JSClassName : string; begin
+function TExtSliderSingleSlider.JSClassName : string;
+begin
   Result := 'Ext.slider.SingleSlider';
 end;
 
-procedure TExtSliderSingleSlider.InitDefaults; begin
+procedure TExtSliderSingleSlider.InitDefaults;
+begin
   inherited;
 end;
 
-function TExtSliderSingleSlider.GetValue : TExtFunction; begin
+function TExtSliderSingleSlider.GetValue : TExtFunction;
+begin
   JSCode(JSName + '.getValue();', 'TExtSliderSingleSlider');
   Result := Self;
 end;
 
-function TExtSliderSingleSlider.SetValue(Value : Integer; Animate : Boolean) : TExtFunction; begin
+function TExtSliderSingleSlider.SetValue(Value : Integer; Animate : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.setValue(' + VarToJSON([Value, Animate]) + ');', 'TExtSliderSingleSlider');
   Result := Self;
 end;
 
-function TExtSliderSingleSlider.SyncThumb : TExtFunction; begin
+function TExtSliderSingleSlider.SyncThumb : TExtFunction;
+begin
   JSCode(JSName + '.syncThumb();', 'TExtSliderSingleSlider');
   Result := Self;
 end;
 
-function TExtSliderTip.JSClassName : string; begin
+function TExtSliderTip.JSClassName : string;
+begin
   Result := 'Ext.slider.Tip';
 end;
 
-procedure TExtSliderTip.InitDefaults; begin
+procedure TExtSliderTip.InitDefaults;
+begin
   inherited;
 end;
 
-function TExtSliderTip.GetText(Thumb : TExtSliderThumb) : TExtFunction; begin
+function TExtSliderTip.GetText(Thumb : TExtSliderThumb) : TExtFunction;
+begin
   JSCode(JSName + '.getText(' + VarToJSON([Thumb, false]) + ');', 'TExtSliderTip');
   Result := Self;
 end;

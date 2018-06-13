@@ -200,7 +200,10 @@ var
         LSeries.Style.Color := LOption;
       LOption := LStyle.GetString('Image');
       if LOption <> '' then
-        LSeries.Style.Image := TEFMacroExpansionEngine.Instance.Expand(LOption);
+      begin
+        TEFMacroExpansionEngine.Instance.Expand(LOption);
+        LSeries.Style.Image := LOption;
+      end;
       LOption := LStyle.GetString('Mode');
       if LOption <> '' then
         LSeries.Style.Mode := LOption;

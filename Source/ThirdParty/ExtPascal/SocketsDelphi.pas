@@ -244,39 +244,48 @@ const
 
 implementation
 
-function socketerror:cint; begin
+function socketerror:cint;
+begin
   result:=wsagetlasterror;
 end;
 
-function fpsocket(domain:cint; xtype:cint; protocol: cint):cint; begin
+function fpsocket(domain:cint; xtype:cint; protocol: cint):cint;
+begin
   fpSocket:=WinSockDelphi.Socket(Domain,xtype,ProtoCol);
 end;
 
-function fpsend(s:cint; msg:pointer; len:size_t; flags:cint):ssize_t; begin
+function fpsend(s:cint; msg:pointer; len:size_t; flags:cint):ssize_t;
+begin
   fpSend:=WinSockDelphi.Send(S,msg,len,flags);
 end;
 
-function fprecv(s:cint; buf: pointer; len: size_t; flags: cint):ssize_t; begin
+function fprecv(s:cint; buf: pointer; len: size_t; flags: cint):ssize_t;
+begin
   fpRecv:=WinSockDelphi.Recv(S,Buf,Len,Flags);
 end;
 
-function fpconnect(s:cint; name : psockaddr; namelen : tsocklen):cint; begin
+function fpconnect(s:cint; name : psockaddr; namelen : tsocklen):cint;
+begin
   fpConnect := WinSockDelphi.Connect(S,WinSockDelphi.PSockAddr(name),nameLen);
 end;
 
-function fpbind(s:cint; addrx : psockaddr; addrlen : tsocklen):cint; begin
+function fpbind(s:cint; addrx : psockaddr; addrlen : tsocklen):cint;
+begin
   fpbind:=WinSockDelphi.Bind(S,WinSockDelphi.PSockAddr(Addrx),AddrLen);
 end;
 
-function fplisten(s:cint; backlog : cint):cint; begin
+function fplisten(s:cint; backlog : cint):cint;
+begin
   fplisten:=WinSockDelphi.Listen(S,backlog);
 end;
 
-function fpaccept(s:cint; addrx : psockaddr; addrlen : plongint):cint; begin
+function fpaccept(s:cint; addrx : psockaddr; addrlen : plongint):cint;
+begin
   fpAccept:=WinSockDelphi.Accept(S,WinSockDelphi.PSockAddr(Addrx), AddrLen);
 end;
 
-function fpgetsockname(s:cint; name : psockaddr; namelen : psocklen):cint; begin
+function fpgetsockname(s:cint; name : psockaddr; namelen : psocklen):cint;
+begin
   fpGetSockName:=WinSockDelphi.GetSockName(S, WinSockDelphi.PSockAddr(name)^,nameLen^);
 end;
 
@@ -327,7 +336,8 @@ begin
   Result.s_addr := ntohl(Result.s_addr);
 end;
 
-function StrToNetAddr(IP : AnsiString) : in_addr; begin
+function StrToNetAddr(IP : AnsiString) : in_addr;
+begin
   StrToNetAddr.s_addr:=htonl(StrToHostAddr(IP).s_addr);
 end;
 

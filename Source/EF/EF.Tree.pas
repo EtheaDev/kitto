@@ -1223,7 +1223,7 @@ type
     FPrefix: string;
   strict protected
     property Tree: TEFTree read FTree;
-    function InternalExpand(const AString: string): string; override;
+    procedure InternalExpand(var AString: string); override;
   public
     constructor Create(const ATree: TEFTree; const ANameSpace: string); reintroduce;
   end;
@@ -1517,7 +1517,8 @@ end;
 
 function TEFNode.GetAsExpandedString: string;
 begin
-  Result := TEFMacroExpansionEngine.Instance.Expand(AsString);
+  Result := AsString;
+  TEFMacroExpansionEngine.Instance.Expand(Result);
 end;
 
 function TEFNode.GetAsFloat: Double;
@@ -2454,7 +2455,8 @@ end;
 
 function TEFTree.GetExpandedString(const APath, ADefaultValue: string): string;
 begin
-  Result := TEFMacroExpansionEngine.Instance.Expand(GetString(APath, ADefaultValue));
+  Result := GetString(APath, ADefaultValue);
+  TEFMacroExpansionEngine.Instance.Expand(Result);
 end;
 
 function TEFTree.GetFloat(const APath: string;
@@ -2647,7 +2649,7 @@ begin
     FPrefix := '';
 end;
 
-function TEFTreeMacroExpander.InternalExpand(const AString: string): string;
+procedure TEFTreeMacroExpander.InternalExpand(var AString: string);
 var
   LIndex: Integer;
   LStart: Integer;
@@ -2657,27 +2659,27 @@ var
   LNodeValue: string;
   LNode: TEFNode;
 begin
-  Result := inherited InternalExpand(AString);
+  inherited InternalExpand(AString);
 
   LIndex := 1;
   repeat
-    LStart := PosEx('%' + FPrefix, Result, LIndex);
+    LStart := PosEx('%' + FPrefix, AString, LIndex);
     if LStart = 0 then
       Exit;
     LPathStart := LStart + 1 + Length(FPrefix);
-    LEnd := PosEx('%', Result, LStart + 1);
+    LEnd := PosEx('%', AString, LStart + 1);
     if LEnd = 0 then
       Exit;
-    LNodePath := Copy(Result, LPathStart, LEnd - LPathStart);
+    LNodePath := Copy(AString, LPathStart, LEnd - LPathStart);
     LNode := FTree.FindNode(StripPrefixAndSuffix(LNodePath, '%', '%'));
     if Assigned(LNode) then
     begin
       LNodeValue := LNode.AsExpandedString;
-      Delete(Result, LStart, LEnd - LStart + 1);
-      Insert(LNodeValue, Result, LStart);
+      Delete(AString, LStart, LEnd - LStart + 1);
+      Insert(LNodeValue, AString, LStart);
     end;
     LIndex := LEnd + 1;
-  until LIndex > Length(Result);
+  until LIndex > Length(AString);
 end;
 
 { TEFDataType }
@@ -3006,6 +3008,8 @@ begin
     LFormatSetting.TimeSeparator := ':';
     Result := StrToDateTime(AValue, LFormatSetting);
   end
+  else if VarIsNull(AValue) then
+    Result := 0
   else
     Result := AValue;
 end;

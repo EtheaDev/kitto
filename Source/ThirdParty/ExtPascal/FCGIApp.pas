@@ -188,7 +188,8 @@ Converts a Request string into a FastCGI Header
 @param FCGIHeader FastCGI header converted from Buffer
 @see MoveFromFCGIHeader
 }
-procedure MoveToFCGIHeader(var Buffer : AnsiChar; var FCGIHeader : TFCGIHeader); begin
+procedure MoveToFCGIHeader(var Buffer : AnsiChar; var FCGIHeader : TFCGIHeader);
+begin
   move(Buffer, FCGIHeader, sizeof(TFCGIHeader));
   {$IFNDEF FPC_BIG_ENDIAN}
   FCGIHeader.ID  := swap(FCGIHeader.ID);
@@ -202,7 +203,8 @@ Converts a Request string into a FastCGI Header
 @param FCGIHeader FastCGI header converted from Buffer
 @see MoveToFCGIHeader
 }
-procedure MoveFromFCGIHeader(FCGIHeader : TFCGIHeader; var Buffer : AnsiChar); begin
+procedure MoveFromFCGIHeader(FCGIHeader : TFCGIHeader; var Buffer : AnsiChar);
+begin
   {$IFNDEF FPC_BIG_ENDIAN}
   FCGIHeader.ID  := swap(FCGIHeader.ID);
   FCGIHeader.Len := swap(FCGIHeader.Len);
@@ -244,7 +246,8 @@ end;
 Appends or cleans HTTP response header. The HTTP response header is sent using <link TFCGIThread.SendResponse, SendResponse> method.
 @param Header Use '' to clean response header else Header parameter is appended to response header
 }
-procedure TFCGIThread.SetResponseHeader(Header : string); begin
+procedure TFCGIThread.SetResponseHeader(Header : string);
+begin
   FSession.FCustomResponseHeaders.Add(Header);
 end;
 
@@ -296,7 +299,8 @@ end;
 Sends an end request record to the Web Server and ends this thread.
 @param Status Status of request. Default is psRequestComplete
 }
-procedure TFCGIThread.SendEndRequest(Status : TProtocolStatus = psRequestComplete); begin
+procedure TFCGIThread.SendEndRequest(Status : TProtocolStatus = psRequestComplete);
+begin
   if Status <> psRequestComplete then begin
     case Status of
       psCantMPXConn : FSession.Alert('Multiplexing is not allowed.');
@@ -674,7 +678,8 @@ The published method will use the Request as input and the Response as output.
 @param pRequest Request body assigned to FRequest field or to <link TFCGIThread.Query, Query> array if FRequestMethod is <link TRequestMethod, rmPost>, it is the input to the published method
 @return Response body to <link TFCGIThread.SendResponse, send>
 }
-function TFCGIThread.HandleRequest(pRequest : AnsiString) : AnsiString; begin
+function TFCGIThread.HandleRequest(pRequest : AnsiString) : AnsiString;
+begin
   if (FRequestMethod = rmPost) and (Pos(AnsiString('='), pRequest) <> 0) then
     FSession.SetQueryText(string(pRequest), True, True);
   FRequest := pRequest;
@@ -688,7 +693,8 @@ function TFCGIThread.HandleRequest(pRequest : AnsiString) : AnsiString; begin
 end;
 
 // Frees a TFCGIApplication
-destructor TFCGIApplication.Destroy; begin
+destructor TFCGIApplication.Destroy;
+begin
   FThreads.Free;
   AccessThreads.Free;
   WebServers.Free;
@@ -730,7 +736,8 @@ Tests if Address parameter is an IP address in WebServers list
 @param Address IP address to find
 @return True if Address is in WebServers list
 }
-function TFCGIApplication.CanConnect(Address : string) : boolean; begin
+function TFCGIApplication.CanConnect(Address : string) : boolean;
+begin
   Result := (WebServers = nil) or (WebServers.IndexOf(Address) <> -1)
 end;
 
@@ -738,7 +745,8 @@ end;
 Tests if MaxConns (max connections), default is 1000, was reached
 @return True if was reached
 }
-function TFCGIApplication.ReachedMaxConns : boolean; begin
+function TFCGIApplication.ReachedMaxConns : boolean;
+begin
   Result := FThreads.Count >= MaxConns
 end;
 
@@ -780,7 +788,8 @@ begin
   end;
 end;
 
-function TFCGIApplication.GetTerminated : Boolean; begin
+function TFCGIApplication.GetTerminated : Boolean;
+begin
   Result := inherited GetTerminated or (Shutdown and (ThreadsCount = 0));
 end;
 
@@ -788,7 +797,8 @@ end;
 Returns the Ith thread
 @param I Index of the thread to return
 }
-function TFCGIApplication.GetThread(I : integer) : TThread; begin
+function TFCGIApplication.GetThread(I : integer) : TThread;
+begin
   Result := TThread(FThreads.Objects[I])
 end;
 
@@ -806,7 +816,8 @@ Can be overrided in descendent thread class. It shall be overrided if the applic
 @see Create
 @see DoRun
 }
-procedure TFCGIApplication.OnPortInUseError; begin
+procedure TFCGIApplication.OnPortInUseError;
+begin
   writeln('Port: ', Port, ' already in use.');
   sleep(10000);
 end;
@@ -851,7 +862,8 @@ begin
 end;
 
 // Returns the number of active threads
-function TFCGIApplication.ThreadsCount : integer; begin
+function TFCGIApplication.ThreadsCount : integer;
+begin
   Result := FThreadsCount
 end;
 
@@ -864,28 +876,34 @@ begin
   inherited Create(AOwner);
 end;
 
-function TFCGISession.CanCallAfterHandleRequest : Boolean; begin
+function TFCGISession.CanCallAfterHandleRequest : Boolean;
+begin
   Result := True;
 end;
 
-function TFCGISession.CanHandleUrlPath : Boolean; begin
+function TFCGISession.CanHandleUrlPath : Boolean;
+begin
   Result := not IsUpload or (Pos('success:true', Response) <> 0);
 end;
 
-procedure TFCGISession.DoLogout; begin
+procedure TFCGISession.DoLogout;
+begin
   inherited;
   TFCGIThread(Owner).FGarbage := True;
 end;
 
-procedure TFCGISession.DoSetCookie(const Name, ValueRaw : string); begin
+procedure TFCGISession.DoSetCookie(const Name, ValueRaw : string);
+begin
   CustomResponseHeaders['Set-Cookie'] := Name + '=' + ValueRaw;
 end;
 
-class function TFCGISession.GetCurrentWebSession : TCustomWebSession; begin
+class function TFCGISession.GetCurrentWebSession : TCustomWebSession;
+      begin
   Result := _CurrentWebSession;
 end;
 
-function TFCGISession.GetDocumentRoot : string; begin
+function TFCGISession.GetDocumentRoot : string;
+begin
   Result := RequestHeader['DOCUMENT_ROOT'];
   if (Result <> '') and CharInSet(Result[Length(Result)], ['/', '\']) then
     Delete(Result, Length(Result), 1);
@@ -904,20 +922,24 @@ begin
   Result := TEncoding.UTF8.GetString(LBytes);
 end;
 
-function TFCGISession.GetRequestHeader(const Name : string) : string; begin
+function TFCGISession.GetRequestHeader(const Name : string) : string;
+begin
   Result := TFCGIThread(Owner).FRequestHeader.Values[Name];
 end;
 
-function TFCGISession.GetWebServer : string; begin
+function TFCGISession.GetWebServer : string;
+begin
   Result := RequestHeader['Server_Software'];
   if Result = '' then Result := 'Embedded';
 end;
 
-procedure TFCGISession.SendResponse(const Msg : AnsiString); begin
+procedure TFCGISession.SendResponse(const Msg : AnsiString);
+begin
   TFCGIThread(Owner).SendResponse(Msg);
 end;
 
-function TFCGISession.UploadBlockType(const Buffer : AnsiString; var MarkPos : Integer) : TUploadBlockType; begin
+function TFCGISession.UploadBlockType(const Buffer : AnsiString; var MarkPos : Integer) : TUploadBlockType;
+begin
   MarkPos := Pos(UploadMark, Buffer);
   case MarkPos of
     0 : Result := ubtMiddle;
@@ -927,7 +949,8 @@ function TFCGISession.UploadBlockType(const Buffer : AnsiString; var MarkPos : I
   end;
 end;
 
-function TFCGISession.UploadNeedUnknownBlock : Boolean; begin
+function TFCGISession.UploadNeedUnknownBlock : Boolean;
+begin
   Result := True;
 end;
 

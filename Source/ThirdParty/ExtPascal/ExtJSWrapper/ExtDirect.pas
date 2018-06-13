@@ -146,32 +146,38 @@ type
 
 implementation
 
-procedure TExtDirectProvider.SetFId(Value : String); begin
+procedure TExtDirectProvider.SetFId(Value : String);
+begin
   FId := Value;
   JSCode('id:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectProvider.SetFPriority(Value : Integer); begin
+procedure TExtDirectProvider.SetFPriority(Value : Integer);
+begin
   FPriority := Value;
   JSCode('priority:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectProvider.SetFTypeJS(Value : String); begin
+procedure TExtDirectProvider.SetFTypeJS(Value : String);
+begin
   FTypeJS := Value;
   JSCode('typeJS:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectProvider.SetFConnect(Value : TExtObject); begin
+procedure TExtDirectProvider.SetFConnect(Value : TExtObject);
+begin
   FConnect := Value;
     JSCode(JSName + '.connect=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtDirectProvider.SetFDisconnect(Value : TExtObject); begin
+procedure TExtDirectProvider.SetFDisconnect(Value : TExtObject);
+begin
   FDisconnect := Value;
     JSCode(JSName + '.disconnect=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtDirectProvider.SetFOnConnect(Value : TExtDirectProviderOnConnect); begin
+procedure TExtDirectProvider.SetFOnConnect(Value : TExtDirectProviderOnConnect);
+begin
   if Assigned(FOnConnect) then
     JSCode(JSName+'.events ["connect"].listeners=[];');
   if Assigned(Value) then
@@ -179,7 +185,8 @@ procedure TExtDirectProvider.SetFOnConnect(Value : TExtDirectProviderOnConnect);
   FOnConnect := Value;
 end;
 
-procedure TExtDirectProvider.SetFOnData(Value : TExtDirectProviderOnData); begin
+procedure TExtDirectProvider.SetFOnData(Value : TExtDirectProviderOnData);
+begin
   if Assigned(FOnData) then
     JSCode(JSName+'.events ["data"].listeners=[];');
   if Assigned(Value) then
@@ -187,7 +194,8 @@ procedure TExtDirectProvider.SetFOnData(Value : TExtDirectProviderOnData); begin
   FOnData := Value;
 end;
 
-procedure TExtDirectProvider.SetFOnDisconnect(Value : TExtDirectProviderOnDisconnect); begin
+procedure TExtDirectProvider.SetFOnDisconnect(Value : TExtDirectProviderOnDisconnect);
+begin
   if Assigned(FOnDisconnect) then
     JSCode(JSName+'.events ["disconnect"].listeners=[];');
   if Assigned(Value) then
@@ -195,7 +203,8 @@ procedure TExtDirectProvider.SetFOnDisconnect(Value : TExtDirectProviderOnDiscon
   FOnDisconnect := Value;
 end;
 
-procedure TExtDirectProvider.SetFOnException(Value : TExtDirectProviderOnException); begin
+procedure TExtDirectProvider.SetFOnException(Value : TExtDirectProviderOnException);
+begin
   if Assigned(FOnException) then
     JSCode(JSName+'.events ["exception"].listeners=[];');
   if Assigned(Value) then
@@ -203,22 +212,26 @@ procedure TExtDirectProvider.SetFOnException(Value : TExtDirectProviderOnExcepti
   FOnException := Value;
 end;
 
-function TExtDirectProvider.JSClassName : string; begin
+function TExtDirectProvider.JSClassName : string;
+begin
   Result := 'Ext.direct.Provider';
 end;
 
-procedure TExtDirectProvider.InitDefaults; begin
+procedure TExtDirectProvider.InitDefaults;
+begin
   inherited;
   FConnect := TExtObject.CreateInternal(Self, 'connect');
   FDisconnect := TExtObject.CreateInternal(Self, 'disconnect');
 end;
 
-function TExtDirectProvider.IsConnected : TExtFunction; begin
+function TExtDirectProvider.IsConnected : TExtFunction;
+begin
   JSCode(JSName + '.isConnected();', 'TExtDirectProvider');
   Result := Self;
 end;
 
-procedure TExtDirectProvider.HandleEvent(const AEvtName : string); begin
+procedure TExtDirectProvider.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'connect') and Assigned(FOnConnect) then
     FOnConnect(TExtDirectProvider(ParamAsObject('Provider')))
@@ -230,56 +243,67 @@ procedure TExtDirectProvider.HandleEvent(const AEvtName : string); begin
     FOnException();
 end;
 
-function TExtDirectJsonProvider.JSClassName : string; begin
+function TExtDirectJsonProvider.JSClassName : string;
+begin
   Result := 'Ext.direct.JsonProvider';
 end;
 
-procedure TExtDirectRemotingProvider.SetFActions(Value : TExtObject); begin
+procedure TExtDirectRemotingProvider.SetFActions(Value : TExtObject);
+begin
   FActions := Value;
     JSCode('actions:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFEnableBuffer(Value : Integer); begin
+procedure TExtDirectRemotingProvider.SetFEnableBuffer(Value : Integer);
+begin
   FEnableBuffer := Value;
   JSCode('enableBuffer:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFEnableBufferBoolean(Value : Boolean); begin
+procedure TExtDirectRemotingProvider.SetFEnableBufferBoolean(Value : Boolean);
+begin
   FEnableBufferBoolean := Value;
   JSCode('enableBuffer:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFEnableUrlEncode(Value : String); begin
+procedure TExtDirectRemotingProvider.SetFEnableUrlEncode(Value : String);
+begin
   FEnableUrlEncode := Value;
   JSCode('enableUrlEncode:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFMaxRetries(Value : Integer); begin
+procedure TExtDirectRemotingProvider.SetFMaxRetries(Value : Integer);
+begin
   FMaxRetries := Value;
   JSCode('maxRetries:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFNamespace(Value : String); begin
+procedure TExtDirectRemotingProvider.SetFNamespace(Value : String);
+begin
   FNamespace := Value;
   JSCode('namespace:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFNamespaceObject(Value : TExtObject); begin
+procedure TExtDirectRemotingProvider.SetFNamespaceObject(Value : TExtObject);
+begin
   FNamespaceObject := Value;
     JSCode('namespace:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFTimeout(Value : Integer); begin
+procedure TExtDirectRemotingProvider.SetFTimeout(Value : Integer);
+begin
   FTimeout := Value;
   JSCode('timeout:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFUrl(Value : String); begin
+procedure TExtDirectRemotingProvider.SetFUrl(Value : String);
+begin
   FUrl := Value;
   JSCode('url:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectRemotingProvider.SetFOnBeforecall(Value : TExtDirectRemotingProviderOnBeforecall); begin
+procedure TExtDirectRemotingProvider.SetFOnBeforecall(Value : TExtDirectRemotingProviderOnBeforecall);
+begin
   if Assigned(FOnBeforecall) then
     JSCode(JSName+'.events ["beforecall"].listeners=[];');
   if Assigned(Value) then
@@ -287,7 +311,8 @@ procedure TExtDirectRemotingProvider.SetFOnBeforecall(Value : TExtDirectRemoting
   FOnBeforecall := Value;
 end;
 
-procedure TExtDirectRemotingProvider.SetFOnCall(Value : TExtDirectRemotingProviderOnCall); begin
+procedure TExtDirectRemotingProvider.SetFOnCall(Value : TExtDirectRemotingProviderOnCall);
+begin
   if Assigned(FOnCall) then
     JSCode(JSName+'.events ["call"].listeners=[];');
   if Assigned(Value) then
@@ -295,18 +320,21 @@ procedure TExtDirectRemotingProvider.SetFOnCall(Value : TExtDirectRemotingProvid
   FOnCall := Value;
 end;
 
-function TExtDirectRemotingProvider.JSClassName : string; begin
+function TExtDirectRemotingProvider.JSClassName : string;
+begin
   Result := 'Ext.direct.RemotingProvider';
 end;
 
-procedure TExtDirectRemotingProvider.InitDefaults; begin
+procedure TExtDirectRemotingProvider.InitDefaults;
+begin
   inherited;
   FActions := TExtObject.CreateInternal(Self, 'actions');
   FEnableBuffer := 10;
   FNamespaceObject := TExtObject.CreateInternal(Self, 'namespace');
 end;
 
-procedure TExtDirectRemotingProvider.HandleEvent(const AEvtName : string); begin
+procedure TExtDirectRemotingProvider.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforecall') and Assigned(FOnBeforecall) then
     FOnBeforecall(TExtDirectRemotingProvider(ParamAsObject('Provider')), TExtDirectTransaction(ParamAsObject('Transaction')))
@@ -314,32 +342,38 @@ procedure TExtDirectRemotingProvider.HandleEvent(const AEvtName : string); begin
     FOnCall(TExtDirectRemotingProvider(ParamAsObject('Provider')), TExtDirectTransaction(ParamAsObject('Transaction')));
 end;
 
-procedure TExtDirectPollingProvider.SetFBaseParams(Value : TExtObject); begin
+procedure TExtDirectPollingProvider.SetFBaseParams(Value : TExtObject);
+begin
   FBaseParams := Value;
     JSCode('baseParams:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtDirectPollingProvider.SetFInterval(Value : Integer); begin
+procedure TExtDirectPollingProvider.SetFInterval(Value : Integer);
+begin
   FInterval := Value;
   JSCode('interval:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectPollingProvider.SetFPriority(Value : Integer); begin
+procedure TExtDirectPollingProvider.SetFPriority(Value : Integer);
+begin
   FPriority := Value;
   JSCode('priority:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectPollingProvider.SetFUrl(Value : String); begin
+procedure TExtDirectPollingProvider.SetFUrl(Value : String);
+begin
   FUrl := Value;
   JSCode('url:' + VarToJSON([Value]));
 end;
 
-procedure TExtDirectPollingProvider.SetFUrlFunction(Value : TExtFunction); begin
+procedure TExtDirectPollingProvider.SetFUrlFunction(Value : TExtFunction);
+begin
   FUrlFunction := Value;
   JSCode('url:' + VarToJSON([Value, true]));
 end;
 
-procedure TExtDirectPollingProvider.SetFOnBeforepoll(Value : TExtDirectPollingProviderOnBeforepoll); begin
+procedure TExtDirectPollingProvider.SetFOnBeforepoll(Value : TExtDirectPollingProviderOnBeforepoll);
+begin
   if Assigned(FOnBeforepoll) then
     JSCode(JSName+'.events ["beforepoll"].listeners=[];');
   if Assigned(Value) then
@@ -347,7 +381,8 @@ procedure TExtDirectPollingProvider.SetFOnBeforepoll(Value : TExtDirectPollingPr
   FOnBeforepoll := Value;
 end;
 
-procedure TExtDirectPollingProvider.SetFOnPoll(Value : TExtDirectPollingProviderOnPoll); begin
+procedure TExtDirectPollingProvider.SetFOnPoll(Value : TExtDirectPollingProviderOnPoll);
+begin
   if Assigned(FOnPoll) then
     JSCode(JSName+'.events ["poll"].listeners=[];');
   if Assigned(Value) then
@@ -355,28 +390,33 @@ procedure TExtDirectPollingProvider.SetFOnPoll(Value : TExtDirectPollingProvider
   FOnPoll := Value;
 end;
 
-function TExtDirectPollingProvider.JSClassName : string; begin
+function TExtDirectPollingProvider.JSClassName : string;
+begin
   Result := 'Ext.direct.PollingProvider';
 end;
 
-procedure TExtDirectPollingProvider.InitDefaults; begin
+procedure TExtDirectPollingProvider.InitDefaults;
+begin
   inherited;
   FBaseParams := TExtObject.CreateInternal(Self, 'baseParams');
   FInterval := 3000;
   FPriority := 3;
 end;
 
-function TExtDirectPollingProvider.Connect : TExtFunction; begin
+function TExtDirectPollingProvider.Connect : TExtFunction;
+begin
   JSCode(JSName + '.connect();', 'TExtDirectPollingProvider');
   Result := Self;
 end;
 
-function TExtDirectPollingProvider.Disconnect : TExtFunction; begin
+function TExtDirectPollingProvider.Disconnect : TExtFunction;
+begin
   JSCode(JSName + '.disconnect();', 'TExtDirectPollingProvider');
   Result := Self;
 end;
 
-procedure TExtDirectPollingProvider.HandleEvent(const AEvtName : string); begin
+procedure TExtDirectPollingProvider.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforepoll') and Assigned(FOnBeforepoll) then
     FOnBeforepoll(TExtDirectPollingProvider(ParamAsObject('E')))

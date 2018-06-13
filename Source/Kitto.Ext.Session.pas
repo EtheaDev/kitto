@@ -61,7 +61,7 @@ type
   strict private
     FSession: TKExtSession;
   strict protected
-    function InternalExpand(const AString: string): string; override;
+    procedure InternalExpand(var AString: string); override;
   public
     constructor Create(const ASession: TKExtSession); reintroduce;
   end;
@@ -369,6 +369,8 @@ type
     procedure Execute;
   end;
 
+function Session: TKExtSession;
+
 implementation
 
 uses
@@ -464,7 +466,7 @@ begin
   if LFileName <> '' then
   begin
     Result := TextFileToString(LFileName, GetEncoding);
-    Result := TEFMacroExpansionEngine.Instance.Expand(Result);
+    TEFMacroExpansionEngine.Instance.Expand(Result);
   end;
 end;
 
@@ -1411,14 +1413,13 @@ begin
   FSession := ASession;
 end;
 
-function TKExtSessionMacroExpander.InternalExpand(
-  const AString: string): string;
+procedure TKExtSessionMacroExpander.InternalExpand(var AString: string);
 begin
-  Result := inherited InternalExpand(AString);
+  inherited InternalExpand(AString);
   if Assigned(FSession) then
   begin
-    Result := ExpandMacros(Result, '%SESSION_ID%', FSession.SessionId);
-    Result := ExpandMacros(Result, '%LANGUAGE_ID%', FSession.Language);
+    ExpandMacros(AString, '%SESSION_ID%', FSession.SessionId);
+    ExpandMacros(AString, '%LANGUAGE_ID%', FSession.Language);
   end;
 end;
 

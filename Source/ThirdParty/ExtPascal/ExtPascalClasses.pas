@@ -437,11 +437,13 @@ begin
   Response := Format('alert("%s");', [AMessage]);
 end;
 
-function TCustomWebSession.BeforeHandleRequest : Boolean; begin
+function TCustomWebSession.BeforeHandleRequest : Boolean;
+begin
   Result := True;
 end;
 
-function TCustomWebSession.CheckPassword(const RealPassword : string) : Boolean; begin
+function TCustomWebSession.CheckPassword(const RealPassword : string) : Boolean;
+begin
   Result := (RealPassword <> '') and (Query['password'] = RealPassword);
 end;
 
@@ -472,7 +474,8 @@ procedure TCustomWebSession.DoLogout; begin end;
 // send cookie to response
 procedure TCustomWebSession.DoSetCookie(const Name, ValueRaw : string); begin end;
 
-procedure TCustomWebSession.DownloadBuffer(const FileName: string; const Size: Longint; const Buffer : AnsiString; AContentType : string = ''); begin
+procedure TCustomWebSession.DownloadBuffer(const FileName: string; const Size: Longint; const Buffer : AnsiString; AContentType : string = '');
+begin
   if AContentType = '' then
     ContentType := DownloadContentType(FileName, 'application/octet-stream')
   else
@@ -543,31 +546,38 @@ begin
     Result := AnsiString(Response);
 end;
 
-function TCustomWebSession.GarbageFixName(const Name : string) : string; begin
+function TCustomWebSession.GarbageFixName(const Name : string) : string;
+begin
   Result := Name;
 end;
 
-function TCustomWebSession.GetCookie(const Name : string) : string; begin
+function TCustomWebSession.GetCookie(const Name : string) : string;
+begin
   Result := FCookies.Values[Name];
 end;
 
-function TCustomWebSession.GetQuery(const ParamName : string) : string; begin
+function TCustomWebSession.GetQuery(const ParamName : string) : string;
+begin
   Result := FQueries.Values[ParamName];
 end;
 
-function TCustomWebSession.GetQueryAsBoolean(const ParamName : string) : Boolean; begin
+function TCustomWebSession.GetQueryAsBoolean(const ParamName : string) : Boolean;
+begin
   Result := StrToBoolDef(Query[ParamName], False);
 end;
 
-function TCustomWebSession.GetQueryAsDouble(const ParamName : string) : Double; begin
+function TCustomWebSession.GetQueryAsDouble(const ParamName : string) : Double;
+begin
   Result := StrToFloatDef(Query[ParamName], 0);
 end;
 
-function TCustomWebSession.GetQueryAsInteger(const ParamName : string): Integer; begin
+function TCustomWebSession.GetQueryAsInteger(const ParamName : string): Integer;
+begin
   Result := StrToIntDef(Query[ParamName], 0);
 end;
 
-function TCustomWebSession.GetQueryAsTDateTime(const ParamName : string) : TDateTime; begin
+function TCustomWebSession.GetQueryAsTDateTime(const ParamName : string) : TDateTime;
+begin
   Result := StrToFloatDef(Query[ParamName], 0);
 end;
 
@@ -581,11 +591,13 @@ begin
   Result := 'FCGIThread';
 end;
 
-function TCustomWebSession.GetUrlHandlerObject : TObject; begin
+function TCustomWebSession.GetUrlHandlerObject : TObject;
+begin
   Result := Self;
 end;
 
-procedure TCustomWebSession.HandleRequest(const ARequest : AnsiString); begin
+procedure TCustomWebSession.HandleRequest(const ARequest : AnsiString);
+begin
   if Browser = brUnknown then DetectBrowser(RequestHeader['HTTP_USER_AGENT']);
   if BeforeHandleRequest then
     try
@@ -627,7 +639,8 @@ end;
 
 procedure TCustomWebSession.InitDefaultValues; begin end;
 
-procedure TCustomWebSession.Logout; begin
+procedure TCustomWebSession.Logout;
+begin
   Response := 'window.close();';
   DoLogout;
 end;
@@ -640,7 +653,8 @@ begin
   Result := Result + MethodName;
 end;
 
-function TCustomWebSession.MethodURI(Method : TExtProcedure) : string; begin
+function TCustomWebSession.MethodURI(Method : TExtProcedure) : string;
+begin
   Result := GetCurrentWebSession.MethodName(@Method);
   if Result <> '' then
     Result := MethodURI(Result)
@@ -648,11 +662,13 @@ function TCustomWebSession.MethodURI(Method : TExtProcedure) : string; begin
     raise Exception.Create('MethodURI: Method is not published');
 end;
 
-procedure TCustomWebSession.OnError(const Msg, Method, Params : string); begin
+procedure TCustomWebSession.OnError(const Msg, Method, Params : string);
+begin
   Alert(Msg + '\non Method: ' + Method + '\nParams: ' + Params);
 end;
 
-procedure TCustomWebSession.OnNotFoundError; begin
+procedure TCustomWebSession.OnNotFoundError;
+begin
   Response := Format('alert("Method: ''%s'' not found");', [PathInfo]);
 end;
 
@@ -699,7 +715,8 @@ begin
   FCookies.Values[Name] := ValueRaw;
 end;
 
-procedure TCustomWebSession.SetCustomResponseHeaders(const Name, Value : string); begin
+procedure TCustomWebSession.SetCustomResponseHeaders(const Name, Value : string);
+begin
   FCustomResponseHeaders.Values[Name] := Value;
 end;
 
@@ -744,7 +761,8 @@ begin
   SetCookie(GetSessionCookieName, AValue, 0, '', LPath);
 end;
 
-procedure TCustomWebSession.Shutdown; begin
+procedure TCustomWebSession.Shutdown;
+begin
   with Application do
     if CheckPassword(Password) then begin
       Logout;
@@ -753,7 +771,8 @@ procedure TCustomWebSession.Shutdown; begin
     end;
 end;
 
-function TCustomWebSession.TryToServeFile : Boolean; begin
+function TCustomWebSession.TryToServeFile : Boolean;
+begin
   Result := False;
 end;
 
@@ -873,20 +892,24 @@ end;
 
 type TThreadAccess = class(TThread);
 
-function TCustomWebApplication.GetTerminated : Boolean; begin
+function TCustomWebApplication.GetTerminated : Boolean;
+begin
   Result := FTerminated or (Assigned(OwnerThread) and TThreadAccess(OwnerThread).Terminated);
 end;
 
-function TCustomWebApplication.Reconfig(AReload : Boolean = True) : Boolean; begin
+function TCustomWebApplication.Reconfig(AReload : Boolean = True) : Boolean;
+begin
   Result := False;
 end;
 
-procedure TCustomWebApplication.Run(AOwnerThread : TThread = nil); begin
+procedure TCustomWebApplication.Run(AOwnerThread : TThread = nil);
+begin
   FOwnerThread := AOwnerThread;
   DoRun;
 end;
 
-procedure TCustomWebApplication.Terminate; begin
+procedure TCustomWebApplication.Terminate;
+begin
   FTerminated := True;
 end;
 

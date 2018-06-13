@@ -51,7 +51,8 @@ Puts the socket in listening state, used on the server side
 @param Backlog The maximum length of the queue of pending connections
 @see Error
 }
-procedure TBlockSocket.Bind(pPort, BackLog : word); begin
+procedure TBlockSocket.Bind(pPort, BackLog : word);
+begin
   with RemoteSin do begin
     Sin_Family := AF_INET;
     Sin_Addr.s_Addr := 0;
@@ -68,7 +69,8 @@ Attempts to establish a new TCP connection, used on the client side
 @param Port Port number to connect
 @see Error
 }
-procedure TBlockSocket.Connect(Host : AnsiString; pPort : word); begin
+procedure TBlockSocket.Connect(Host : AnsiString; pPort : word);
+begin
   with RemoteSin do begin
     Sin_Family := AF_INET;
     Sin_Addr   := StrToNetAddr(Host);
@@ -81,7 +83,8 @@ end;
 Creates a new socket stream
 @param S Assigns an existing socket to the TBlockSocket
 }
-constructor TBlockSocket.Create(S : integer = 0); begin
+constructor TBlockSocket.Create(S : integer = 0);
+begin
   {$IFNDEF MSWINDOWS}fpSetErrNo(0);{$ENDIF}
 	if S = 0 then
   	Socket := fpSocket(AF_INET, SOCK_STREAM, 0)
@@ -90,7 +93,8 @@ constructor TBlockSocket.Create(S : integer = 0); begin
 end;
 
 // Closes the socket and frees the object
-destructor TBlockSocket.Destroy; begin
+destructor TBlockSocket.Destroy;
+begin
   Close;
 	inherited;
 end;
@@ -107,7 +111,8 @@ begin
 end;
 
 // Closes the socket
-procedure TBlockSocket.Close; begin
+procedure TBlockSocket.Close;
+begin
   CloseSocket(Socket);
 end;
 
@@ -188,7 +193,8 @@ Returns the socket input stream as a string
 @param Timeout Max time to wait until some data is available for reading. Default is 300 miliseconds
 @see Error
 }
-function TBlockSocket.RecvString(Timeout : integer = 300) : AnsiString; begin
+function TBlockSocket.RecvString(Timeout : integer = 300) : AnsiString;
+begin
   Result := '';
   if CanRead(Timeout) then
     while WaitingData <> 0 do
@@ -200,7 +206,8 @@ Sends a string by the socket
 @param Data String to send
 @see Error
 }
-procedure TBlockSocket.SendString(const Data : AnsiString); begin
+procedure TBlockSocket.SendString(const Data : AnsiString);
+begin
 	fpSend(Socket, @Data[1], length(Data), 0);
 end;
 
@@ -208,7 +215,8 @@ end;
 Use Error method to test if others TBlockSocket methods succeded
 @return 0 if success or socket error code otherwise
 }
-function TBlockSocket.Error : integer; begin
+function TBlockSocket.Error : integer;
+begin
   Result := SocketError
 end;
 

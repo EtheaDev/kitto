@@ -273,15 +273,25 @@ function Join(const AStrings: TStringDynArray; const ASeparator: string = ''): s
 function SplitPairs(const AString: string; const ASeparators: string = ' '): TEFPairs;
 
 ///	<summary>
-///	  Joins the pairs producing a string with a list of name=value pairs
-///	  separated by the specified separator.
+///	 Joins the pairs producing a string with a list of name=value pairs
+///	 separated by the specified separator.
 ///	</summary>
 function JoinPairs(const APairs: TEFPairs; const ASeparator: string = ''): string;
 
-///	<summary>Formats the specified number of bytes in GBs, MBs, KBs or bytes
-///	according to the size.</summary>
-///	<example>FormatByteSize(2560) yields '2.5 KBs'</example>
+///	<summary>
+///  Formats the specified number of bytes in GBs, MBs, KBs or bytes
+///	 according to the size.
+/// </summary>
+///	<example>
+///  FormatByteSize(2560) yields '2.5 KBs'
+/// </example>
 function FormatByteSize(const AByteSize: Longint; const AFormatSettings: TFormatSettings): string;
+
+///	<summary>
+///	 A faster replacement for StringReplace ONLY FOR CASE_SENSITIVE comparisons.
+///	 Up to 15 times faster in such cases.
+///	</summary>
+procedure ReplaceAllCaseSensitive(var AString: string; const AOldPattern, ANewPattern: string);
 
 implementation
 
@@ -942,6 +952,26 @@ begin
     Result := FormatFloat('0.## KBs', AByteSize / KB, AFormatSettings)
   else
     Result := FormatFloat('0 bytes', AByteSize, AFormatSettings);
+end;
+
+procedure ReplaceAllCaseSensitive(var AString: string; const AOldPattern, ANewPattern: string);
+var
+  LPos: Integer;
+  LLength: Integer;
+begin
+  if AOldPattern = ANewPattern then
+    Exit;
+
+  LPos := Pos(AOldPattern, AString);
+  LLength := Length(AOldPattern);
+  if LPos <> 0 then
+  begin
+    repeat
+      Delete(AString, LPos, LLength);
+      Insert(ANewPattern, AString, LPos);
+      LPos := Pos(AOldPattern, AString);
+    until LPos = 0;
+  end;
 end;
 
 initialization

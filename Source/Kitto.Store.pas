@@ -178,7 +178,7 @@ type
     ///  Replaces occurrencess of {FieldName} tags in the specified string
     ///  with actual field values, formatted as strings.
     /// </summary>
-    function ExpandExpression(const AExpression: string): string; virtual;
+    procedure ExpandExpression(var AExpression: string); virtual;
 
     /// <summary>
     ///  Marks the record as new. An insert instruction will be executed when
@@ -463,7 +463,7 @@ implementation
 
 uses
   Math, FmtBcd, Variants, StrUtils,
-  EF.StrUtils, EF.Localization, EF.JSON, EF.XML, EF.superobject,
+  EF.StrUtils, EF.Localization, EF.JSON, EF.XML, EF.superobject, EF.Macros,
   Kitto.Types, Kitto.Config;
 
 { TKStore }
@@ -730,13 +730,18 @@ begin
       Records.Clear;
     if not ADBQuery.IsOpen then
       ADBQuery.Open;
-    while not ADBQuery.DataSet.Eof do
-    begin
-      LRecord := Records.AppendAndInitialize;
-      LRecord.ReadFromFields(ADBQuery.DataSet.Fields, AFieldsByIndex);
-      if Assigned(AForEachRecord) then
-        AForEachRecord(LRecord);
-      ADBQuery.DataSet.Next;
+    TEFMacroExpansionEngine.Instance.Disable;
+    try
+      while not ADBQuery.DataSet.Eof do
+      begin
+        LRecord := Records.AppendAndInitialize;
+        LRecord.ReadFromFields(ADBQuery.DataSet.Fields, AFieldsByIndex);
+        if Assigned(AForEachRecord) then
+          AForEachRecord(LRecord);
+        ADBQuery.DataSet.Next;
+      end;
+    finally
+      TEFMacroExpansionEngine.Instance.Enable;
     end;
   finally
     EnableChangeNotifications;
@@ -1054,16 +1059,15 @@ begin
   end;
 end;
 
-function TKRecord.ExpandExpression(const AExpression: string): string;
+procedure TKRecord.ExpandExpression(var AExpression: string);
 var
   I: Integer;
   LField: TKField;
 begin
-  Result := AExpression;
   for I := 0 to FieldCount - 1 do
   begin
     LField := Fields[I];
-    Result := ReplaceText(Result, Format('{%s}',[LField.FieldName]), LField.AsString);
+    ReplaceAllCaseSensitive(AExpression, Format('{%s}',[LField.FieldName]), LField.AsString);
   end;
 end;
 
@@ -1355,7 +1359,14 @@ begin
       if AByIndex then
         LDBField := AFields[I]
       else
-        LDBField := AFields.FindField(TranslateFieldName(Fields[I].FieldName));
+      begin
+        if (I < AFields.Count) then
+          LDBField := AFields[I]
+        else
+          LDBField := nil;
+        if not Assigned(LDBField) or not SameText(LDBField.FieldName, Fields[I].FieldName) then
+          LDBField := AFields.FindField(TranslateFieldName(Fields[I].FieldName));
+      end;
       if Assigned(LDBField) then
       begin
         Fields[I].AssignFieldValue(LDBField);

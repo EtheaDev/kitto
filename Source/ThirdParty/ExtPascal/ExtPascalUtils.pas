@@ -265,7 +265,8 @@ begin
 end;
 {$IFEND}
 
-function DetermineBrowser(const UserAgentStr : string) : TBrowser; begin
+function DetermineBrowser(const UserAgentStr : string) : TBrowser;
+begin
   Result := TBrowser(RCaseOf(UserAgentStr, ['MSIE', 'Firefox', 'Chrome', 'Safari', 'Opera', 'Konqueror'])+1);
   // Note string order must match order in TBrowser enumeration above
   if (Result = brSafari) and // Which Safari?
@@ -385,13 +386,15 @@ begin
   end;
 end;
 
-function CaseOf(const S : string; const Cases : array of string) : integer; begin
+function CaseOf(const S : string; const Cases : array of string) : integer;
+begin
   for Result := 0 to high(Cases) do
     if SameText(S, Cases[Result]) then exit;
   Result := -1;
 end;
 
-function RCaseOf(const S : string; const Cases : array of string) : integer; begin
+function RCaseOf(const S : string; const Cases : array of string) : integer;
+begin
   for Result := 0 to high(Cases) do
     if pos(Cases[Result], S) <> 0 then exit;
   Result := -1;
@@ -476,7 +479,8 @@ var
   P, Lvl : integer;
   Res : string;
 
-  function AddNewLine(const atPos : integer; const AddText : string) : integer; begin
+  function AddNewLine(const atPos : integer; const AddText : string) : integer;
+  begin
     insert(^J + AddText, Res, atPos);
     Result := length(^J + AddText);
   end;
@@ -774,7 +778,8 @@ begin
   inc(Result, Slash);
 end;
 
-function JSDateToDateTime(JSDate : string) : TDateTime; begin
+function JSDateToDateTime(JSDate : string) : TDateTime;
+begin
   Result := EncodeDateTime(StrToInt(copy(JSDate, 12, 4)), AnsiIndexStr(copy(JSDate, 5, 3), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']) +1,
     StrToInt(copy(JSDate, 9, 2)), StrToInt(copy(JSDate, 17, 2)), StrToInt(copy(JSDate, 20, 2)), StrToInt(copy(JSDate, 23, 2)), 0);
 end;

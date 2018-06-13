@@ -68,7 +68,7 @@ implementation
 
 uses
   SysUtils, StrUtils,
-  EF.Localization, EF.StrUtils,
+  EF.Localization, EF.StrUtils, EF.Macros,
   Kitto.Types, Kitto.Config, Kitto.AccessControl,
   Kitto.Ext.Session, Kitto.Ext.Filters;
 
@@ -289,10 +289,16 @@ begin
 end;
 
 procedure TKExtListPanelController.InitComponents;
+var
+  LTitle: string;
 begin
   inherited;
   if Title = '' then
-    Title := _(Session.Config.MacroExpansionEngine.Expand(ViewTable.PluralDisplayLabel));
+  begin
+    LTitle := ViewTable.PluralDisplayLabel;
+    TEFMacroExpansionEngine.Instance.Expand(LTitle);
+    Title := _(LTitle);
+  end;
 end;
 
 function TKExtListPanelController.GetRegionDefaultControllerClass(const ARegion: TExtBoxComponentRegion): string;

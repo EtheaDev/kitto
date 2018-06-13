@@ -64,14 +64,15 @@ var
 begin
   LFileName := Session.Config.FindResourcePathName(Config.GetExpandedString('TemplateFileName'));
   if LFileName <> '' then
-    FDataView.Tpl := ProcessTemplate(TEFMacroExpansionEngine.Instance.Expand(TextFileToString(LFileName, TEncoding.UTF8)))
+    LTemplate := TextFileToString(LFileName, TEncoding.UTF8)
+  else
+    LTemplate := Config.GetString('Template');
+  if LTemplate = '' then
+    FDataView.Tpl := 'TemplateFileName or Template parameters not specified.'
   else
   begin
-    LTemplate := Config.GetExpandedString('Template');
-    if LTemplate = '' then
-      FDataView.Tpl := 'TemplateFileName or Template parameters not specified.'
-    else
-      FDataView.Tpl := ProcessTemplate(LTemplate);
+    TEFMacroExpansionEngine.Instance.Expand(LTemplate);
+    FDataView.Tpl := ProcessTemplate(LTemplate);
   end;
   FDataView.Store := ClientStore;
 end;

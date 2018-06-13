@@ -234,145 +234,174 @@ implementation
 uses
   EF.Localization;
 
-procedure TExtUxFormItemSelector.SetFMultiselects(Value : TExtObjectList); begin
+procedure TExtUxFormItemSelector.SetFMultiselects(Value : TExtObjectList);
+begin
   FMultiselects := Value;
     JSCode('multiselects:' + VarToJSON([Value, false]));
 end;
 
-class function TExtUxFormItemSelector.JSClassName : string; begin
+class function TExtUxFormItemSelector.JSClassName : string;
+      begin
   Result := 'Ext.ux.form.ItemSelector';
 end;
 
-procedure TExtUxFormItemSelector.InitDefaults; begin
+procedure TExtUxFormItemSelector.InitDefaults;
+begin
   inherited;
   FMultiselects := TExtObjectList.CreateAsAttribute(Self, 'multiselects');
 end;
 
-procedure TExtUxFormMultiSelect.SetFAllowBlank(Value : Boolean); begin
+procedure TExtUxFormMultiSelect.SetFAllowBlank(Value : Boolean);
+begin
   FAllowBlank := Value;
   JSCode('allowBlank:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFAppendOnly(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFAppendOnly(Value : string);
+begin
   FAppendOnly := Value;
   JSCode('appendOnly:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDdReorder(Value : Boolean); begin
+procedure TExtUxFormMultiSelect.SetFDdReorder(Value : Boolean);
+begin
   FDdReorder := Value;
   JSCode('ddReorder:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDelimiter(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFDelimiter(Value : string);
+begin
   FDelimiter := Value;
   JSCode('delimiter:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDisplayField(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFDisplayField(Value : string);
+begin
   FDisplayField := Value;
   JSCode('displayField:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDisplayFieldNumber(Value : Integer); begin
+procedure TExtUxFormMultiSelect.SetFDisplayFieldNumber(Value : Integer);
+begin
   FDisplayFieldNumber := Value;
   JSCode('displayField:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDragGroup(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFDragGroup(Value : string);
+begin
   FDragGroup := Value;
   JSCode('dragGroup:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDragGroupArray(Value : TExtObjectList); begin
+procedure TExtUxFormMultiSelect.SetFDragGroupArray(Value : TExtObjectList);
+begin
   FDragGroupArray := Value;
     JSCode('dragGroup:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDropGroup(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFDropGroup(Value : string);
+begin
   FDropGroup := Value;
   JSCode('dropGroup:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFDropGroupArray(Value : TExtObjectList); begin
+procedure TExtUxFormMultiSelect.SetFDropGroupArray(Value : TExtObjectList);
+begin
   FDropGroupArray := Value;
     JSCode('dropGroup:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFHeight(Value : Integer); begin
+procedure TExtUxFormMultiSelect.SetFHeight(Value : Integer);
+begin
   FHeight := Value;
   JSCode('height:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFLegend(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFLegend(Value : string);
+begin
   FLegend := Value;
   JSCode('legend:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFMaxSelections(Value : Integer); begin
+procedure TExtUxFormMultiSelect.SetFMaxSelections(Value : Integer);
+begin
   FMaxSelections := Value;
   JSCode('maxSelections:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFMaxSelectionsText(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFMaxSelectionsText(Value : string);
+begin
   FMaxSelectionsText := Value;
   JSCode('maxSelectionsText:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFMinSelections(Value : Integer); begin
+procedure TExtUxFormMultiSelect.SetFMinSelections(Value : Integer);
+begin
   FMinSelections := Value;
   JSCode('minSelections:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFMinSelectionsText(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFMinSelectionsText(Value : string);
+begin
   FMinSelectionsText := Value;
   JSCode('minSelectionsText:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFStore(Value : TExtDataStore); begin
+procedure TExtUxFormMultiSelect.SetFStore(Value : TExtDataStore);
+begin
   FStore := Value;
     JSCode('store:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFStoreArray(Value : TExtObjectList); begin
+procedure TExtUxFormMultiSelect.SetFStoreArray(Value : TExtObjectList);
+begin
   FStoreArray := Value;
     JSCode('store:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFTbar(Value : TExtObject); begin
+procedure TExtUxFormMultiSelect.SetFTbar(Value : TExtObject);
+begin
   FTbar := Value;
     JSCode('tbar:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFTbarArray(Value : TExtObjectList); begin
+procedure TExtUxFormMultiSelect.SetFTbarArray(Value : TExtObjectList);
+begin
   FTbarArray := Value;
     JSCode('tbar:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFValueField(Value : string); begin
+procedure TExtUxFormMultiSelect.SetFValueField(Value : string);
+begin
   FValueField := Value;
   JSCode('valueField:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFValueFieldNumber(Value : Integer); begin
+procedure TExtUxFormMultiSelect.SetFValueFieldNumber(Value : Integer);
+begin
   FValueFieldNumber := Value;
   JSCode('valueField:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFView(Value : TExtListView); begin
+procedure TExtUxFormMultiSelect.SetFView(Value : TExtListView);
+begin
   FView := Value;
     JSCode('view:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormMultiSelect.SetFWidth(Value : Integer); begin
+procedure TExtUxFormMultiSelect.SetFWidth(Value : Integer);
+begin
   FWidth := Value;
   JSCode('width:' + VarToJSON([Value]));
 end;
 
-class function TExtUxFormMultiSelect.JSClassName : string; begin
+class function TExtUxFormMultiSelect.JSClassName : string;
+      begin
   Result := 'Ext.ux.form.MultiSelect';
 end;
 
-procedure TExtUxFormMultiSelect.InitDefaults; begin
+procedure TExtUxFormMultiSelect.InitDefaults;
+begin
   inherited;
   FAllowBlank := true;
   FDelimiter := ',';
@@ -388,369 +417,442 @@ procedure TExtUxFormMultiSelect.InitDefaults; begin
   FWidth := 100;
 end;
 
-function TExtUxFormMultiSelect.GetTargetFromEvent : TExtFunction; begin
+function TExtUxFormMultiSelect.GetTargetFromEvent : TExtFunction;
+begin
   JSCode(JSName + '.getTargetFromEvent();', 'TExtUxFormMultiSelect');
   Result := Self;
 end;
 
-function TExtUxFormMultiSelect.GetValue : TExtFunction; begin
+function TExtUxFormMultiSelect.GetValue : TExtFunction;
+begin
   JSCode(JSName + '.getValue();', 'TExtUxFormMultiSelect');
   Result := Self;
 end;
 
-function TExtUxFormMultiSelect.SetValue(Values : string) : TExtFunction; begin
+function TExtUxFormMultiSelect.SetValue(Values : string) : TExtFunction;
+begin
   JSCode(JSName + '.setValue(' + VarToJSON([Values]) + ');', 'TExtUxFormMultiSelect');
   Result := Self;
 end;
 
-function TExtUxFormMultiSelect.SetValue(Values : TExtObjectList) : TExtFunction; begin
+function TExtUxFormMultiSelect.SetValue(Values : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.setValue(' + VarToJSON(Values) + ');', 'TExtUxFormMultiSelect');
   Result := Self;
 end;
 
-procedure TExtUxFormDateTime.SetFConsole(Value : TExtObject); begin
+procedure TExtUxFormDateTime.SetFConsole(Value : TExtObject);
+begin
   FConsole := Value;
     JSCode(JSName + '.console=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtUxFormDateTime.SetFHighlightBgColors(Value : TExtObject); begin
+procedure TExtUxFormDateTime.SetFHighlightBgColors(Value : TExtObject);
+begin
   FHighlightBgColors := Value;
     JSCode(JSName + '.highlightBgColors=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtUxFormDateTime.SetFRuntime(Value : TExtObject); begin
+procedure TExtUxFormDateTime.SetFRuntime(Value : TExtObject);
+begin
   FRuntime := Value;
     JSCode(JSName + '.runtime=' + VarToJSON([Value, false]) + ';');
 end;
 
-class function TExtUxFormDateTime.JSClassName : string; begin
+class function TExtUxFormDateTime.JSClassName : string;
+      begin
   Result := 'Ext.ux.form.DateTime';
 end;
 
-procedure TExtUxFormDateTime.InitDefaults; begin
+procedure TExtUxFormDateTime.InitDefaults;
+begin
   inherited;
   FConsole := TExtObject.CreateInternal(Self, 'console');
   FHighlightBgColors := TExtObject.CreateInternal(Self, 'highlightBgColors');
   FRuntime := TExtObject.CreateInternal(Self, 'runtime');
 end;
 
-function TExtUxFormDateTime.IntrospectorExtend : TExtFunction; begin
+function TExtUxFormDateTime.IntrospectorExtend : TExtFunction;
+begin
   JSCode(JSName + '.Introspector.extend();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.SelectBox : TExtFunction; begin
+function TExtUxFormDateTime.SelectBox : TExtFunction;
+begin
   JSCode(JSName + '.SelectBox();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.AddEventListener : TExtFunction; begin
+function TExtUxFormDateTime.AddEventListener : TExtFunction;
+begin
   JSCode(JSName + '.addEventListener();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.AddKeyboardEvents : TExtFunction; begin
+function TExtUxFormDateTime.AddKeyboardEvents : TExtFunction;
+begin
   JSCode(JSName + '.addKeyboardEvents();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.BlockWrap : TExtFunction; begin
+function TExtUxFormDateTime.BlockWrap : TExtFunction;
+begin
   JSCode(JSName + '.blockWrap();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.Camelize : TExtFunction; begin
+function TExtUxFormDateTime.Camelize : TExtFunction;
+begin
   JSCode(JSName + '.camelize();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.CanInit : TExtFunction; begin
+function TExtUxFormDateTime.CanInit : TExtFunction;
+begin
   JSCode(JSName + '.canInit();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.Cleanup : TExtFunction; begin
+function TExtUxFormDateTime.Cleanup : TExtFunction;
+begin
   JSCode(JSName + '.cleanup();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.CreateHighlight : TExtFunction; begin
+function TExtUxFormDateTime.CreateHighlight : TExtFunction;
+begin
   JSCode(JSName + '.createHighlight();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.CreateOpenConsoleButton : TExtFunction; begin
+function TExtUxFormDateTime.CreateOpenConsoleButton : TExtFunction;
+begin
   JSCode(JSName + '.createOpenConsoleButton();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.CreateTextField : TExtFunction; begin
+function TExtUxFormDateTime.CreateTextField : TExtFunction;
+begin
   JSCode(JSName + '.createTextField();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.DrawRect : TExtFunction; begin
+function TExtUxFormDateTime.DrawRect : TExtFunction;
+begin
   JSCode(JSName + '.drawRect();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.Dump : TExtFunction; begin
+function TExtUxFormDateTime.Dump : TExtFunction;
+begin
   JSCode(JSName + '.dump();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.EscapeHtml : TExtFunction; begin
+function TExtUxFormDateTime.EscapeHtml : TExtFunction;
+begin
   JSCode(JSName + '.escapeHtml();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.ExtendRect : TExtFunction; begin
+function TExtUxFormDateTime.ExtendRect : TExtFunction;
+begin
   JSCode(JSName + '.extendRect();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.FindDebugWindow : TExtFunction; begin
+function TExtUxFormDateTime.FindDebugWindow : TExtFunction;
+begin
   JSCode(JSName + '.findDebugWindow();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.FindLoader : TExtFunction; begin
+function TExtUxFormDateTime.FindLoader : TExtFunction;
+begin
   JSCode(JSName + '.findLoader();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.GetBorderBox : TExtFunction; begin
+function TExtUxFormDateTime.GetBorderBox : TExtFunction;
+begin
   JSCode(JSName + '.getBorderBox();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.GetHtmlWindows : TExtFunction; begin
+function TExtUxFormDateTime.GetHtmlWindows : TExtFunction;
+begin
   JSCode(JSName + '.getHtmlWindows();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.GetIntProp : TExtFunction; begin
+function TExtUxFormDateTime.GetIntProp : TExtFunction;
+begin
   JSCode(JSName + '.getIntProp();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.GetStyleProp : TExtFunction; begin
+function TExtUxFormDateTime.GetStyleProp : TExtFunction;
+begin
   JSCode(JSName + '.getStyleProp();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.GetTextFormat : TExtFunction; begin
+function TExtUxFormDateTime.GetTextFormat : TExtFunction;
+begin
   JSCode(JSName + '.getTextFormat();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.HideHighlight : TExtFunction; begin
+function TExtUxFormDateTime.HideHighlight : TExtFunction;
+begin
   JSCode(JSName + '.hideHighlight();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.HighlightElement : TExtFunction; begin
+function TExtUxFormDateTime.HighlightElement : TExtFunction;
+begin
   JSCode(JSName + '.highlightElement();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.Init : TExtFunction; begin
+function TExtUxFormDateTime.Init : TExtFunction;
+begin
   JSCode(JSName + '.init();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.IsArgumentsObject : TExtFunction; begin
+function TExtUxFormDateTime.IsArgumentsObject : TExtFunction;
+begin
   JSCode(JSName + '.isArgumentsObject();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.IsArrayObject : TExtFunction; begin
+function TExtUxFormDateTime.IsArrayObject : TExtFunction;
+begin
   JSCode(JSName + '.isArrayObject();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.IsDateObject : TExtFunction; begin
+function TExtUxFormDateTime.IsDateObject : TExtFunction;
+begin
   JSCode(JSName + '.isDateObject();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.IsItemNative : TExtFunction; begin
+function TExtUxFormDateTime.IsItemNative : TExtFunction;
+begin
   JSCode(JSName + '.isItemNative();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.IsNumberObject : TExtFunction; begin
+function TExtUxFormDateTime.IsNumberObject : TExtFunction;
+begin
   JSCode(JSName + '.isNumberObject();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.IsStringObject : TExtFunction; begin
+function TExtUxFormDateTime.IsStringObject : TExtFunction;
+begin
   JSCode(JSName + '.isStringObject();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.IsXMLObject : TExtFunction; begin
+function TExtUxFormDateTime.IsXMLObject : TExtFunction;
+begin
   JSCode(JSName + '.isXMLObject();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.LoadDebugger : TExtFunction; begin
+function TExtUxFormDateTime.LoadDebugger : TExtFunction;
+begin
   JSCode(JSName + '.loadDebugger();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.LogArguments : TExtFunction; begin
+function TExtUxFormDateTime.LogArguments : TExtFunction;
+begin
   JSCode(JSName + '.logArguments();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.LogError : TExtFunction; begin
+function TExtUxFormDateTime.LogError : TExtFunction;
+begin
   JSCode(JSName + '.logError();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.NoBridge : TExtFunction; begin
+function TExtUxFormDateTime.NoBridge : TExtFunction;
+begin
   JSCode(JSName + '.noBridge();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.NoChildBridge : TExtFunction; begin
+function TExtUxFormDateTime.NoChildBridge : TExtFunction;
+begin
   JSCode(JSName + '.noChildBridge();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.ReadConfigFile : TExtFunction; begin
+function TExtUxFormDateTime.ReadConfigFile : TExtFunction;
+begin
   JSCode(JSName + '.readConfigFile();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.Register : TExtFunction; begin
+function TExtUxFormDateTime.Register : TExtFunction;
+begin
   JSCode(JSName + '.register();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterChildSandboxBridge : TExtFunction; begin
+function TExtUxFormDateTime.RegisterChildSandboxBridge : TExtFunction;
+begin
   JSCode(JSName + '.registerChildSandboxBridge();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterCloseEventListener : TExtFunction; begin
+function TExtUxFormDateTime.RegisterCloseEventListener : TExtFunction;
+begin
   JSCode(JSName + '.registerCloseEventListener();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterCompleteEventListener : TExtFunction; begin
+function TExtUxFormDateTime.RegisterCompleteEventListener : TExtFunction;
+begin
   JSCode(JSName + '.registerCompleteEventListener();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterDOMEventListeners : TExtFunction; begin
+function TExtUxFormDateTime.RegisterDOMEventListeners : TExtFunction;
+begin
   JSCode(JSName + '.registerDOMEventListeners();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterDeactivateEventListener : TExtFunction; begin
+function TExtUxFormDateTime.RegisterDeactivateEventListener : TExtFunction;
+begin
   JSCode(JSName + '.registerDeactivateEventListener();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterFrame : TExtFunction; begin
+function TExtUxFormDateTime.RegisterFrame : TExtFunction;
+begin
   JSCode(JSName + '.registerFrame();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterFramesParentSandboxBridge : TExtFunction; begin
+function TExtUxFormDateTime.RegisterFramesParentSandboxBridge : TExtFunction;
+begin
   JSCode(JSName + '.registerFramesParentSandboxBridge();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RegisterUncaughtExceptionListener : TExtFunction; begin
+function TExtUxFormDateTime.RegisterUncaughtExceptionListener : TExtFunction;
+begin
   JSCode(JSName + '.registerUncaughtExceptionListener();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RemoteClick : TExtFunction; begin
+function TExtUxFormDateTime.RemoteClick : TExtFunction;
+begin
   JSCode(JSName + '.remoteClick();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.RemoveEventListener : TExtFunction; begin
+function TExtUxFormDateTime.RemoveEventListener : TExtFunction;
+begin
   JSCode(JSName + '.removeEventListener();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.ShowCssElement : TExtFunction; begin
+function TExtUxFormDateTime.ShowCssElement : TExtFunction;
+begin
   JSCode(JSName + '.showCssElement();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.ShowHighlight : TExtFunction; begin
+function TExtUxFormDateTime.ShowHighlight : TExtFunction;
+begin
   JSCode(JSName + '.showHighlight();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.ShowHighlightLabels : TExtFunction; begin
+function TExtUxFormDateTime.ShowHighlightLabels : TExtFunction;
+begin
   JSCode(JSName + '.showHighlightLabels();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.ToggleWindow : TExtFunction; begin
+function TExtUxFormDateTime.ToggleWindow : TExtFunction;
+begin
   JSCode(JSName + '.toggleWindow();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.TryCreateWindow : TExtFunction; begin
+function TExtUxFormDateTime.TryCreateWindow : TExtFunction;
+begin
   JSCode(JSName + '.tryCreateWindow();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.TwoDigits : TExtFunction; begin
+function TExtUxFormDateTime.TwoDigits : TExtFunction;
+begin
   JSCode(JSName + '.twoDigits();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.WaitForBody : TExtFunction; begin
+function TExtUxFormDateTime.WaitForBody : TExtFunction;
+begin
   JSCode(JSName + '.waitForBody();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.WriteConfigFile : TExtFunction; begin
+function TExtUxFormDateTime.WriteConfigFile : TExtFunction;
+begin
   JSCode(JSName + '.writeConfigFile();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.WriteConsoleToClipboard : TExtFunction; begin
+function TExtUxFormDateTime.WriteConsoleToClipboard : TExtFunction;
+begin
   JSCode(JSName + '.writeConsoleToClipboard();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-function TExtUxFormDateTime.WriteConsoleToFile : TExtFunction; begin
+function TExtUxFormDateTime.WriteConsoleToFile : TExtFunction;
+begin
   JSCode(JSName + '.writeConsoleToFile();', 'TExtUxFormDateTime');
   Result := Self;
 end;
 
-procedure TExtUxFormFileUploadField.SetFButtonCfg(Value : TExtObject); begin
+procedure TExtUxFormFileUploadField.SetFButtonCfg(Value : TExtObject);
+begin
   FButtonCfg.Free;
   FButtonCfg := Value;
     JSCode('buttonCfg:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtUxFormFileUploadField.SetFButtonOffset(Value : Integer); begin
+procedure TExtUxFormFileUploadField.SetFButtonOffset(Value : Integer);
+begin
   FButtonOffset := Value;
   JSCode('buttonOffset:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormFileUploadField.SetFButtonOnly(Value : Boolean); begin
+procedure TExtUxFormFileUploadField.SetFButtonOnly(Value : Boolean);
+begin
   FButtonOnly := Value;
   JSCode('buttonOnly:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormFileUploadField.SetFButtonText(Value : string); begin
+procedure TExtUxFormFileUploadField.SetFButtonText(Value : string);
+begin
   FButtonText := Value;
   JSCode('buttonText:' + VarToJSON([Value]));
 end;
 
-procedure TExtUxFormFileUploadField.SetFOnFileselected(Value : TExtUxFormFileUploadFieldOnFileselected); begin
+procedure TExtUxFormFileUploadField.SetFOnFileselected(Value : TExtUxFormFileUploadFieldOnFileselected);
+begin
   if Assigned(FOnFileselected) then
     JSCode(JSName+'.events ["fileselected"].listeners=[];');
   if Assigned(Value) then
@@ -758,11 +860,13 @@ procedure TExtUxFormFileUploadField.SetFOnFileselected(Value : TExtUxFormFileUpl
   FOnFileselected := Value;
 end;
 
-class function TExtUxFormFileUploadField.JSClassName : string; begin
+class function TExtUxFormFileUploadField.JSClassName : string;
+      begin
   Result := 'Ext.ux.form.FileUploadField';
 end;
 
-procedure TExtUxFormFileUploadField.InitDefaults; begin
+procedure TExtUxFormFileUploadField.InitDefaults;
+begin
   inherited;
   FButtonCfg := TExtObject.CreateInternal(Self, 'buttonCfg');
   FButtonOffset := 3;
@@ -774,25 +878,30 @@ begin
   Result := 'uplfld';
 end;
 
-procedure TExtUxFormFileUploadField.HandleEvent(const AEvtName : string); begin
+procedure TExtUxFormFileUploadField.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'fileselected') and Assigned(FOnFileselected) then
     FOnFileselected(TExtUxFormFileUploadField(ParamAsObject('This')), ParamAsstring('Value'));
 end;
 
-class function TExtUxFormSpinnerField.JSClassName : string; begin
+class function TExtUxFormSpinnerField.JSClassName : string;
+      begin
   Result := 'Ext.ux.form.SpinnerField';
 end;
 
-procedure TExtUxFormSpinnerField.InitDefaults; begin
+procedure TExtUxFormSpinnerField.InitDefaults;
+begin
   inherited;
 end;
 
-class function TExtUxFormSelectBox.JSClassName : string; begin
+class function TExtUxFormSelectBox.JSClassName : string;
+      begin
   Result := 'Ext.ux.form.SelectBox';
 end;
 
-procedure TExtUxFormSelectBox.InitDefaults; begin
+procedure TExtUxFormSelectBox.InitDefaults;
+begin
   inherited;
 end;
 

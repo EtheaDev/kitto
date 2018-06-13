@@ -74,18 +74,21 @@ implementation
 uses
 	{$IFNDEF FPC}Windows,{$ENDIF} SysUtils, Registry;
 
-function TService.GetName : string; begin
+function TService.GetName : string;
+begin
   Result := string(FName);
 end;
 
 // Closes service handle
-procedure TService.Reset; begin
+procedure TService.Reset;
+begin
   CloseServiceHandle(FService);
   FService := 0;
 end;
 
 // Returns if service is initialized
-function TService.Exists : boolean; begin
+function TService.Exists : boolean;
+begin
 	Result := FService <> 0;
 end;
 
@@ -96,7 +99,8 @@ Installs a service.
 @see Install
 @see Delete
 }
-procedure TService.Insert(Exec : string); begin
+procedure TService.Insert(Exec : string);
+begin
   FService := CreateService(FManager, FName, FName, SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START,
                             SERVICE_ERROR_NORMAL, pchar(Exec), nil, nil, nil, nil, nil);
   if not Exists then RaiseLastOSError;
@@ -117,7 +121,8 @@ Installs a service using command line. In command line use \<application\> -INST
 @see Insert
 @see Uninstall
 }
-function TService.Install : boolean; begin
+function TService.Install : boolean;
+begin
   if FindCmdLineSwitch('INSTALL', ['-', '/'], true) and (FService = 0) then begin
     Insert(system.ParamStr(0));
     Result := true;
@@ -132,7 +137,8 @@ Uninstalls a service.
 @see Insert
 @see Uninstall
 }
-procedure TService.Delete; begin
+procedure TService.Delete;
+begin
   if not Exists then RaiseLastOSError;
   if not DeleteService(FService) then RaiseLastOSError;
   with TRegistry.Create do begin
@@ -149,7 +155,8 @@ Uninstalls a service using command line. In command line use \<application\> -UN
 @see Delete
 @see Install
 }
-function TService.Uninstall : boolean; begin
+function TService.Uninstall : boolean;
+begin
   if FindCmdLineSwitch('UNINSTALL', ['-', '/'], true) then begin
     Delete;
     Result := true;
@@ -159,13 +166,15 @@ function TService.Uninstall : boolean; begin
 end;
 
 // Returns last error code
-function TService.GetServiceError : integer; begin
+function TService.GetServiceError : integer;
+begin
   Result := GetLastError;
   if Result = 0 then Result := -1
 end;
 
 // Returns last error message
-function TService.GetServiceErrorMessage : string; begin
+function TService.GetServiceErrorMessage : string;
+begin
   Result := SysErrorMessage(GetServiceError)
 end;
 
@@ -173,7 +182,8 @@ end;
 Stops the service
 @return 0 if succeeded else last error code
 }
-function TService.Stop : integer; begin
+function TService.Stop : integer;
+begin
 	Result := 0;
   if Exists then begin
 		if not ControlService(FService, SERVICE_CONTROL_STOP, FStatus) then Result := GetLastError;
@@ -199,7 +209,8 @@ begin
 		Result := GetServiceError;
 end;
 
-function TService.GetState : cardinal; begin
+function TService.GetState : cardinal;
+begin
   if QueryServiceStatus(FService, FStatus) then
     Result := FStatus.dwCurrentState
   else
@@ -221,12 +232,14 @@ begin
 end;
 
 // StopNow can be used within the service to stop the service
-procedure TService.StopNow; begin
+procedure TService.StopNow;
+begin
   SetLastError(0);
   SetEvent(FStopEvent)
 end;
 
-function TService.ReportServiceStatus(CurrentState, Win32ExitCode, CheckPoint, WaitHint : integer) : boolean; begin
+function TService.ReportServiceStatus(CurrentState, Win32ExitCode, CheckPoint, WaitHint : integer) : boolean;
+begin
   SetLastError(0);
 	with FStatus do begin
 		dwServiceType := SERVICE_WIN32_OWN_PROCESS;
@@ -251,7 +264,8 @@ function TService.ReportServiceStatus(CurrentState, Win32ExitCode, CheckPoint, W
 	end;
 end;
 
-function TService.ReportNoError(Estado : integer) : boolean; begin
+function TService.ReportNoError(Estado : integer) : boolean;
+begin
 	Result := ReportServiceStatus(Estado, NO_ERROR, 0, 0)
 end;
 
@@ -399,7 +413,8 @@ Creates a new service, but not installs it. Use <link TService.Insert> to instal
 @param ServiceName to show in Service Manager
 @param Description to show in Service Manager
 }
-constructor TService.Create(ServiceName : string; Description : string = ''); begin
+constructor TService.Create(ServiceName : string; Description : string = '');
+begin
   inherited Create;
   FName        := pchar(ServiceName);
   FDescription := Description;
@@ -412,7 +427,8 @@ constructor TService.Create(ServiceName : string; Description : string = ''); be
 end;
 
 // Frees a service but not uninstalls it. Use <link TService.Delete> method to uninstall.
-destructor TService.Destroy; begin
+destructor TService.Destroy;
+begin
   CloseServiceHandle(FService);
 	CloseEventLog(FSource);
   CloseServiceHandle(FManager);

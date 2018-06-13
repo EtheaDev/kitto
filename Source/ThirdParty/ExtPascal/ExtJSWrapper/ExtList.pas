@@ -149,186 +149,224 @@ type
 
 implementation
 
-procedure TExtListColumn.SetFAlign(Value : String); begin
+procedure TExtListColumn.SetFAlign(Value : String);
+begin
   FAlign := Value;
   JSCode('align:' + VarToJSON([Value]));
 end;
 
-procedure TExtListColumn.SetFCls(Value : String); begin
+procedure TExtListColumn.SetFCls(Value : String);
+begin
   FCls := Value;
   JSCode('cls:' + VarToJSON([Value]));
 end;
 
-procedure TExtListColumn.SetFDataIndex(Value : String); begin
+procedure TExtListColumn.SetFDataIndex(Value : String);
+begin
   FDataIndex := Value;
   JSCode('dataIndex:' + VarToJSON([Value]));
 end;
 
-procedure TExtListColumn.SetFHeader(Value : String); begin
+procedure TExtListColumn.SetFHeader(Value : String);
+begin
   FHeader := Value;
   JSCode('header:' + VarToJSON([Value]));
 end;
 
-procedure TExtListColumn.SetFTpl(Value : String); begin
+procedure TExtListColumn.SetFTpl(Value : String);
+begin
   FTpl := Value;
   JSCode('tpl:' + VarToJSON([Value]));
 end;
 
-procedure TExtListColumn.SetFWidth(Value : Integer); begin
+procedure TExtListColumn.SetFWidth(Value : Integer);
+begin
   FWidth := Value;
   JSCode('width:' + VarToJSON([Value]));
 end;
 
-function TExtListColumn.JSClassName : string; begin
+function TExtListColumn.JSClassName : string;
+begin
   Result := 'Ext.list.Column';
 end;
 
-procedure TExtListNumberColumn.SetFFormat(Value : String); begin
+procedure TExtListNumberColumn.SetFFormat(Value : String);
+begin
   FFormat := Value;
   JSCode('format:' + VarToJSON([Value]));
 end;
 
-function TExtListNumberColumn.JSClassName : string; begin
+function TExtListNumberColumn.JSClassName : string;
+begin
   Result := 'Ext.list.NumberColumn';
 end;
 
-procedure TExtListNumberColumn.InitDefaults; begin
+procedure TExtListNumberColumn.InitDefaults;
+begin
   inherited;
   FFormat := '0,000.00';
 end;
 
-procedure TExtListSorter.SetFSortClasses(Value : TExtObjectList); begin
+procedure TExtListSorter.SetFSortClasses(Value : TExtObjectList);
+begin
   FSortClasses := Value;
     JSCode('sortClasses:' + VarToJSON([Value, false]));
 end;
 
-function TExtListSorter.JSClassName : string; begin
+function TExtListSorter.JSClassName : string;
+begin
   Result := 'Ext.list.Sorter';
 end;
 
-procedure TExtListSorter.InitDefaults; begin
+procedure TExtListSorter.InitDefaults;
+begin
   inherited;
   FSortClasses := TExtObjectList.CreateAsAttribute(Self, 'sortClasses');
 end;
 
-function TExtListDateColumn.JSClassName : string; begin
+function TExtListDateColumn.JSClassName : string;
+begin
   Result := 'Ext.list.DateColumn';
 end;
 
-procedure TExtListBooleanColumn.SetFFalseText(Value : String); begin
+procedure TExtListBooleanColumn.SetFFalseText(Value : String);
+begin
   FFalseText := Value;
   JSCode('falseText:' + VarToJSON([Value]));
 end;
 
-procedure TExtListBooleanColumn.SetFTrueText(Value : String); begin
+procedure TExtListBooleanColumn.SetFTrueText(Value : String);
+begin
   FTrueText := Value;
   JSCode('trueText:' + VarToJSON([Value]));
 end;
 
-procedure TExtListBooleanColumn.SetFUndefinedText(Value : String); begin
+procedure TExtListBooleanColumn.SetFUndefinedText(Value : String);
+begin
   FUndefinedText := Value;
   JSCode('undefinedText:' + VarToJSON([Value]));
 end;
 
-function TExtListBooleanColumn.JSClassName : string; begin
+function TExtListBooleanColumn.JSClassName : string;
+begin
   Result := 'Ext.list.BooleanColumn';
 end;
 
-procedure TExtListBooleanColumn.InitDefaults; begin
+procedure TExtListBooleanColumn.InitDefaults;
+begin
   inherited;
   FFalseText := 'false';
   FTrueText := 'true';
 end;
 
-procedure TExtListColumnResizer.SetFMinPct(Value : Integer); begin
+procedure TExtListColumnResizer.SetFMinPct(Value : Integer);
+begin
   FMinPct := Value;
   JSCode('minPct:' + VarToJSON([Value]));
 end;
 
-function TExtListColumnResizer.JSClassName : string; begin
+function TExtListColumnResizer.JSClassName : string;
+begin
   Result := 'Ext.list.ColumnResizer';
 end;
 
-procedure TExtListColumnResizer.InitDefaults; begin
+procedure TExtListColumnResizer.InitDefaults;
+begin
   inherited;
   FMinPct := 05;
 end;
 
-procedure TExtListListView.SetFColumnResize(Value : Boolean); begin
+procedure TExtListListView.SetFColumnResize(Value : Boolean);
+begin
   FColumnResize := Value;
   JSCode('columnResize:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFColumnResizeObject(Value : TExtObject); begin
+procedure TExtListListView.SetFColumnResizeObject(Value : TExtObject);
+begin
   FColumnResizeObject := Value;
     JSCode('columnResize:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtListListView.SetFColumnSort(Value : Boolean); begin
+procedure TExtListListView.SetFColumnSort(Value : Boolean);
+begin
   FColumnSort := Value;
   JSCode('columnSort:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFColumnSortObject(Value : TExtObject); begin
+procedure TExtListListView.SetFColumnSortObject(Value : TExtObject);
+begin
   FColumnSortObject := Value;
     JSCode('columnSort:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtListListView.SetFColumns(Value : TExtObjectList); begin
+procedure TExtListListView.SetFColumns(Value : TExtObjectList);
+begin
   FColumns := Value;
     JSCode('columns:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtListListView.SetFHideHeaders(Value : Boolean); begin
+procedure TExtListListView.SetFHideHeaders(Value : Boolean);
+begin
   FHideHeaders := Value;
   JSCode('hideHeaders:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFInternalTpl(Value : String); begin
+procedure TExtListListView.SetFInternalTpl(Value : String);
+begin
   FInternalTpl := Value;
   JSCode('internalTpl:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFInternalTplArray(Value : TExtObjectList); begin
+procedure TExtListListView.SetFInternalTplArray(Value : TExtObjectList);
+begin
   FInternalTplArray := Value;
     JSCode('internalTpl:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtListListView.SetFItemSelector(Value : String); begin
+procedure TExtListListView.SetFItemSelector(Value : String);
+begin
   FItemSelector := Value;
   JSCode('itemSelector:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFOverClass(Value : String); begin
+procedure TExtListListView.SetFOverClass(Value : String);
+begin
   FOverClass := Value;
   JSCode('overClass:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFReserveScrollOffset(Value : Boolean); begin
+procedure TExtListListView.SetFReserveScrollOffset(Value : Boolean);
+begin
   FReserveScrollOffset := Value;
   JSCode('reserveScrollOffset:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFScrollOffset(Value : Integer); begin
+procedure TExtListListView.SetFScrollOffset(Value : Integer);
+begin
   FScrollOffset := Value;
   JSCode('scrollOffset:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFSelectedClass(Value : String); begin
+procedure TExtListListView.SetFSelectedClass(Value : String);
+begin
   FSelectedClass := Value;
   JSCode('selectedClass:' + VarToJSON([Value]));
 end;
 
-procedure TExtListListView.SetFDisableHeaders(Value : Boolean); begin
+procedure TExtListListView.SetFDisableHeaders(Value : Boolean);
+begin
   FDisableHeaders := Value;
   JSCode(JSName + '.disableHeaders=' + VarToJSON([Value]) + ';');
 end;
 
-function TExtListListView.JSClassName : string; begin
+function TExtListListView.JSClassName : string;
+begin
   Result := 'Ext.list.ListView';
 end;
 
-procedure TExtListListView.InitDefaults; begin
+procedure TExtListListView.InitDefaults;
+begin
   inherited;
   FColumnResize := true;
   FColumnResizeObject := TExtObject.CreateInternal(Self, 'columnResize');
@@ -340,7 +378,8 @@ procedure TExtListListView.InitDefaults; begin
   FSelectedClass := 'x-list-selected';
 end;
 
-function TExtListListView.CollectData(Records : TExtObjectList; StartIndex : Integer) : TExtFunction; begin
+function TExtListListView.CollectData(Records : TExtObjectList; StartIndex : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.collectData(' + VarToJSON(Records) + ',' + VarToJSON([StartIndex]) + ');', 'TExtListListView');
   Result := Self;
 end;

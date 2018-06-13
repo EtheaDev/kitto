@@ -74,16 +74,17 @@ procedure TKExtDataExecSQLCmdToolController.AssignParamValue(const AParam: TPara
 var
   LNode: TEFNode;
   LRecord: TKViewTableRecord;
+  LStringValue: string;
 
-  function ExpandExpression(const AExpression: string): string;
+  procedure ExpandExpression(var AExpression: string);
   begin
     if Assigned(LRecord) then
     begin
-      Result := LRecord.ExpandFieldJSONValues(AExpression, True);
-      Result := TEFMacroExpansionEngine.Instance.Expand(Result);
+      LRecord.ExpandFieldJSONValues(AExpression, True);
+      TEFMacroExpansionEngine.Instance.Expand(AExpression);
     end
     else
-      Result := TEFMacroExpansionEngine.Instance.Expand(Result);
+      TEFMacroExpansionEngine.Instance.Expand(AExpression);
   end;
 
 begin
@@ -93,7 +94,9 @@ begin
   LNode := Config.FindNode('Parameters/'+AParam.Name);
   if Assigned(LNode) then
   begin
-    AValue := ExpandExpression(LNode.AsString);
+    LStringValue := LNode.AsString;
+    ExpandExpression(LStringValue);
+    AValue := LStringValue;
   end;
 end;
 
@@ -115,8 +118,8 @@ var
   begin
     Result := AExpression;
     if Assigned(ServerRecord) then
-      Result := ServerRecord.ExpandFieldJSONValues(Result, True);
-    Result := TEFMacroExpansionEngine.Instance.Expand(Result);
+      ServerRecord.ExpandFieldJSONValues(Result, True);
+    TEFMacroExpansionEngine.Instance.Expand(Result);
   end;
 
 begin

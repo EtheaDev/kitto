@@ -670,204 +670,245 @@ type
 
 implementation
 
-class function TExtTreeRootTreeNodeUI.JSClassName : string; begin
+class function TExtTreeRootTreeNodeUI.JSClassName : string;
+      begin
   Result := 'Ext.tree.RootTreeNodeUI';
 end;
 
-class function TExtTreeTreeNodeUI.JSClassName : string; begin
+class function TExtTreeTreeNodeUI.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeNodeUI';
 end;
 
-function TExtTreeTreeNodeUI.AddClass(ClassName : String) : TExtFunction; begin
+function TExtTreeTreeNodeUI.AddClass(ClassName : String) : TExtFunction;
+begin
   JSCode(JSName + '.addClass(' + VarToJSON([ClassName]) + ');', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.AddClass(ClassName : TExtObjectList) : TExtFunction; begin
+function TExtTreeTreeNodeUI.AddClass(ClassName : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.addClass(' + VarToJSON(ClassName) + ');', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.GetAnchor : TExtFunction; begin
+function TExtTreeTreeNodeUI.GetAnchor : TExtFunction;
+begin
   JSCode(JSName + '.getAnchor();', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.GetEl : TExtFunction; begin
+function TExtTreeTreeNodeUI.GetEl : TExtFunction;
+begin
   JSCode(JSName + '.getEl();', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.GetIconEl : TExtFunction; begin
+function TExtTreeTreeNodeUI.GetIconEl : TExtFunction;
+begin
   JSCode(JSName + '.getIconEl();', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.GetTextEl : TExtFunction; begin
+function TExtTreeTreeNodeUI.GetTextEl : TExtFunction;
+begin
   JSCode(JSName + '.getTextEl();', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.Hide : TExtFunction; begin
+function TExtTreeTreeNodeUI.Hide : TExtFunction;
+begin
   JSCode(JSName + '.hide();', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.IsChecked : TExtFunction; begin
+function TExtTreeTreeNodeUI.IsChecked : TExtFunction;
+begin
   JSCode(JSName + '.isChecked();', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.RemoveClass(ClassName : String) : TExtFunction; begin
+function TExtTreeTreeNodeUI.RemoveClass(ClassName : String) : TExtFunction;
+begin
   JSCode(JSName + '.removeClass(' + VarToJSON([ClassName]) + ');', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.RemoveClass(ClassName : TExtObjectList) : TExtFunction; begin
+function TExtTreeTreeNodeUI.RemoveClass(ClassName : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.removeClass(' + VarToJSON(ClassName) + ');', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.Show : TExtFunction; begin
+function TExtTreeTreeNodeUI.Show : TExtFunction;
+begin
   JSCode(JSName + '.show();', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-function TExtTreeTreeNodeUI.ToggleCheck(Value : Boolean = false) : TExtFunction; begin
+function TExtTreeTreeNodeUI.ToggleCheck(Value : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.toggleCheck(' + VarToJSON([Value]) + ');', 'TExtTreeTreeNodeUI');
   Result := Self;
 end;
 
-class function TExtTreeTreeFilter.JSClassName : string; begin
+class function TExtTreeTreeFilter.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeFilter';
 end;
 
-function TExtTreeTreeFilter.Clear : TExtFunction; begin
+function TExtTreeTreeFilter.Clear : TExtFunction;
+begin
   JSCode(JSName + '.clear();', 'TExtTreeTreeFilter');
   Result := Self;
 end;
 
-function TExtTreeTreeFilter.Filter(Value : String; Attr : String = ''; StartNode : TExtTreeTreeNode = nil) : TExtFunction; begin
+function TExtTreeTreeFilter.Filter(Value : String; Attr : String = ''; StartNode : TExtTreeTreeNode = nil) : TExtFunction;
+begin
   JSCode(JSName + '.filter(' + VarToJSON([Value, Attr, StartNode, false]) + ');', 'TExtTreeTreeFilter');
   Result := Self;
 end;
 
-function TExtTreeTreeFilter.Filter(Value : TRegExp; Attr : String = ''; StartNode : TExtTreeTreeNode = nil) : TExtFunction; begin
+function TExtTreeTreeFilter.Filter(Value : TRegExp; Attr : String = ''; StartNode : TExtTreeTreeNode = nil) : TExtFunction;
+begin
   JSCode(JSName + '.filter(' + VarToJSON([#3 + Value, Attr, StartNode, false]) + ');', 'TExtTreeTreeFilter');
   Result := Self;
 end;
 
-function TExtTreeTreeFilter.FilterBy(Fn : TExtFunction; Scope : TExtObject = nil) : TExtFunction; begin
+function TExtTreeTreeFilter.FilterBy(Fn : TExtFunction; Scope : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.filterBy(' + VarToJSON([Fn, true, Scope, false]) + ');', 'TExtTreeTreeFilter');
   Result := Self;
 end;
 
-procedure TExtTreeTreeSorter.SetFCaseSensitive(Value : Boolean); begin
+procedure TExtTreeTreeSorter.SetFCaseSensitive(Value : Boolean);
+begin
   FCaseSensitive := Value;
   JSCode('caseSensitive:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeSorter.SetFDir(Value : String); begin
+procedure TExtTreeTreeSorter.SetFDir(Value : String);
+begin
   FDir := Value;
   JSCode('dir:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeSorter.SetFFolderSort(Value : Boolean); begin
+procedure TExtTreeTreeSorter.SetFFolderSort(Value : Boolean);
+begin
   FFolderSort := Value;
   JSCode('folderSort:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeSorter.SetFLeafAttr(Value : String); begin
+procedure TExtTreeTreeSorter.SetFLeafAttr(Value : String);
+begin
   FLeafAttr := Value;
   JSCode('leafAttr:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeSorter.SetFPropertyJS(Value : String); begin
+procedure TExtTreeTreeSorter.SetFPropertyJS(Value : String);
+begin
   FPropertyJS := Value;
   JSCode('propertyJS:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeSorter.SetFSortType(Value : TExtFunction); begin
+procedure TExtTreeTreeSorter.SetFSortType(Value : TExtFunction);
+begin
   FSortType := Value;
   JSCode('sortType:' + VarToJSON([Value, true]));
 end;
 
-class function TExtTreeTreeSorter.JSClassName : string; begin
+class function TExtTreeTreeSorter.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeSorter';
 end;
 
-procedure TExtTreeTreeSorter.InitDefaults; begin
+procedure TExtTreeTreeSorter.InitDefaults;
+begin
   inherited;
   FLeafAttr := 'leaf';
   FPropertyJS := 'text';
 end;
 
-procedure TExtTreeTreeLoader.SetFBaseAttrs(Value : TExtObject); begin
+procedure TExtTreeTreeLoader.SetFBaseAttrs(Value : TExtObject);
+begin
   FBaseAttrs := Value;
     JSCode('baseAttrs:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreeLoader.SetFBaseParams(Value : TExtObject); begin
+procedure TExtTreeTreeLoader.SetFBaseParams(Value : TExtObject);
+begin
   FBaseParams := Value;
     JSCode('baseParams:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreeLoader.SetFClearOnLoad(Value : Boolean); begin
+procedure TExtTreeTreeLoader.SetFClearOnLoad(Value : Boolean);
+begin
   FClearOnLoad := Value;
   JSCode('clearOnLoad:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFDataUrl(Value : String); begin
+procedure TExtTreeTreeLoader.SetFDataUrl(Value : String);
+begin
   FDataUrl := Value;
   JSCode('dataUrl:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFDirectFn(Value : TExtFunction); begin
+procedure TExtTreeTreeLoader.SetFDirectFn(Value : TExtFunction);
+begin
   FDirectFn := Value;
   JSCode('directFn:' + VarToJSON([Value, true]));
 end;
 
-procedure TExtTreeTreeLoader.SetFNodeParameter(Value : String); begin
+procedure TExtTreeTreeLoader.SetFNodeParameter(Value : String);
+begin
   FNodeParameter := Value;
   JSCode('nodeParameter:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFParamOrder(Value : TExtObjectList); begin
+procedure TExtTreeTreeLoader.SetFParamOrder(Value : TExtObjectList);
+begin
   FParamOrder := Value;
     JSCode('paramOrder:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreeLoader.SetFParamOrderString(Value : String); begin
+procedure TExtTreeTreeLoader.SetFParamOrderString(Value : String);
+begin
   FParamOrderString := Value;
   JSCode('paramOrder:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFParamsAsHash(Value : Boolean); begin
+procedure TExtTreeTreeLoader.SetFParamsAsHash(Value : Boolean);
+begin
   FParamsAsHash := Value;
   JSCode('paramsAsHash:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFPreloadChildren(Value : Boolean); begin
+procedure TExtTreeTreeLoader.SetFPreloadChildren(Value : Boolean);
+begin
   FPreloadChildren := Value;
   JSCode('preloadChildren:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFRequestMethod(Value : String); begin
+procedure TExtTreeTreeLoader.SetFRequestMethod(Value : String);
+begin
   FRequestMethod := Value;
   JSCode('requestMethod:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFUiProviders(Value : TExtObject); begin
+procedure TExtTreeTreeLoader.SetFUiProviders(Value : TExtObject);
+begin
   FUiProviders := Value;
     JSCode('uiProviders:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreeLoader.SetFUrl(Value : String); begin
+procedure TExtTreeTreeLoader.SetFUrl(Value : String);
+begin
   FUrl := Value;
   JSCode('url:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeLoader.SetFOnBeforeload(Value : TExtTreeTreeLoaderOnBeforeload); begin
+procedure TExtTreeTreeLoader.SetFOnBeforeload(Value : TExtTreeTreeLoaderOnBeforeload);
+begin
   if Assigned(FOnBeforeload) then
     JSCode(JSName+'.events ["beforeload"].listeners=[];');
   if Assigned(Value) then
@@ -875,7 +916,8 @@ procedure TExtTreeTreeLoader.SetFOnBeforeload(Value : TExtTreeTreeLoaderOnBefore
   FOnBeforeload := Value;
 end;
 
-procedure TExtTreeTreeLoader.SetFOnLoad(Value : TExtTreeTreeLoaderOnLoad); begin
+procedure TExtTreeTreeLoader.SetFOnLoad(Value : TExtTreeTreeLoaderOnLoad);
+begin
   if Assigned(FOnLoad) then
     JSCode(JSName+'.events ["load"].listeners=[];');
   if Assigned(Value) then
@@ -883,7 +925,8 @@ procedure TExtTreeTreeLoader.SetFOnLoad(Value : TExtTreeTreeLoaderOnLoad); begin
   FOnLoad := Value;
 end;
 
-procedure TExtTreeTreeLoader.SetFOnLoadexception(Value : TExtTreeTreeLoaderOnLoadexception); begin
+procedure TExtTreeTreeLoader.SetFOnLoadexception(Value : TExtTreeTreeLoaderOnLoadexception);
+begin
   if Assigned(FOnLoadexception) then
     JSCode(JSName+'.events ["loadexception"].listeners=[];');
   if Assigned(Value) then
@@ -891,11 +934,13 @@ procedure TExtTreeTreeLoader.SetFOnLoadexception(Value : TExtTreeTreeLoaderOnLoa
   FOnLoadexception := Value;
 end;
 
-class function TExtTreeTreeLoader.JSClassName : string; begin
+class function TExtTreeTreeLoader.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeLoader';
 end;
 
-procedure TExtTreeTreeLoader.InitDefaults; begin
+procedure TExtTreeTreeLoader.InitDefaults;
+begin
   inherited;
   FBaseAttrs := TExtObject.CreateInternal(Self, 'baseAttrs');
   FBaseParams := TExtObject.CreateInternal(Self, 'baseParams');
@@ -904,17 +949,20 @@ procedure TExtTreeTreeLoader.InitDefaults; begin
   FUiProviders := TExtObject.CreateInternal(Self, 'uiProviders');
 end;
 
-function TExtTreeTreeLoader.CreateNode(Attr : TExtObject) : TExtFunction; begin
+function TExtTreeTreeLoader.CreateNode(Attr : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.createNode(' + VarToJSON([Attr, false]) + ');', 'TExtTreeTreeLoader');
   Result := Self;
 end;
 
-function TExtTreeTreeLoader.Load(Node : TExtTreeTreeNode; Callback : TExtFunction; Scope : TExtObject) : TExtFunction; begin
+function TExtTreeTreeLoader.Load(Node : TExtTreeTreeNode; Callback : TExtFunction; Scope : TExtObject) : TExtFunction;
+begin
   JSCode(JSName + '.load(' + VarToJSON([Node, false, Callback, true, Scope, false]) + ');', 'TExtTreeTreeLoader');
   Result := Self;
 end;
 
-procedure TExtTreeTreeLoader.HandleEvent(const AEvtName : string); begin
+procedure TExtTreeTreeLoader.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforeload') and Assigned(FOnBeforeload) then
     FOnBeforeload(TExtTreeTreeLoader(ParamAsObject('This')), TExtObject(ParamAsObject('Node')), TExtObject(ParamAsObject('Callback')))
@@ -924,7 +972,8 @@ procedure TExtTreeTreeLoader.HandleEvent(const AEvtName : string); begin
     FOnLoadexception(TExtTreeTreeLoader(ParamAsObject('This')), TExtObject(ParamAsObject('Node')), TExtObject(ParamAsObject('Response')));
 end;
 
-procedure TExtTreeMultiSelectionModel.SetFOnSelectionchange(Value : TExtTreeMultiSelectionModelOnSelectionchange); begin
+procedure TExtTreeMultiSelectionModel.SetFOnSelectionchange(Value : TExtTreeMultiSelectionModelOnSelectionchange);
+begin
   if Assigned(FOnSelectionchange) then
     JSCode(JSName+'.events ["selectionchange"].listeners=[];');
   if Assigned(Value) then
@@ -932,42 +981,50 @@ procedure TExtTreeMultiSelectionModel.SetFOnSelectionchange(Value : TExtTreeMult
   FOnSelectionchange := Value;
 end;
 
-class function TExtTreeMultiSelectionModel.JSClassName : string; begin
+class function TExtTreeMultiSelectionModel.JSClassName : string;
+      begin
   Result := 'Ext.tree.MultiSelectionModel';
 end;
 
-function TExtTreeMultiSelectionModel.ClearSelections : TExtFunction; begin
+function TExtTreeMultiSelectionModel.ClearSelections : TExtFunction;
+begin
   JSCode(JSName + '.clearSelections();', 'TExtTreeMultiSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeMultiSelectionModel.GetSelectedNodes : TExtFunction; begin
+function TExtTreeMultiSelectionModel.GetSelectedNodes : TExtFunction;
+begin
   JSCode(JSName + '.getSelectedNodes();', 'TExtTreeMultiSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeMultiSelectionModel.IsSelected(Node : TExtTreeTreeNode) : TExtFunction; begin
+function TExtTreeMultiSelectionModel.IsSelected(Node : TExtTreeTreeNode) : TExtFunction;
+begin
   JSCode(JSName + '.isSelected(' + VarToJSON([Node, false]) + ');', 'TExtTreeMultiSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeMultiSelectionModel.Select(Node : TExtTreeTreeNode; E : TEventObject = nil; KeepExisting : Boolean = false) : TExtFunction; begin
+function TExtTreeMultiSelectionModel.Select(Node : TExtTreeTreeNode; E : TEventObject = nil; KeepExisting : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.select(' + VarToJSON([Node, false, E, false, KeepExisting]) + ');', 'TExtTreeMultiSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeMultiSelectionModel.Unselect(Node : TExtTreeTreeNode) : TExtFunction; begin
+function TExtTreeMultiSelectionModel.Unselect(Node : TExtTreeTreeNode) : TExtFunction;
+begin
   JSCode(JSName + '.unselect(' + VarToJSON([Node, false]) + ');', 'TExtTreeMultiSelectionModel');
   Result := Self;
 end;
 
-procedure TExtTreeMultiSelectionModel.HandleEvent(const AEvtName : string); begin
+procedure TExtTreeMultiSelectionModel.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'selectionchange') and Assigned(FOnSelectionchange) then
     FOnSelectionchange(TExtTreeMultiSelectionModel(ParamAsObject('This')), TExtObjectList(ParamAsObject('Nodes')));
 end;
 
-procedure TExtTreeDefaultSelectionModel.SetFOnBeforeselect(Value : TExtTreeDefaultSelectionModelOnBeforeselect); begin
+procedure TExtTreeDefaultSelectionModel.SetFOnBeforeselect(Value : TExtTreeDefaultSelectionModelOnBeforeselect);
+begin
   if Assigned(FOnBeforeselect) then
     JSCode(JSName+'.events ["beforeselect"].listeners=[];');
   if Assigned(Value) then
@@ -975,7 +1032,8 @@ procedure TExtTreeDefaultSelectionModel.SetFOnBeforeselect(Value : TExtTreeDefau
   FOnBeforeselect := Value;
 end;
 
-procedure TExtTreeDefaultSelectionModel.SetFOnSelectionchange(Value : TExtTreeDefaultSelectionModelOnSelectionchange); begin
+procedure TExtTreeDefaultSelectionModel.SetFOnSelectionchange(Value : TExtTreeDefaultSelectionModelOnSelectionchange);
+begin
   if Assigned(FOnSelectionchange) then
     JSCode(JSName+'.events ["selectionchange"].listeners=[];');
   if Assigned(Value) then
@@ -983,46 +1041,55 @@ procedure TExtTreeDefaultSelectionModel.SetFOnSelectionchange(Value : TExtTreeDe
   FOnSelectionchange := Value;
 end;
 
-class function TExtTreeDefaultSelectionModel.JSClassName : string; begin
+class function TExtTreeDefaultSelectionModel.JSClassName : string;
+      begin
   Result := 'Ext.tree.DefaultSelectionModel';
 end;
 
-function TExtTreeDefaultSelectionModel.ClearSelections(Silent : Boolean) : TExtFunction; begin
+function TExtTreeDefaultSelectionModel.ClearSelections(Silent : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.clearSelections(' + VarToJSON([Silent]) + ');', 'TExtTreeDefaultSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeDefaultSelectionModel.GetSelectedNode : TExtFunction; begin
+function TExtTreeDefaultSelectionModel.GetSelectedNode : TExtFunction;
+begin
   JSCode(JSName + '.getSelectedNode();', 'TExtTreeDefaultSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeDefaultSelectionModel.IsSelected(Node : TExtTreeTreeNode) : TExtFunction; begin
+function TExtTreeDefaultSelectionModel.IsSelected(Node : TExtTreeTreeNode) : TExtFunction;
+begin
   JSCode(JSName + '.isSelected(' + VarToJSON([Node, false]) + ');', 'TExtTreeDefaultSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeDefaultSelectionModel.Select(Node : TExtTreeTreeNode) : TExtFunction; begin
+function TExtTreeDefaultSelectionModel.Select(Node : TExtTreeTreeNode) : TExtFunction;
+begin
   JSCode(JSName + '.select(' + VarToJSON([Node, false]) + ');', 'TExtTreeDefaultSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeDefaultSelectionModel.SelectNext : TExtFunction; begin
+function TExtTreeDefaultSelectionModel.SelectNext : TExtFunction;
+begin
   JSCode(JSName + '.selectNext();', 'TExtTreeDefaultSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeDefaultSelectionModel.SelectPrevious : TExtFunction; begin
+function TExtTreeDefaultSelectionModel.SelectPrevious : TExtFunction;
+begin
   JSCode(JSName + '.selectPrevious();', 'TExtTreeDefaultSelectionModel');
   Result := Self;
 end;
 
-function TExtTreeDefaultSelectionModel.Unselect(Node : TExtTreeTreeNode; Silent : Boolean) : TExtFunction; begin
+function TExtTreeDefaultSelectionModel.Unselect(Node : TExtTreeTreeNode; Silent : Boolean) : TExtFunction;
+begin
   JSCode(JSName + '.unselect(' + VarToJSON([Node, false, Silent]) + ');', 'TExtTreeDefaultSelectionModel');
   Result := Self;
 end;
 
-procedure TExtTreeDefaultSelectionModel.HandleEvent(const AEvtName : string); begin
+procedure TExtTreeDefaultSelectionModel.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforeselect') and Assigned(FOnBeforeselect) then
     FOnBeforeselect(TExtTreeDefaultSelectionModel(ParamAsObject('This')), TExtTreeTreeNode(ParamAsObject('Node')), TExtTreeTreeNode(ParamAsObject('Node_')))
@@ -1030,27 +1097,32 @@ procedure TExtTreeDefaultSelectionModel.HandleEvent(const AEvtName : string); be
     FOnSelectionchange(TExtTreeDefaultSelectionModel(ParamAsObject('This')), TExtTreeTreeNode(ParamAsObject('Node')));
 end;
 
-procedure TExtTreeTreeNode.SetFAllowChildren(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFAllowChildren(Value : Boolean);
+begin
   FAllowChildren := Value;
   JSCode('allowChildren:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFAllowDrag(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFAllowDrag(Value : Boolean);
+begin
   FAllowDrag := Value;
   JSCode('allowDrag:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFAllowDrop(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFAllowDrop(Value : Boolean);
+begin
   FAllowDrop := Value;
   JSCode('allowDrop:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFChecked(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFChecked(Value : Boolean);
+begin
   FChecked := Value;
   JSCode('checked:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFCls(Value : String); begin
+procedure TExtTreeTreeNode.SetFCls(Value : String);
+begin
   FCls := Value;
   JSCode('cls:' + VarToJSON([Value]));
 end;
@@ -1061,12 +1133,14 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'disabled', [AValue]);
 end;
 
-procedure TExtTreeTreeNode.SetFDraggable(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFDraggable(Value : Boolean);
+begin
   FDraggable := Value;
   JSCode('draggable:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFEditable(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFEditable(Value : Boolean);
+begin
   FEditable := Value;
   JSCode('editable:' + VarToJSON([Value]));
 end;
@@ -1089,17 +1163,20 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'hidden', [AValue]);
 end;
 
-procedure TExtTreeTreeNode.SetFHref(Value : String); begin
+procedure TExtTreeTreeNode.SetFHref(Value : String);
+begin
   FHref := Value;
   JSCode('href:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFHrefTarget(Value : String); begin
+procedure TExtTreeTreeNode.SetFHrefTarget(Value : String);
+begin
   FHrefTarget := Value;
   JSCode('hrefTarget:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFIcon(Value : String); begin
+procedure TExtTreeTreeNode.SetFIcon(Value : String);
+begin
   FIcon := Value;
   JSCode('icon:' + VarToJSON([Value]));
 end;
@@ -1110,7 +1187,8 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'iconCls', [AValue]);
 end;
 
-procedure TExtTreeTreeNode.SetFIsTarget(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFIsTarget(Value : Boolean);
+begin
   FIsTarget := Value;
   JSCode('isTarget:' + VarToJSON([Value]));
 end;
@@ -1121,48 +1199,57 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'qtip', [AValue]);
 end;
 
-procedure TExtTreeTreeNode.SetFQtipCfg(Value : String); begin
+procedure TExtTreeTreeNode.SetFQtipCfg(Value : String);
+begin
   FQtipCfg := Value;
   JSCode('qtipCfg:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode.SetFSingleClickExpand(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFSingleClickExpand(Value : Boolean);
+begin
   FSingleClickExpand := Value;
   JSCode('singleClickExpand:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeNode._SetText(const AValue: string); begin
+procedure TExtTreeTreeNode._SetText(const AValue: string);
+begin
   FText := AValue;
   ExtSession.ResponseItems.SetConfigItem(Self, 'text', 'setText', [AValue]);
 end;
 
-procedure TExtTreeTreeNode.SetFUiProvider(Value : TExtFunction); begin
+procedure TExtTreeTreeNode.SetFUiProvider(Value : TExtFunction);
+begin
   FUiProvider := Value;
   JSCode('uiProvider:' + VarToJSON([Value, true]));
 end;
 
-procedure TExtTreeTreeNode.SetFDisabled_(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFDisabled_(Value : Boolean);
+begin
   FDisabled_ := Value;
   JSCode(JSName + '.disabled=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtTreeTreeNode.SetFHidden_(Value : Boolean); begin
+procedure TExtTreeTreeNode.SetFHidden_(Value : Boolean);
+begin
   FHidden_ := Value;
   JSCode(JSName + '.hidden=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtTreeTreeNode.SetFText_(Value : String); begin
+procedure TExtTreeTreeNode.SetFText_(Value : String);
+begin
   FText_ := Value;
   JSCode(JSName + '.text=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtTreeTreeNode.SetFUi(Value : TExtTreeTreeNodeUI); begin
+procedure TExtTreeTreeNode.SetFUi(Value : TExtTreeTreeNodeUI);
+begin
   FUi.Free;
   FUi := Value;
     JSCode(JSName + '.ui=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtTreeTreeNode.SetFOnBeforechildrenrendered(Value : TExtTreeTreeNodeOnBeforechildrenrendered); begin
+procedure TExtTreeTreeNode.SetFOnBeforechildrenrendered(Value : TExtTreeTreeNodeOnBeforechildrenrendered);
+begin
   if Assigned(FOnBeforechildrenrendered) then
     JSCode(JSName+'.events ["beforechildrenrendered"].listeners=[];');
   if Assigned(Value) then
@@ -1170,7 +1257,8 @@ procedure TExtTreeTreeNode.SetFOnBeforechildrenrendered(Value : TExtTreeTreeNode
   FOnBeforechildrenrendered := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnBeforeclick(Value : TExtTreeTreeNodeOnBeforeclick); begin
+procedure TExtTreeTreeNode.SetFOnBeforeclick(Value : TExtTreeTreeNodeOnBeforeclick);
+begin
   if Assigned(FOnBeforeclick) then
     JSCode(JSName+'.events ["beforeclick"].listeners=[];');
   if Assigned(Value) then
@@ -1178,7 +1266,8 @@ procedure TExtTreeTreeNode.SetFOnBeforeclick(Value : TExtTreeTreeNodeOnBeforecli
   FOnBeforeclick := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnBeforecollapse(Value : TExtTreeTreeNodeOnBeforecollapse); begin
+procedure TExtTreeTreeNode.SetFOnBeforecollapse(Value : TExtTreeTreeNodeOnBeforecollapse);
+begin
   if Assigned(FOnBeforecollapse) then
     JSCode(JSName+'.events ["beforecollapse"].listeners=[];');
   if Assigned(Value) then
@@ -1186,7 +1275,8 @@ procedure TExtTreeTreeNode.SetFOnBeforecollapse(Value : TExtTreeTreeNodeOnBefore
   FOnBeforecollapse := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnBeforedblclick(Value : TExtTreeTreeNodeOnBeforedblclick); begin
+procedure TExtTreeTreeNode.SetFOnBeforedblclick(Value : TExtTreeTreeNodeOnBeforedblclick);
+begin
   if Assigned(FOnBeforedblclick) then
     JSCode(JSName+'.events ["beforedblclick"].listeners=[];');
   if Assigned(Value) then
@@ -1194,7 +1284,8 @@ procedure TExtTreeTreeNode.SetFOnBeforedblclick(Value : TExtTreeTreeNodeOnBefore
   FOnBeforedblclick := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnBeforeexpand(Value : TExtTreeTreeNodeOnBeforeexpand); begin
+procedure TExtTreeTreeNode.SetFOnBeforeexpand(Value : TExtTreeTreeNodeOnBeforeexpand);
+begin
   if Assigned(FOnBeforeexpand) then
     JSCode(JSName+'.events ["beforeexpand"].listeners=[];');
   if Assigned(Value) then
@@ -1202,7 +1293,8 @@ procedure TExtTreeTreeNode.SetFOnBeforeexpand(Value : TExtTreeTreeNodeOnBeforeex
   FOnBeforeexpand := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnCheckchange(Value : TExtTreeTreeNodeOnCheckchange); begin
+procedure TExtTreeTreeNode.SetFOnCheckchange(Value : TExtTreeTreeNodeOnCheckchange);
+begin
   if Assigned(FOnCheckchange) then
     JSCode(JSName+'.events ["checkchange"].listeners=[];');
   if Assigned(Value) then
@@ -1210,7 +1302,8 @@ procedure TExtTreeTreeNode.SetFOnCheckchange(Value : TExtTreeTreeNodeOnCheckchan
   FOnCheckchange := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnClick(Value : TExtTreeTreeNodeOnClick); begin
+procedure TExtTreeTreeNode.SetFOnClick(Value : TExtTreeTreeNodeOnClick);
+begin
   if Assigned(FOnClick) then
     JSCode(JSName+'.events ["click"].listeners=[];');
   if Assigned(Value) then
@@ -1218,7 +1311,8 @@ procedure TExtTreeTreeNode.SetFOnClick(Value : TExtTreeTreeNodeOnClick); begin
   FOnClick := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnCollapse(Value : TExtTreeTreeNodeOnCollapse); begin
+procedure TExtTreeTreeNode.SetFOnCollapse(Value : TExtTreeTreeNodeOnCollapse);
+begin
   if Assigned(FOnCollapse) then
     JSCode(JSName+'.events ["collapse"].listeners=[];');
   if Assigned(Value) then
@@ -1226,7 +1320,8 @@ procedure TExtTreeTreeNode.SetFOnCollapse(Value : TExtTreeTreeNodeOnCollapse); b
   FOnCollapse := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnContextmenu(Value : TExtTreeTreeNodeOnContextmenu); begin
+procedure TExtTreeTreeNode.SetFOnContextmenu(Value : TExtTreeTreeNodeOnContextmenu);
+begin
   if Assigned(FOnContextmenu) then
     JSCode(JSName+'.events ["contextmenu"].listeners=[];');
   if Assigned(Value) then
@@ -1234,7 +1329,8 @@ procedure TExtTreeTreeNode.SetFOnContextmenu(Value : TExtTreeTreeNodeOnContextme
   FOnContextmenu := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnDblclick(Value : TExtTreeTreeNodeOnDblclick); begin
+procedure TExtTreeTreeNode.SetFOnDblclick(Value : TExtTreeTreeNodeOnDblclick);
+begin
   if Assigned(FOnDblclick) then
     JSCode(JSName+'.events ["dblclick"].listeners=[];');
   if Assigned(Value) then
@@ -1242,7 +1338,8 @@ procedure TExtTreeTreeNode.SetFOnDblclick(Value : TExtTreeTreeNodeOnDblclick); b
   FOnDblclick := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnDisabledchange(Value : TExtTreeTreeNodeOnDisabledchange); begin
+procedure TExtTreeTreeNode.SetFOnDisabledchange(Value : TExtTreeTreeNodeOnDisabledchange);
+begin
   if Assigned(FOnDisabledchange) then
     JSCode(JSName+'.events ["disabledchange"].listeners=[];');
   if Assigned(Value) then
@@ -1250,7 +1347,8 @@ procedure TExtTreeTreeNode.SetFOnDisabledchange(Value : TExtTreeTreeNodeOnDisabl
   FOnDisabledchange := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnExpand(Value : TExtTreeTreeNodeOnExpand); begin
+procedure TExtTreeTreeNode.SetFOnExpand(Value : TExtTreeTreeNodeOnExpand);
+begin
   if Assigned(FOnExpand) then
     JSCode(JSName+'.events ["expand"].listeners=[];');
   if Assigned(Value) then
@@ -1258,7 +1356,8 @@ procedure TExtTreeTreeNode.SetFOnExpand(Value : TExtTreeTreeNodeOnExpand); begin
   FOnExpand := Value;
 end;
 
-procedure TExtTreeTreeNode.SetFOnTextchange(Value : TExtTreeTreeNodeOnTextchange); begin
+procedure TExtTreeTreeNode.SetFOnTextchange(Value : TExtTreeTreeNodeOnTextchange);
+begin
   if Assigned(FOnTextchange) then
     JSCode(JSName+'.events ["textchange"].listeners=[];');
   if Assigned(Value) then
@@ -1266,11 +1365,13 @@ procedure TExtTreeTreeNode.SetFOnTextchange(Value : TExtTreeTreeNodeOnTextchange
   FOnTextchange := Value;
 end;
 
-class function TExtTreeTreeNode.JSClassName : string; begin
+class function TExtTreeTreeNode.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeNode';
 end;
 
-procedure TExtTreeTreeNode.InitDefaults; begin
+procedure TExtTreeTreeNode.InitDefaults;
+begin
   inherited;
   FAllowChildren := true;
   FAllowDrag := true;
@@ -1280,37 +1381,44 @@ procedure TExtTreeTreeNode.InitDefaults; begin
   FUi := TExtTreeTreeNodeUI.CreateInternal(Self, 'ui');
 end;
 
-function TExtTreeTreeNode.Collapse(Deep : Boolean = false; Anim : Boolean = false; Callback : TExtFunction = nil; Scope : TExtObject = nil) : TExtFunction; begin
+function TExtTreeTreeNode.Collapse(Deep : Boolean = false; Anim : Boolean = false; Callback : TExtFunction = nil; Scope : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.collapse(' + VarToJSON([Deep, Anim, Callback, true, Scope, false]) + ');', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.CollapseChildNodes(Deep : Boolean = false) : TExtFunction; begin
+function TExtTreeTreeNode.CollapseChildNodes(Deep : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.collapseChildNodes(' + VarToJSON([Deep]) + ');', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.Disable : TExtFunction; begin
+function TExtTreeTreeNode.Disable : TExtFunction;
+begin
   JSCode(JSName + '.disable();', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.Enable : TExtFunction; begin
+function TExtTreeTreeNode.Enable : TExtFunction;
+begin
   JSCode(JSName + '.enable();', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.EnsureVisible(Callback : TExtFunction = nil; Scope : TExtObject = nil) : TExtFunction; begin
+function TExtTreeTreeNode.EnsureVisible(Callback : TExtFunction = nil; Scope : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.ensureVisible(' + VarToJSON([Callback, true, Scope, false]) + ');', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.Expand(Deep : Boolean = false; Anim : Boolean = false; Callback : TExtFunction = nil; Scope : TExtObject = nil) : TExtFunction; begin
+function TExtTreeTreeNode.Expand(Deep : Boolean = false; Anim : Boolean = false; Callback : TExtFunction = nil; Scope : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.expand(' + VarToJSON([Deep, Anim, Callback, true, Scope, false]) + ');', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.ExpandChildNodes(Deep : Boolean = false) : TExtFunction; begin
+function TExtTreeTreeNode.ExpandChildNodes(Deep : Boolean = false) : TExtFunction;
+begin
   JSCode(JSName + '.expandChildNodes(' + VarToJSON([Deep]) + ');', 'TExtTreeTreeNode');
   Result := Self;
 end;
@@ -1320,22 +1428,26 @@ begin
   Result := 'treenode';
 end;
 
-function TExtTreeTreeNode.GetUI : TExtFunction; begin
+function TExtTreeTreeNode.GetUI : TExtFunction;
+begin
   JSCode(JSName + '.getUI();', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.IsExpanded : TExtFunction; begin
+function TExtTreeTreeNode.IsExpanded : TExtFunction;
+begin
   JSCode(JSName + '.isExpanded();', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.IsSelected : TExtFunction; begin
+function TExtTreeTreeNode.IsSelected : TExtFunction;
+begin
   JSCode(JSName + '.isSelected();', 'TExtTreeTreeNode');
   Result := Self;
 end;
 
-function TExtTreeTreeNode.Select : TExtFunction; begin
+function TExtTreeTreeNode.Select : TExtFunction;
+begin
   JSCode(JSName + '.select();', 'TExtTreeTreeNode');
   Result := Self;
 end;
@@ -1365,7 +1477,8 @@ begin
   Result := Self;
 end;
 
-procedure TExtTreeTreeNode.HandleEvent(const AEvtName : string); begin
+procedure TExtTreeTreeNode.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforechildrenrendered') and Assigned(FOnBeforechildrenrendered) then
     FOnBeforechildrenrendered(TExtTreeTreeNode(ParamAsObject('This')))
@@ -1395,17 +1508,20 @@ procedure TExtTreeTreeNode.HandleEvent(const AEvtName : string); begin
     FOnTextchange(TExtTreeTreeNode(ParamAsObject('This')), ParamAsString('Text'), ParamAsString('OldText'));
 end;
 
-procedure TExtTreeAsyncTreeNode.SetFLoader(Value : TExtTreeTreeLoader); begin
+procedure TExtTreeAsyncTreeNode.SetFLoader(Value : TExtTreeTreeLoader);
+begin
   FLoader := Value;
     JSCode('loader:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeAsyncTreeNode.SetFLoader_(Value : TExtTreeTreeLoader); begin
+procedure TExtTreeAsyncTreeNode.SetFLoader_(Value : TExtTreeTreeLoader);
+begin
   FLoader_ := Value;
     JSCode(JSName + '.loader=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtTreeAsyncTreeNode.SetFOnBeforeload(Value : TExtTreeAsyncTreeNodeOnBeforeload); begin
+procedure TExtTreeAsyncTreeNode.SetFOnBeforeload(Value : TExtTreeAsyncTreeNodeOnBeforeload);
+begin
   if Assigned(FOnBeforeload) then
     JSCode(JSName+'.events ["beforeload"].listeners=[];');
   if Assigned(Value) then
@@ -1413,7 +1529,8 @@ procedure TExtTreeAsyncTreeNode.SetFOnBeforeload(Value : TExtTreeAsyncTreeNodeOn
   FOnBeforeload := Value;
 end;
 
-procedure TExtTreeAsyncTreeNode.SetFOnLoad(Value : TExtTreeAsyncTreeNodeOnLoad); begin
+procedure TExtTreeAsyncTreeNode.SetFOnLoad(Value : TExtTreeAsyncTreeNodeOnLoad);
+begin
   if Assigned(FOnLoad) then
     JSCode(JSName+'.events ["load"].listeners=[];');
   if Assigned(Value) then
@@ -1421,32 +1538,38 @@ procedure TExtTreeAsyncTreeNode.SetFOnLoad(Value : TExtTreeAsyncTreeNodeOnLoad);
   FOnLoad := Value;
 end;
 
-class function TExtTreeAsyncTreeNode.JSClassName : string; begin
+class function TExtTreeAsyncTreeNode.JSClassName : string;
+      begin
   Result := 'Ext.tree.AsyncTreeNode';
 end;
 
-procedure TExtTreeAsyncTreeNode.InitDefaults; begin
+procedure TExtTreeAsyncTreeNode.InitDefaults;
+begin
   inherited;
   FLoader := TExtTreeTreeLoader.CreateInternal(Self, 'loader');
   FLoader_ := TExtTreeTreeLoader.CreateInternal(Self, 'loader');
 end;
 
-function TExtTreeAsyncTreeNode.IsLoaded : TExtFunction; begin
+function TExtTreeAsyncTreeNode.IsLoaded : TExtFunction;
+begin
   JSCode(JSName + '.isLoaded();', 'TExtTreeAsyncTreeNode');
   Result := Self;
 end;
 
-function TExtTreeAsyncTreeNode.IsLoading : TExtFunction; begin
+function TExtTreeAsyncTreeNode.IsLoading : TExtFunction;
+begin
   JSCode(JSName + '.isLoading();', 'TExtTreeAsyncTreeNode');
   Result := Self;
 end;
 
-function TExtTreeAsyncTreeNode.Reload(Callback : TExtFunction; Scope : TExtObject = nil) : TExtFunction; begin
+function TExtTreeAsyncTreeNode.Reload(Callback : TExtFunction; Scope : TExtObject = nil) : TExtFunction;
+begin
   JSCode(JSName + '.reload(' + VarToJSON([Callback, true, Scope, false]) + ');', 'TExtTreeAsyncTreeNode');
   Result := Self;
 end;
 
-procedure TExtTreeAsyncTreeNode.HandleEvent(const AEvtName : string); begin
+procedure TExtTreeAsyncTreeNode.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'beforeload') and Assigned(FOnBeforeload) then
     FOnBeforeload(TExtTreeAsyncTreeNode(ParamAsObject('This')))
@@ -1454,46 +1577,55 @@ procedure TExtTreeAsyncTreeNode.HandleEvent(const AEvtName : string); begin
     FOnLoad(TExtTreeAsyncTreeNode(ParamAsObject('This')));
 end;
 
-procedure TExtTreeTreeEditor.SetFAlignment(Value : String); begin
+procedure TExtTreeTreeEditor.SetFAlignment(Value : String);
+begin
   FAlignment := Value;
   JSCode('alignment:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeEditor.SetFCls(Value : String); begin
+procedure TExtTreeTreeEditor.SetFCls(Value : String);
+begin
   FCls := Value;
   JSCode('cls:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeEditor.SetFEditDelay(Value : Integer); begin
+procedure TExtTreeTreeEditor.SetFEditDelay(Value : Integer);
+begin
   FEditDelay := Value;
   JSCode('editDelay:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeEditor.SetFHideEl(Value : Boolean); begin
+procedure TExtTreeTreeEditor.SetFHideEl(Value : Boolean);
+begin
   FHideEl := Value;
   JSCode('hideEl:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeEditor.SetFMaxWidth(Value : Integer); begin
+procedure TExtTreeTreeEditor.SetFMaxWidth(Value : Integer);
+begin
   FMaxWidth := Value;
   JSCode('maxWidth:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeEditor.SetFShim(Value : Boolean); begin
+procedure TExtTreeTreeEditor.SetFShim(Value : Boolean);
+begin
   FShim := Value;
   JSCode('shim:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeEditor.SetFEditNode(Value : TExtTreeTreeNode); begin
+procedure TExtTreeTreeEditor.SetFEditNode(Value : TExtTreeTreeNode);
+begin
   FEditNode := Value;
     JSCode(JSName + '.editNode=' + VarToJSON([Value, false]) + ';');
 end;
 
-class function TExtTreeTreeEditor.JSClassName : string; begin
+class function TExtTreeTreeEditor.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeEditor';
 end;
 
-procedure TExtTreeTreeEditor.InitDefaults; begin
+procedure TExtTreeTreeEditor.InitDefaults;
+begin
   inherited;
   FCls := 'x-small-editor x-tree-editor';
   FEditDelay := 350;
@@ -1501,133 +1633,159 @@ procedure TExtTreeTreeEditor.InitDefaults; begin
   FEditNode := TExtTreeTreeNode.CreateInternal(Self, 'editNode');
 end;
 
-function TExtTreeTreeEditor.TriggerEdit(Node : TExtTreeTreeNode) : TExtFunction; begin
+function TExtTreeTreeEditor.TriggerEdit(Node : TExtTreeTreeNode) : TExtFunction;
+begin
   JSCode(JSName + '.triggerEdit(' + VarToJSON([Node, false]) + ');', 'TExtTreeTreeEditor');
   Result := Self;
 end;
 
-procedure TExtTreeTreeDropZone.SetFAllowContainerDrop(Value : String); begin
+procedure TExtTreeTreeDropZone.SetFAllowContainerDrop(Value : String);
+begin
   FAllowContainerDrop := Value;
   JSCode('allowContainerDrop:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeDropZone.SetFAllowParentInsert(Value : Boolean); begin
+procedure TExtTreeTreeDropZone.SetFAllowParentInsert(Value : Boolean);
+begin
   FAllowParentInsert := Value;
   JSCode('allowParentInsert:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeDropZone.SetFAppendOnly(Value : String); begin
+procedure TExtTreeTreeDropZone.SetFAppendOnly(Value : String);
+begin
   FAppendOnly := Value;
   JSCode('appendOnly:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeDropZone.SetFDdGroup(Value : String); begin
+procedure TExtTreeTreeDropZone.SetFDdGroup(Value : String);
+begin
   FDdGroup := Value;
   JSCode('ddGroup:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeDropZone.SetFExpandDelay(Value : String); begin
+procedure TExtTreeTreeDropZone.SetFExpandDelay(Value : String);
+begin
   FExpandDelay := Value;
   JSCode('expandDelay:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeDropZone.SetFDragOverData(Value : TExtTreeTreePanel); begin
+procedure TExtTreeTreeDropZone.SetFDragOverData(Value : TExtTreeTreePanel);
+begin
   FDragOverData := Value;
     JSCode(JSName + '.dragOverData=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtTreeTreeDropZone.SetFTree(Value : TExtTreeTreePanel); begin
+procedure TExtTreeTreeDropZone.SetFTree(Value : TExtTreeTreePanel);
+begin
   FTree := Value;
     JSCode(JSName + '.tree=' + VarToJSON([Value, false]) + ';');
 end;
 
-class function TExtTreeTreeDropZone.JSClassName : string; begin
+class function TExtTreeTreeDropZone.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeDropZone';
 end;
 
-procedure TExtTreeTreeDropZone.InitDefaults; begin
+procedure TExtTreeTreeDropZone.InitDefaults;
+begin
   inherited;
   FDdGroup := 'TreeDD';
   FDragOverData := TExtTreeTreePanel.CreateInternal(Self, 'dragOverData');
   FTree := TExtTreeTreePanel.CreateInternal(Self, 'tree');
 end;
 
-procedure TExtTreeTreePanel.SetFAnimate(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFAnimate(Value : Boolean);
+begin
   FAnimate := Value;
   JSCode('animate:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFContainerScroll(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFContainerScroll(Value : Boolean);
+begin
   FContainerScroll := Value;
   JSCode('containerScroll:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFDdAppendOnly(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFDdAppendOnly(Value : Boolean);
+begin
   FDdAppendOnly := Value;
   JSCode('ddAppendOnly:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFDdGroup(Value : String); begin
+procedure TExtTreeTreePanel.SetFDdGroup(Value : String);
+begin
   FDdGroup := Value;
   JSCode('ddGroup:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFDdScroll(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFDdScroll(Value : Boolean);
+begin
   FDdScroll := Value;
   JSCode('ddScroll:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFDragConfig(Value : TExtObject); begin
+procedure TExtTreeTreePanel.SetFDragConfig(Value : TExtObject);
+begin
   FDragConfig := Value;
     JSCode('dragConfig:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreePanel.SetFDropConfig(Value : TExtObject); begin
+procedure TExtTreeTreePanel.SetFDropConfig(Value : TExtObject);
+begin
   FDropConfig := Value;
     JSCode('dropConfig:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreePanel.SetFEnableDD(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFEnableDD(Value : Boolean);
+begin
   FEnableDD := Value;
   JSCode('enableDD:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFEnableDrag(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFEnableDrag(Value : Boolean);
+begin
   FEnableDrag := Value;
   JSCode('enableDrag:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFEnableDrop(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFEnableDrop(Value : Boolean);
+begin
   FEnableDrop := Value;
   JSCode('enableDrop:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFHlColor(Value : String); begin
+procedure TExtTreeTreePanel.SetFHlColor(Value : String);
+begin
   FHlColor := Value;
   JSCode('hlColor:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFHlDrop(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFHlDrop(Value : Boolean);
+begin
   FHlDrop := Value;
   JSCode('hlDrop:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFLines(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFLines(Value : Boolean);
+begin
   FLines := Value;
   JSCode('lines:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFLoader(Value : TExtTreeTreeLoader); begin
+procedure TExtTreeTreePanel.SetFLoader(Value : TExtTreeTreeLoader);
+begin
   FLoader := Value;
     JSCode('loader:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreePanel.SetFPathSeparator(Value : String); begin
+procedure TExtTreeTreePanel.SetFPathSeparator(Value : String);
+begin
   FPathSeparator := Value;
   JSCode('pathSeparator:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFRequestMethod(Value : String); begin
+procedure TExtTreeTreePanel.SetFRequestMethod(Value : String);
+begin
   FRequestMethod := Value;
   JSCode('requestMethod:' + VarToJSON([Value]));
 end;
@@ -1645,42 +1803,50 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'rootVisible', [AValue]);
 end;
 
-procedure TExtTreeTreePanel.SetFSelModel(Value : TExtObject); begin
+procedure TExtTreeTreePanel.SetFSelModel(Value : TExtObject);
+begin
   FSelModel := Value;
     JSCode('selModel:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtTreeTreePanel.SetFSingleExpand(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFSingleExpand(Value : Boolean);
+begin
   FSingleExpand := Value;
   JSCode('singleExpand:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFTrackMouseOver(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFTrackMouseOver(Value : Boolean);
+begin
   FTrackMouseOver := Value;
   JSCode('trackMouseOver:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFUseArrows(Value : Boolean); begin
+procedure TExtTreeTreePanel.SetFUseArrows(Value : Boolean);
+begin
   FUseArrows := Value;
   JSCode('useArrows:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreePanel.SetFDragZone(Value : TExtTreeTreeDragZone); begin
+procedure TExtTreeTreePanel.SetFDragZone(Value : TExtTreeTreeDragZone);
+begin
   FDragZone := Value;
     JSCode(JSName + '.dragZone=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtTreeTreePanel.SetFDropZone(Value : TExtTreeTreeDropZone); begin
+procedure TExtTreeTreePanel.SetFDropZone(Value : TExtTreeTreeDropZone);
+begin
   FDropZone := Value;
     JSCode(JSName + '.dropZone=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtTreeTreePanel.SetFRoot_(Value : TExtTreeTreeNode); begin
+procedure TExtTreeTreePanel.SetFRoot_(Value : TExtTreeTreeNode);
+begin
   FRoot_ := Value;
     JSCode(JSName + '.root=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtTreeTreePanel.SetFOnAppend(Value : TExtTreeTreePanelOnAppend); begin
+procedure TExtTreeTreePanel.SetFOnAppend(Value : TExtTreeTreePanelOnAppend);
+begin
   if Assigned(FOnAppend) then
     JSCode(JSName+'.events ["append"].listeners=[];');
   if Assigned(Value) then
@@ -1688,7 +1854,8 @@ procedure TExtTreeTreePanel.SetFOnAppend(Value : TExtTreeTreePanelOnAppend); beg
   FOnAppend := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforeappend(Value : TExtTreeTreePanelOnBeforeappend); begin
+procedure TExtTreeTreePanel.SetFOnBeforeappend(Value : TExtTreeTreePanelOnBeforeappend);
+begin
   if Assigned(FOnBeforeappend) then
     JSCode(JSName+'.events ["beforeappend"].listeners=[];');
   if Assigned(Value) then
@@ -1696,7 +1863,8 @@ procedure TExtTreeTreePanel.SetFOnBeforeappend(Value : TExtTreeTreePanelOnBefore
   FOnBeforeappend := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforechildrenrendered(Value : TExtTreeTreePanelOnBeforechildrenrendered); begin
+procedure TExtTreeTreePanel.SetFOnBeforechildrenrendered(Value : TExtTreeTreePanelOnBeforechildrenrendered);
+begin
   if Assigned(FOnBeforechildrenrendered) then
     JSCode(JSName+'.events ["beforechildrenrendered"].listeners=[];');
   if Assigned(Value) then
@@ -1704,7 +1872,8 @@ procedure TExtTreeTreePanel.SetFOnBeforechildrenrendered(Value : TExtTreeTreePan
   FOnBeforechildrenrendered := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforeclick(Value : TExtTreeTreePanelOnBeforeclick); begin
+procedure TExtTreeTreePanel.SetFOnBeforeclick(Value : TExtTreeTreePanelOnBeforeclick);
+begin
   if Assigned(FOnBeforeclick) then
     JSCode(JSName+'.events ["beforeclick"].listeners=[];');
   if Assigned(Value) then
@@ -1712,7 +1881,8 @@ procedure TExtTreeTreePanel.SetFOnBeforeclick(Value : TExtTreeTreePanelOnBeforec
   FOnBeforeclick := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforecollapsenode(Value : TExtTreeTreePanelOnBeforecollapsenode); begin
+procedure TExtTreeTreePanel.SetFOnBeforecollapsenode(Value : TExtTreeTreePanelOnBeforecollapsenode);
+begin
   if Assigned(FOnBeforecollapsenode) then
     JSCode(JSName+'.events ["beforecollapsenode"].listeners=[];');
   if Assigned(Value) then
@@ -1720,7 +1890,8 @@ procedure TExtTreeTreePanel.SetFOnBeforecollapsenode(Value : TExtTreeTreePanelOn
   FOnBeforecollapsenode := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforedblclick(Value : TExtTreeTreePanelOnBeforedblclick); begin
+procedure TExtTreeTreePanel.SetFOnBeforedblclick(Value : TExtTreeTreePanelOnBeforedblclick);
+begin
   if Assigned(FOnBeforedblclick) then
     JSCode(JSName+'.events ["beforedblclick"].listeners=[];');
   if Assigned(Value) then
@@ -1728,7 +1899,8 @@ procedure TExtTreeTreePanel.SetFOnBeforedblclick(Value : TExtTreeTreePanelOnBefo
   FOnBeforedblclick := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforeexpandnode(Value : TExtTreeTreePanelOnBeforeexpandnode); begin
+procedure TExtTreeTreePanel.SetFOnBeforeexpandnode(Value : TExtTreeTreePanelOnBeforeexpandnode);
+begin
   if Assigned(FOnBeforeexpandnode) then
     JSCode(JSName+'.events ["beforeexpandnode"].listeners=[];');
   if Assigned(Value) then
@@ -1736,7 +1908,8 @@ procedure TExtTreeTreePanel.SetFOnBeforeexpandnode(Value : TExtTreeTreePanelOnBe
   FOnBeforeexpandnode := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforeinsert(Value : TExtTreeTreePanelOnBeforeinsert); begin
+procedure TExtTreeTreePanel.SetFOnBeforeinsert(Value : TExtTreeTreePanelOnBeforeinsert);
+begin
   if Assigned(FOnBeforeinsert) then
     JSCode(JSName+'.events ["beforeinsert"].listeners=[];');
   if Assigned(Value) then
@@ -1744,7 +1917,8 @@ procedure TExtTreeTreePanel.SetFOnBeforeinsert(Value : TExtTreeTreePanelOnBefore
   FOnBeforeinsert := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforeload(Value : TExtTreeTreePanelOnBeforeload); begin
+procedure TExtTreeTreePanel.SetFOnBeforeload(Value : TExtTreeTreePanelOnBeforeload);
+begin
   if Assigned(FOnBeforeload) then
     JSCode(JSName+'.events ["beforeload"].listeners=[];');
   if Assigned(Value) then
@@ -1752,7 +1926,8 @@ procedure TExtTreeTreePanel.SetFOnBeforeload(Value : TExtTreeTreePanelOnBeforelo
   FOnBeforeload := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforemovenode(Value : TExtTreeTreePanelOnBeforemovenode); begin
+procedure TExtTreeTreePanel.SetFOnBeforemovenode(Value : TExtTreeTreePanelOnBeforemovenode);
+begin
   if Assigned(FOnBeforemovenode) then
     JSCode(JSName+'.events ["beforemovenode"].listeners=[];');
   if Assigned(Value) then
@@ -1760,7 +1935,8 @@ procedure TExtTreeTreePanel.SetFOnBeforemovenode(Value : TExtTreeTreePanelOnBefo
   FOnBeforemovenode := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforenodedrop(Value : TExtTreeTreePanelOnBeforenodedrop); begin
+procedure TExtTreeTreePanel.SetFOnBeforenodedrop(Value : TExtTreeTreePanelOnBeforenodedrop);
+begin
   if Assigned(FOnBeforenodedrop) then
     JSCode(JSName+'.events ["beforenodedrop"].listeners=[];');
   if Assigned(Value) then
@@ -1768,7 +1944,8 @@ procedure TExtTreeTreePanel.SetFOnBeforenodedrop(Value : TExtTreeTreePanelOnBefo
   FOnBeforenodedrop := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnBeforeremove(Value : TExtTreeTreePanelOnBeforeremove); begin
+procedure TExtTreeTreePanel.SetFOnBeforeremove(Value : TExtTreeTreePanelOnBeforeremove);
+begin
   if Assigned(FOnBeforeremove) then
     JSCode(JSName+'.events ["beforeremove"].listeners=[];');
   if Assigned(Value) then
@@ -1776,7 +1953,8 @@ procedure TExtTreeTreePanel.SetFOnBeforeremove(Value : TExtTreeTreePanelOnBefore
   FOnBeforeremove := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnCheckchange(Value : TExtTreeTreePanelOnCheckchange); begin
+procedure TExtTreeTreePanel.SetFOnCheckchange(Value : TExtTreeTreePanelOnCheckchange);
+begin
   if Assigned(FOnCheckchange) then
     JSCode(JSName+'.events ["checkchange"].listeners=[];');
   if Assigned(Value) then
@@ -1784,7 +1962,8 @@ procedure TExtTreeTreePanel.SetFOnCheckchange(Value : TExtTreeTreePanelOnCheckch
   FOnCheckchange := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnClick(Value : TExtTreeTreePanelOnClick); begin
+procedure TExtTreeTreePanel.SetFOnClick(Value : TExtTreeTreePanelOnClick);
+begin
   if Assigned(FOnClick) then
     JSCode(JSName+'.events ["click"].listeners=[];');
   if Assigned(Value) then
@@ -1792,7 +1971,8 @@ procedure TExtTreeTreePanel.SetFOnClick(Value : TExtTreeTreePanelOnClick); begin
   FOnClick := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnCollapsenode(Value : TExtTreeTreePanelOnCollapsenode); begin
+procedure TExtTreeTreePanel.SetFOnCollapsenode(Value : TExtTreeTreePanelOnCollapsenode);
+begin
   if Assigned(FOnCollapsenode) then
     JSCode(JSName+'.events ["collapsenode"].listeners=[];');
   if Assigned(Value) then
@@ -1800,7 +1980,8 @@ procedure TExtTreeTreePanel.SetFOnCollapsenode(Value : TExtTreeTreePanelOnCollap
   FOnCollapsenode := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnContainerclick(Value : TExtTreeTreePanelOnContainerclick); begin
+procedure TExtTreeTreePanel.SetFOnContainerclick(Value : TExtTreeTreePanelOnContainerclick);
+begin
   if Assigned(FOnContainerclick) then
     JSCode(JSName+'.events ["containerclick"].listeners=[];');
   if Assigned(Value) then
@@ -1808,7 +1989,8 @@ procedure TExtTreeTreePanel.SetFOnContainerclick(Value : TExtTreeTreePanelOnCont
   FOnContainerclick := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnContainercontextmenu(Value : TExtTreeTreePanelOnContainercontextmenu); begin
+procedure TExtTreeTreePanel.SetFOnContainercontextmenu(Value : TExtTreeTreePanelOnContainercontextmenu);
+begin
   if Assigned(FOnContainercontextmenu) then
     JSCode(JSName+'.events ["containercontextmenu"].listeners=[];');
   if Assigned(Value) then
@@ -1816,7 +1998,8 @@ procedure TExtTreeTreePanel.SetFOnContainercontextmenu(Value : TExtTreeTreePanel
   FOnContainercontextmenu := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnContainerdblclick(Value : TExtTreeTreePanelOnContainerdblclick); begin
+procedure TExtTreeTreePanel.SetFOnContainerdblclick(Value : TExtTreeTreePanelOnContainerdblclick);
+begin
   if Assigned(FOnContainerdblclick) then
     JSCode(JSName+'.events ["containerdblclick"].listeners=[];');
   if Assigned(Value) then
@@ -1824,7 +2007,8 @@ procedure TExtTreeTreePanel.SetFOnContainerdblclick(Value : TExtTreeTreePanelOnC
   FOnContainerdblclick := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnContextmenu(Value : TExtTreeTreePanelOnContextmenu); begin
+procedure TExtTreeTreePanel.SetFOnContextmenu(Value : TExtTreeTreePanelOnContextmenu);
+begin
   if Assigned(FOnContextmenu) then
     JSCode(JSName+'.events ["contextmenu"].listeners=[];');
   if Assigned(Value) then
@@ -1832,7 +2016,8 @@ procedure TExtTreeTreePanel.SetFOnContextmenu(Value : TExtTreeTreePanelOnContext
   FOnContextmenu := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnDblclick(Value : TExtTreeTreePanelOnDblclick); begin
+procedure TExtTreeTreePanel.SetFOnDblclick(Value : TExtTreeTreePanelOnDblclick);
+begin
   if Assigned(FOnDblclick) then
     JSCode(JSName+'.events ["dblclick"].listeners=[];');
   if Assigned(Value) then
@@ -1840,7 +2025,8 @@ procedure TExtTreeTreePanel.SetFOnDblclick(Value : TExtTreeTreePanelOnDblclick);
   FOnDblclick := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnDisabledchange(Value : TExtTreeTreePanelOnDisabledchange); begin
+procedure TExtTreeTreePanel.SetFOnDisabledchange(Value : TExtTreeTreePanelOnDisabledchange);
+begin
   if Assigned(FOnDisabledchange) then
     JSCode(JSName+'.events ["disabledchange"].listeners=[];');
   if Assigned(Value) then
@@ -1848,7 +2034,8 @@ procedure TExtTreeTreePanel.SetFOnDisabledchange(Value : TExtTreeTreePanelOnDisa
   FOnDisabledchange := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnDragdrop(Value : TExtTreeTreePanelOnDragdrop); begin
+procedure TExtTreeTreePanel.SetFOnDragdrop(Value : TExtTreeTreePanelOnDragdrop);
+begin
   if Assigned(FOnDragdrop) then
     JSCode(JSName+'.events ["dragdrop"].listeners=[];');
   if Assigned(Value) then
@@ -1856,7 +2043,8 @@ procedure TExtTreeTreePanel.SetFOnDragdrop(Value : TExtTreeTreePanelOnDragdrop);
   FOnDragdrop := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnEnddrag(Value : TExtTreeTreePanelOnEnddrag); begin
+procedure TExtTreeTreePanel.SetFOnEnddrag(Value : TExtTreeTreePanelOnEnddrag);
+begin
   if Assigned(FOnEnddrag) then
     JSCode(JSName+'.events ["enddrag"].listeners=[];');
   if Assigned(Value) then
@@ -1864,7 +2052,8 @@ procedure TExtTreeTreePanel.SetFOnEnddrag(Value : TExtTreeTreePanelOnEnddrag); b
   FOnEnddrag := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnExpandnode(Value : TExtTreeTreePanelOnExpandnode); begin
+procedure TExtTreeTreePanel.SetFOnExpandnode(Value : TExtTreeTreePanelOnExpandnode);
+begin
   if Assigned(FOnExpandnode) then
     JSCode(JSName+'.events ["expandnode"].listeners=[];');
   if Assigned(Value) then
@@ -1872,7 +2061,8 @@ procedure TExtTreeTreePanel.SetFOnExpandnode(Value : TExtTreeTreePanelOnExpandno
   FOnExpandnode := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnInsert(Value : TExtTreeTreePanelOnInsert); begin
+procedure TExtTreeTreePanel.SetFOnInsert(Value : TExtTreeTreePanelOnInsert);
+begin
   if Assigned(FOnInsert) then
     JSCode(JSName+'.events ["insert"].listeners=[];');
   if Assigned(Value) then
@@ -1880,7 +2070,8 @@ procedure TExtTreeTreePanel.SetFOnInsert(Value : TExtTreeTreePanelOnInsert); beg
   FOnInsert := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnLoad(Value : TExtTreeTreePanelOnLoad); begin
+procedure TExtTreeTreePanel.SetFOnLoad(Value : TExtTreeTreePanelOnLoad);
+begin
   if Assigned(FOnLoad) then
     JSCode(JSName+'.events ["load"].listeners=[];');
   if Assigned(Value) then
@@ -1888,7 +2079,8 @@ procedure TExtTreeTreePanel.SetFOnLoad(Value : TExtTreeTreePanelOnLoad); begin
   FOnLoad := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnMovenode(Value : TExtTreeTreePanelOnMovenode); begin
+procedure TExtTreeTreePanel.SetFOnMovenode(Value : TExtTreeTreePanelOnMovenode);
+begin
   if Assigned(FOnMovenode) then
     JSCode(JSName+'.events ["movenode"].listeners=[];');
   if Assigned(Value) then
@@ -1896,7 +2088,8 @@ procedure TExtTreeTreePanel.SetFOnMovenode(Value : TExtTreeTreePanelOnMovenode);
   FOnMovenode := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnNodedragover(Value : TExtTreeTreePanelOnNodedragover); begin
+procedure TExtTreeTreePanel.SetFOnNodedragover(Value : TExtTreeTreePanelOnNodedragover);
+begin
   if Assigned(FOnNodedragover) then
     JSCode(JSName+'.events ["nodedragover"].listeners=[];');
   if Assigned(Value) then
@@ -1904,7 +2097,8 @@ procedure TExtTreeTreePanel.SetFOnNodedragover(Value : TExtTreeTreePanelOnNodedr
   FOnNodedragover := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnNodedrop(Value : TExtTreeTreePanelOnNodedrop); begin
+procedure TExtTreeTreePanel.SetFOnNodedrop(Value : TExtTreeTreePanelOnNodedrop);
+begin
   if Assigned(FOnNodedrop) then
     JSCode(JSName+'.events ["nodedrop"].listeners=[];');
   if Assigned(Value) then
@@ -1912,7 +2106,8 @@ procedure TExtTreeTreePanel.SetFOnNodedrop(Value : TExtTreeTreePanelOnNodedrop);
   FOnNodedrop := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnRemove(Value : TExtTreeTreePanelOnRemove); begin
+procedure TExtTreeTreePanel.SetFOnRemove(Value : TExtTreeTreePanelOnRemove);
+begin
   if Assigned(FOnRemove) then
     JSCode(JSName+'.events ["remove"].listeners=[];');
   if Assigned(Value) then
@@ -1920,7 +2115,8 @@ procedure TExtTreeTreePanel.SetFOnRemove(Value : TExtTreeTreePanelOnRemove); beg
   FOnRemove := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnStartdrag(Value : TExtTreeTreePanelOnStartdrag); begin
+procedure TExtTreeTreePanel.SetFOnStartdrag(Value : TExtTreeTreePanelOnStartdrag);
+begin
   if Assigned(FOnStartdrag) then
     JSCode(JSName+'.events ["startdrag"].listeners=[];');
   if Assigned(Value) then
@@ -1928,7 +2124,8 @@ procedure TExtTreeTreePanel.SetFOnStartdrag(Value : TExtTreeTreePanelOnStartdrag
   FOnStartdrag := Value;
 end;
 
-procedure TExtTreeTreePanel.SetFOnTextchange(Value : TExtTreeTreePanelOnTextchange); begin
+procedure TExtTreeTreePanel.SetFOnTextchange(Value : TExtTreeTreePanelOnTextchange);
+begin
   if Assigned(FOnTextchange) then
     JSCode(JSName+'.events ["textchange"].listeners=[];');
   if Assigned(Value) then
@@ -1936,11 +2133,13 @@ procedure TExtTreeTreePanel.SetFOnTextchange(Value : TExtTreeTreePanelOnTextchan
   FOnTextchange := Value;
 end;
 
-class function TExtTreeTreePanel.JSClassName : string; begin
+class function TExtTreeTreePanel.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreePanel';
 end;
 
-procedure TExtTreeTreePanel.InitDefaults; begin
+procedure TExtTreeTreePanel.InitDefaults;
+begin
   inherited;
   FDragConfig := TExtObject.CreateInternal(Self, 'dragConfig');
   FDropConfig := TExtObject.CreateInternal(Self, 'dropConfig');
@@ -1957,62 +2156,74 @@ procedure TExtTreeTreePanel.InitDefaults; begin
   FRoot_ := TExtTreeTreeNode.CreateInternal(Self, 'root');
 end;
 
-function TExtTreeTreePanel.CollapseAll : TExtFunction; begin
+function TExtTreeTreePanel.CollapseAll : TExtFunction;
+begin
   JSCode(JSName + '.collapseAll();', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.ExpandAll : TExtFunction; begin
+function TExtTreeTreePanel.ExpandAll : TExtFunction;
+begin
   JSCode(JSName + '.expandAll();', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.ExpandPath(Path : String; Attr : String = ''; Callback : TExtFunction = nil) : TExtFunction; begin
+function TExtTreeTreePanel.ExpandPath(Path : String; Attr : String = ''; Callback : TExtFunction = nil) : TExtFunction;
+begin
   JSCode(JSName + '.expandPath(' + VarToJSON([Path, Attr, Callback, true]) + ');', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.GetChecked(Attribute : String = ''; StartNode : TExtTreeTreeNode = nil) : TExtFunction; begin
+function TExtTreeTreePanel.GetChecked(Attribute : String = ''; StartNode : TExtTreeTreeNode = nil) : TExtFunction;
+begin
   JSCode(JSName + '.getChecked(' + VarToJSON([Attribute, StartNode, false]) + ');', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.GetLoader : TExtFunction; begin
+function TExtTreeTreePanel.GetLoader : TExtFunction;
+begin
   JSCode(JSName + '.getLoader();', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.GetNodeById(Id : String) : TExtFunction; begin
+function TExtTreeTreePanel.GetNodeById(Id : String) : TExtFunction;
+begin
   JSCode(JSName + '.getNodeById(' + VarToJSON([Id]) + ');', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.GetRootNode : TExtFunction; begin
+function TExtTreeTreePanel.GetRootNode : TExtFunction;
+begin
   JSCode(JSName + '.getRootNode();', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.GetSelectionModel : TExtFunction; begin
+function TExtTreeTreePanel.GetSelectionModel : TExtFunction;
+begin
   JSCode(JSName + '.getSelectionModel();', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.GetTreeEl : TExtFunction; begin
+function TExtTreeTreePanel.GetTreeEl : TExtFunction;
+begin
   JSCode(JSName + '.getTreeEl();', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.SelectPath(Path : String; Attr : String = ''; Callback : TExtFunction = nil) : TExtFunction; begin
+function TExtTreeTreePanel.SelectPath(Path : String; Attr : String = ''; Callback : TExtFunction = nil) : TExtFunction;
+begin
   JSCode(JSName + '.selectPath(' + VarToJSON([Path, Attr, Callback, true]) + ');', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-function TExtTreeTreePanel.SetRootNode(Node : TExtDataNode) : TExtFunction; begin
+function TExtTreeTreePanel.SetRootNode(Node : TExtDataNode) : TExtFunction;
+begin
   JSCode(JSName + '.setRootNode(' + VarToJSON([Node, false]) + ');', 'TExtTreeTreePanel');
   Result := Self;
 end;
 
-procedure TExtTreeTreePanel.HandleEvent(const AEvtName : string); begin
+procedure TExtTreeTreePanel.HandleEvent(const AEvtName : string);
+begin
   inherited;
   if (AEvtName = 'append') and Assigned(FOnAppend) then
     FOnAppend(TExtDataTree(ParamAsObject('Tree')), TExtDataNode(ParamAsObject('Parent')), TExtDataNode(ParamAsObject('Node')), ParamAsInteger('Index'))
@@ -2080,21 +2291,25 @@ procedure TExtTreeTreePanel.HandleEvent(const AEvtName : string); begin
     FOnTextchange(TExtDataNode(ParamAsObject('Node')), ParamAsString('Text'), ParamAsString('OldText'));
 end;
 
-procedure TExtTreeTreeDragZone.SetFDdGroup(Value : String); begin
+procedure TExtTreeTreeDragZone.SetFDdGroup(Value : String);
+begin
   FDdGroup := Value;
   JSCode('ddGroup:' + VarToJSON([Value]));
 end;
 
-procedure TExtTreeTreeDragZone.SetFTree(Value : TExtTreeTreePanel); begin
+procedure TExtTreeTreeDragZone.SetFTree(Value : TExtTreeTreePanel);
+begin
   FTree := Value;
     JSCode(JSName + '.tree=' + VarToJSON([Value, false]) + ';');
 end;
 
-class function TExtTreeTreeDragZone.JSClassName : string; begin
+class function TExtTreeTreeDragZone.JSClassName : string;
+      begin
   Result := 'Ext.tree.TreeDragZone';
 end;
 
-procedure TExtTreeTreeDragZone.InitDefaults; begin
+procedure TExtTreeTreeDragZone.InitDefaults;
+begin
   inherited;
   FDdGroup := 'TreeDD';
   FTree := TExtTreeTreePanel.CreateInternal(Self, 'tree');

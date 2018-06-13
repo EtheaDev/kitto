@@ -321,85 +321,102 @@ type
 
 implementation
 
-class function TExtLayoutAutoLayout.JSClassName : string; begin
+class function TExtLayoutAutoLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.AutoLayout';
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFAnimFloat(Value : Boolean); begin
+procedure TExtLayoutBorderLayoutRegion.SetFAnimFloat(Value : Boolean);
+begin
   FAnimFloat := Value;
   JSCode('animFloat:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFAutoHide(Value : Boolean); begin
+procedure TExtLayoutBorderLayoutRegion.SetFAutoHide(Value : Boolean);
+begin
   FAutoHide := Value;
   JSCode('autoHide:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFCmargins(Value : TExtObject); begin
+procedure TExtLayoutBorderLayoutRegion.SetFCmargins(Value : TExtObject);
+begin
   FCmargins := Value;
     JSCode('cmargins:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFCollapseMode(Value : String); begin
+procedure TExtLayoutBorderLayoutRegion.SetFCollapseMode(Value : String);
+begin
   FCollapseMode := Value;
   JSCode('collapseMode:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFCollapsible(Value : Boolean); begin
+procedure TExtLayoutBorderLayoutRegion.SetFCollapsible(Value : Boolean);
+begin
   FCollapsible := Value;
   JSCode('collapsible:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFFloatable(Value : Boolean); begin
+procedure TExtLayoutBorderLayoutRegion.SetFFloatable(Value : Boolean);
+begin
   FFloatable := Value;
   JSCode('floatable:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFMargins(Value : TExtObject); begin
+procedure TExtLayoutBorderLayoutRegion.SetFMargins(Value : TExtObject);
+begin
   FMargins := Value;
     JSCode('margins:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFMinHeight(Value : Integer); begin
+procedure TExtLayoutBorderLayoutRegion.SetFMinHeight(Value : Integer);
+begin
   FMinHeight := Value;
   JSCode('minHeight:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFMinWidth(Value : Integer); begin
+procedure TExtLayoutBorderLayoutRegion.SetFMinWidth(Value : Integer);
+begin
   FMinWidth := Value;
   JSCode('minWidth:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFSplit(Value : Boolean); begin
+procedure TExtLayoutBorderLayoutRegion.SetFSplit(Value : Boolean);
+begin
   FSplit := Value;
   JSCode('split:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFIsCollapsed(Value : Boolean); begin
+procedure TExtLayoutBorderLayoutRegion.SetFIsCollapsed(Value : Boolean);
+begin
   FIsCollapsed := Value;
   JSCode(JSName + '.isCollapsed=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFLayout(Value : TLayout); begin
+procedure TExtLayoutBorderLayoutRegion.SetFLayout(Value : TLayout);
+begin
   FLayout := Value;
     JSCode(JSName + '.layout=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFPanel(Value : TExtPanel); begin
+procedure TExtLayoutBorderLayoutRegion.SetFPanel(Value : TExtPanel);
+begin
   FPanel := Value;
     JSCode(JSName + '.panel=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtLayoutBorderLayoutRegion.SetFPosition(Value : String); begin
+procedure TExtLayoutBorderLayoutRegion.SetFPosition(Value : String);
+begin
   FPosition := Value;
   JSCode(JSName + '.position=' + VarToJSON([Value]) + ';');
 end;
 
-class function TExtLayoutBorderLayoutRegion.JSClassName : string; begin
+class function TExtLayoutBorderLayoutRegion.JSClassName : string;
+      begin
   Result := 'Ext.layout.BorderLayout.Region';
 end;
 
-procedure TExtLayoutBorderLayoutRegion.InitDefaults; begin
+procedure TExtLayoutBorderLayoutRegion.InitDefaults;
+begin
   inherited;
   FAnimFloat := true;
   FAutoHide := true;
@@ -411,381 +428,459 @@ procedure TExtLayoutBorderLayoutRegion.InitDefaults; begin
   FPanel := TExtPanel.CreateInternal(Self, 'panel');
 end;
 
-function TExtLayoutBorderLayoutRegion.MustHaveACenterRegion : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.MustHaveACenterRegion : TExtFunction;
+begin
   JSCode(JSName + '.must have a center region();', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-function TExtLayoutBorderLayoutRegion.GetMinHeight : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.GetMinHeight : TExtFunction;
+begin
   JSCode(JSName + '.getMinHeight();', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-function TExtLayoutBorderLayoutRegion.GetMinWidth : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.GetMinWidth : TExtFunction;
+begin
   JSCode(JSName + '.getMinWidth();', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-function TExtLayoutBorderLayoutRegion.GetSize : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.GetSize : TExtFunction;
+begin
   JSCode(JSName + '.getSize();', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-function TExtLayoutBorderLayoutRegion.IsVisible : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.IsVisible : TExtFunction;
+begin
   JSCode(JSName + '.isVisible();', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-function TExtLayoutBorderLayoutRegion.SetPanel(Panel : TExtPanel) : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.SetPanel(Panel : TExtPanel) : TExtFunction;
+begin
   JSCode(JSName + '.setPanel(' + VarToJSON([Panel, false]) + ');', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-function TExtLayoutBorderLayoutRegion.SlideIn : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.SlideIn : TExtFunction;
+begin
   JSCode(JSName + '.slideIn();', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-function TExtLayoutBorderLayoutRegion.SlideOut : TExtFunction; begin
+function TExtLayoutBorderLayoutRegion.SlideOut : TExtFunction;
+begin
   JSCode(JSName + '.slideOut();', 'TExtLayoutBorderLayoutRegion');
   Result := Self;
 end;
 
-procedure TExtLayoutContainerLayout.SetFExtraCls(Value : String); begin
+procedure TExtLayoutContainerLayout.SetFExtraCls(Value : String);
+begin
   FExtraCls := Value;
   JSCode('extraCls:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutContainerLayout.SetFRenderHidden(Value : Boolean); begin
+procedure TExtLayoutContainerLayout.SetFRenderHidden(Value : Boolean);
+begin
   FRenderHidden := Value;
   JSCode('renderHidden:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutContainerLayout.SetFActiveItem(Value : TExtComponent); begin
+procedure TExtLayoutContainerLayout.SetFActiveItem(Value : TExtComponent);
+begin
   FActiveItem := Value;
     JSCode(JSName + '.activeItem=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtLayoutContainerLayout.SetFFieldTpl(Value : TExtTemplate); begin
+procedure TExtLayoutContainerLayout.SetFFieldTpl(Value : TExtTemplate);
+begin
   FFieldTpl := Value;
     JSCode(JSName + '.fieldTpl=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtLayoutContainerLayout.SetFIfJS(Value : TExtObject); begin
+procedure TExtLayoutContainerLayout.SetFIfJS(Value : TExtObject);
+begin
   FIfJS := Value;
     JSCode(JSName + '.ifJS=' + VarToJSON([Value, false]) + ';');
 end;
 
-class function TExtLayoutContainerLayout.JSClassName : string; begin
+class function TExtLayoutContainerLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.ContainerLayout';
 end;
 
-procedure TExtLayoutContainerLayout.InitDefaults; begin
+procedure TExtLayoutContainerLayout.InitDefaults;
+begin
   inherited;
   FActiveItem := TExtComponent.CreateInternal(Self, 'activeItem');
   FFieldTpl := TExtTemplate.CreateInternal(Self, 'fieldTpl');
   FIfJS := TExtObject.CreateInternal(Self, 'ifJS');
 end;
 
-function TExtLayoutContainerLayout.ParseMargins(V : Integer) : TExtFunction; begin
+function TExtLayoutContainerLayout.ParseMargins(V : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.parseMargins(' + VarToJSON([V]) + ');', 'TExtLayoutContainerLayout');
   Result := Self;
 end;
 
-function TExtLayoutContainerLayout.ParseMargins(V : String) : TExtFunction; begin
+function TExtLayoutContainerLayout.ParseMargins(V : String) : TExtFunction;
+begin
   JSCode(JSName + '.parseMargins(' + VarToJSON([V]) + ');', 'TExtLayoutContainerLayout');
   Result := Self;
 end;
 
-class function TExtLayoutMenuLayout.JSClassName : string; begin
+class function TExtLayoutMenuLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.MenuLayout';
 end;
 
-procedure TExtLayoutTableLayout.SetFColumns(Value : Integer); begin
+procedure TExtLayoutTableLayout.SetFColumns(Value : Integer);
+begin
   FColumns := Value;
   JSCode('columns:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutTableLayout.SetFTableAttrs(Value : TExtObject); begin
+procedure TExtLayoutTableLayout.SetFTableAttrs(Value : TExtObject);
+begin
   FTableAttrs := Value;
     JSCode('tableAttrs:' + VarToJSON([Value, false]));
 end;
 
-class function TExtLayoutTableLayout.JSClassName : string; begin
+class function TExtLayoutTableLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.TableLayout';
 end;
 
-procedure TExtLayoutTableLayout.InitDefaults; begin
+procedure TExtLayoutTableLayout.InitDefaults;
+begin
   inherited;
   FTableAttrs := TExtObject.CreateInternal(Self, 'tableAttrs');
 end;
 
-class function TExtLayoutFitLayout.JSClassName : string; begin
+class function TExtLayoutFitLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.FitLayout';
 end;
 
-class function TExtLayoutColumnLayout.JSClassName : string; begin
+class function TExtLayoutColumnLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.ColumnLayout';
 end;
 
-procedure TExtLayoutBoxLayout.SetFDefaultMargins(Value : TExtObject); begin
+procedure TExtLayoutBoxLayout.SetFDefaultMargins(Value : TExtObject);
+begin
   FDefaultMargins := Value;
     JSCode('defaultMargins:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtLayoutBoxLayout.SetFPadding(Value : String); begin
+procedure TExtLayoutBoxLayout.SetFPadding(Value : String);
+begin
   FPadding := Value;
   JSCode('padding:' + VarToJSON([Value]));
 end;
 
-class function TExtLayoutBoxLayout.JSClassName : string; begin
+class function TExtLayoutBoxLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.BoxLayout';
 end;
 
-procedure TExtLayoutBoxLayout.InitDefaults; begin
+procedure TExtLayoutBoxLayout.InitDefaults;
+begin
   inherited;
   FDefaultMargins := TExtObject.CreateInternal(Self, 'defaultMargins');
 end;
 
-function TExtLayoutBoxLayout.UpdateChildBoxes(Boxes : TExtObjectList) : TExtFunction; begin
+function TExtLayoutBoxLayout.UpdateChildBoxes(Boxes : TExtObjectList) : TExtFunction;
+begin
   JSCode(JSName + '.updateChildBoxes(' + VarToJSON(Boxes) + ');', 'TExtLayoutBoxLayout');
   Result := Self;
 end;
 
-procedure TExtLayoutAnchorLayout.SetFAnchor(Value : String); begin
+procedure TExtLayoutAnchorLayout.SetFAnchor(Value : String);
+begin
   FAnchor := Value;
   JSCode('anchor:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAnchorLayout.SetFDefaultAnchor(Value : String); begin
+procedure TExtLayoutAnchorLayout.SetFDefaultAnchor(Value : String);
+begin
   FDefaultAnchor := Value;
   JSCode('defaultAnchor:' + VarToJSON([Value]));
 end;
 
-class function TExtLayoutAnchorLayout.JSClassName : string; begin
+class function TExtLayoutAnchorLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.AnchorLayout';
 end;
 
-procedure TExtLayoutToolbarLayout.SetFHiddenItems(Value : TExtObjectList); begin
+procedure TExtLayoutToolbarLayout.SetFHiddenItems(Value : TExtObjectList);
+begin
   FHiddenItems := Value;
     JSCode(JSName + '.hiddenItems=' + VarToJSON([Value, false]) + ';');
 end;
 
-procedure TExtLayoutToolbarLayout.SetFNoItemsMenuText(Value : String); begin
+procedure TExtLayoutToolbarLayout.SetFNoItemsMenuText(Value : String);
+begin
   FNoItemsMenuText := Value;
   JSCode(JSName + '.noItemsMenuText=' + VarToJSON([Value]) + ';');
 end;
 
-procedure TExtLayoutToolbarLayout.SetFTriggerWidth(Value : Integer); begin
+procedure TExtLayoutToolbarLayout.SetFTriggerWidth(Value : Integer);
+begin
   FTriggerWidth := Value;
   JSCode(JSName + '.triggerWidth=' + VarToJSON([Value]) + ';');
 end;
 
-class function TExtLayoutToolbarLayout.JSClassName : string; begin
+class function TExtLayoutToolbarLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.ToolbarLayout';
 end;
 
-procedure TExtLayoutToolbarLayout.InitDefaults; begin
+procedure TExtLayoutToolbarLayout.InitDefaults;
+begin
   inherited;
   FHiddenItems := TExtObjectList.CreateAsAttribute(Self, 'hiddenItems');
 end;
 
-procedure TExtLayoutBorderLayoutSplitRegion.SetFCollapsibleSplitTip(Value : String); begin
+procedure TExtLayoutBorderLayoutSplitRegion.SetFCollapsibleSplitTip(Value : String);
+begin
   FCollapsibleSplitTip := Value;
   JSCode('collapsibleSplitTip:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutSplitRegion.SetFSplitTip(Value : String); begin
+procedure TExtLayoutBorderLayoutSplitRegion.SetFSplitTip(Value : String);
+begin
   FSplitTip := Value;
   JSCode('splitTip:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutSplitRegion.SetFTickSize(Value : Integer); begin
+procedure TExtLayoutBorderLayoutSplitRegion.SetFTickSize(Value : Integer);
+begin
   FTickSize := Value;
   JSCode('tickSize:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutBorderLayoutSplitRegion.SetFUseSplitTips(Value : Boolean); begin
+procedure TExtLayoutBorderLayoutSplitRegion.SetFUseSplitTips(Value : Boolean);
+begin
   FUseSplitTips := Value;
   JSCode('useSplitTips:' + VarToJSON([Value]));
 end;
 
-class function TExtLayoutBorderLayoutSplitRegion.JSClassName : string; begin
+class function TExtLayoutBorderLayoutSplitRegion.JSClassName : string;
+      begin
   Result := 'Ext.layout.BorderLayout.SplitRegion';
 end;
 
-procedure TExtLayoutBorderLayoutSplitRegion.InitDefaults; begin
+procedure TExtLayoutBorderLayoutSplitRegion.InitDefaults;
+begin
   inherited;
   FCollapsibleSplitTip := 'Drag to resize. Double click to hide.';
   FSplitTip := 'Drag to resize.';
 end;
 
-function TExtLayoutBorderLayoutSplitRegion.GetSplitBar : TExtFunction; begin
+function TExtLayoutBorderLayoutSplitRegion.GetSplitBar : TExtFunction;
+begin
   JSCode(JSName + '.getSplitBar();', 'TExtLayoutBorderLayoutSplitRegion');
   Result := Self;
 end;
 
-class function TExtLayoutBorderLayout.JSClassName : string; begin
+class function TExtLayoutBorderLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.BorderLayout';
 end;
 
-procedure TExtLayoutVBoxLayout.SetFAlign(Value : String); begin
+procedure TExtLayoutVBoxLayout.SetFAlign(Value : String);
+begin
   FAlign := Value;
   JSCode('align:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutVBoxLayout.SetFFlex(Value : Integer); begin
+procedure TExtLayoutVBoxLayout.SetFFlex(Value : Integer);
+begin
   FFlex := Value;
   JSCode('flex:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutVBoxLayout.SetFPack(Value : String); begin
+procedure TExtLayoutVBoxLayout.SetFPack(Value : String);
+begin
   FPack := Value;
   JSCode('pack:' + VarToJSON([Value]));
 end;
 
-class function TExtLayoutVBoxLayout.JSClassName : string; begin
+class function TExtLayoutVBoxLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.VBoxLayout';
 end;
 
-procedure TExtLayoutHBoxLayout.SetFAlign(Value : String); begin
+procedure TExtLayoutHBoxLayout.SetFAlign(Value : String);
+begin
   FAlign := Value;
   JSCode('align:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutHBoxLayout.SetFFlex(Value : Integer); begin
+procedure TExtLayoutHBoxLayout.SetFFlex(Value : Integer);
+begin
   FFlex := Value;
   JSCode('flex:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutHBoxLayout.SetFPack(Value : String); begin
+procedure TExtLayoutHBoxLayout.SetFPack(Value : String);
+begin
   FPack := Value;
   JSCode('pack:' + VarToJSON([Value]));
 end;
 
-class function TExtLayoutHBoxLayout.JSClassName : string; begin
+class function TExtLayoutHBoxLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.HBoxLayout';
 end;
 
-procedure TExtLayoutAccordionLayout.SetFActiveOnTop(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFActiveOnTop(Value : Boolean);
+begin
   FActiveOnTop := Value;
   JSCode('activeOnTop:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAccordionLayout.SetFAnimate(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFAnimate(Value : Boolean);
+begin
   FAnimate := Value;
   JSCode('animate:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAccordionLayout.SetFAutoWidth(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFAutoWidth(Value : Boolean);
+begin
   FAutoWidth := Value;
   JSCode('autoWidth:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAccordionLayout.SetFCollapseFirst(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFCollapseFirst(Value : Boolean);
+begin
   FCollapseFirst := Value;
   JSCode('collapseFirst:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAccordionLayout.SetFFill(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFFill(Value : Boolean);
+begin
   FFill := Value;
   JSCode('fill:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAccordionLayout.SetFHideCollapseTool(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFHideCollapseTool(Value : Boolean);
+begin
   FHideCollapseTool := Value;
   JSCode('hideCollapseTool:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAccordionLayout.SetFSequence(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFSequence(Value : Boolean);
+begin
   FSequence := Value;
   JSCode('sequence:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutAccordionLayout.SetFTitleCollapse(Value : Boolean); begin
+procedure TExtLayoutAccordionLayout.SetFTitleCollapse(Value : Boolean);
+begin
   FTitleCollapse := Value;
   JSCode('titleCollapse:' + VarToJSON([Value]));
 end;
 
-class function TExtLayoutAccordionLayout.JSClassName : string; begin
+class function TExtLayoutAccordionLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.AccordionLayout';
 end;
 
-procedure TExtLayoutAccordionLayout.InitDefaults; begin
+procedure TExtLayoutAccordionLayout.InitDefaults;
+begin
   inherited;
   FAutoWidth := true;
   FFill := true;
   FTitleCollapse := true;
 end;
 
-function TExtLayoutAccordionLayout.SetActiveItem(Item : String) : TExtFunction; begin
+function TExtLayoutAccordionLayout.SetActiveItem(Item : String) : TExtFunction;
+begin
   JSCode(JSName + '.setActiveItem(' + VarToJSON([Item]) + ');', 'TExtLayoutAccordionLayout');
   Result := Self;
 end;
 
-function TExtLayoutAccordionLayout.SetActiveItem(Item : Integer) : TExtFunction; begin
+function TExtLayoutAccordionLayout.SetActiveItem(Item : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setActiveItem(' + VarToJSON([Item]) + ');', 'TExtLayoutAccordionLayout');
   Result := Self;
 end;
 
-class function TExtLayoutAbsoluteLayout.JSClassName : string; begin
+class function TExtLayoutAbsoluteLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.AbsoluteLayout';
 end;
 
-procedure TExtLayoutFormLayout.SetFFieldTpl(Value : TExtTemplate); begin
+procedure TExtLayoutFormLayout.SetFFieldTpl(Value : TExtTemplate);
+begin
   FFieldTpl := Value;
     JSCode('fieldTpl:' + VarToJSON([Value, false]));
 end;
 
-procedure TExtLayoutFormLayout.SetFLabelSeparator(Value : String); begin
+procedure TExtLayoutFormLayout.SetFLabelSeparator(Value : String);
+begin
   FLabelSeparator := Value;
   JSCode('labelSeparator:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutFormLayout.SetFTrackLabels(Value : Boolean); begin
+procedure TExtLayoutFormLayout.SetFTrackLabels(Value : Boolean);
+begin
   FTrackLabels := Value;
   JSCode('trackLabels:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutFormLayout.SetFLabelStyle(Value : String); begin
+procedure TExtLayoutFormLayout.SetFLabelStyle(Value : String);
+begin
   FLabelStyle := Value;
   JSCode(JSName + '.labelStyle=' + VarToJSON([Value]) + ';');
 end;
 
-class function TExtLayoutFormLayout.JSClassName : string; begin
+class function TExtLayoutFormLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.FormLayout';
 end;
 
-procedure TExtLayoutFormLayout.InitDefaults; begin
+procedure TExtLayoutFormLayout.InitDefaults;
+begin
   inherited;
   FFieldTpl := TExtTemplate.CreateInternal(Self, 'fieldTpl');
 end;
 
-function TExtLayoutFormLayout.GetTemplateArgs(Field : TExtFormField) : TExtFunction; begin
+function TExtLayoutFormLayout.GetTemplateArgs(Field : TExtFormField) : TExtFunction;
+begin
   JSCode(JSName + '.getTemplateArgs(' + VarToJSON([Field, false]) + ');', 'TExtLayoutFormLayout');
   Result := Self;
 end;
 
-procedure TExtLayoutCardLayout.SetFDeferredRender(Value : Boolean); begin
+procedure TExtLayoutCardLayout.SetFDeferredRender(Value : Boolean);
+begin
   FDeferredRender := Value;
   JSCode('deferredRender:' + VarToJSON([Value]));
 end;
 
-procedure TExtLayoutCardLayout.SetFLayoutOnCardChange(Value : Boolean); begin
+procedure TExtLayoutCardLayout.SetFLayoutOnCardChange(Value : Boolean);
+begin
   FLayoutOnCardChange := Value;
   JSCode('layoutOnCardChange:' + VarToJSON([Value]));
 end;
 
-class function TExtLayoutCardLayout.JSClassName : string; begin
+class function TExtLayoutCardLayout.JSClassName : string;
+      begin
   Result := 'Ext.layout.CardLayout';
 end;
 
-function TExtLayoutCardLayout.SetActiveItem(Item : String) : TExtFunction; begin
+function TExtLayoutCardLayout.SetActiveItem(Item : String) : TExtFunction;
+begin
   JSCode(JSName + '.setActiveItem(' + VarToJSON([Item]) + ');', 'TExtLayoutCardLayout');
   Result := Self;
 end;
 
-function TExtLayoutCardLayout.SetActiveItem(Item : Integer) : TExtFunction; begin
+function TExtLayoutCardLayout.SetActiveItem(Item : Integer) : TExtFunction;
+begin
   JSCode(JSName + '.setActiveItem(' + VarToJSON([Item]) + ');', 'TExtLayoutCardLayout');
   Result := Self;
 end;

@@ -315,7 +315,7 @@ type
     FConfig: TKConfig;
   strict protected
     property Config: TKConfig read FConfig;
-    function InternalExpand(const AString: string): string; override;
+    procedure InternalExpand(var AString: string); override;
   public
     constructor Create(const AConfig: TKConfig); reintroduce;
   end;
@@ -841,7 +841,7 @@ begin
   inherited Create(AConfig.Config, 'Config');
 end;
 
-function TKConfigMacroExpander.InternalExpand(const AString: string): string;
+procedure TKConfigMacroExpander.InternalExpand(var AString: string);
 const
   IMAGE_MACRO_HEAD = '%IMAGE(';
   MACRO_TAIL = ')%';
@@ -849,20 +849,26 @@ var
   LPosHead: Integer;
   LPosTail: Integer;
   LName: string;
+  LURL: string;
+  LRest: string;
 begin
-  Result := inherited InternalExpand(AString);
-  Result := ExpandMacros(Result, '%HOME_PATH%', TKConfig.AppHomePath);
+  inherited InternalExpand(AString);
+  ExpandMacros(AString, '%HOME_PATH%', TKConfig.AppHomePath);
 
-  LPosHead := Pos(IMAGE_MACRO_HEAD, Result);
+  LPosHead := Pos(IMAGE_MACRO_HEAD, AString);
   if LPosHead > 0 then
   begin
-    LPosTail := PosEx(MACRO_TAIL, Result, LPosHead + 1);
+    LPosTail := PosEx(MACRO_TAIL, AString, LPosHead + 1);
     if LPosTail > 0 then
     begin
-      LName := Copy(Result, LPosHead + Length(IMAGE_MACRO_HEAD),
+      LName := Copy(AString, LPosHead + Length(IMAGE_MACRO_HEAD),
         LPosTail - (LPosHead + Length(IMAGE_MACRO_HEAD)));
-      Result := Copy(Result, 1, LPosHead - 1) + Config.GetImageURL(LName)
-        + InternalExpand(Copy(Result, LPosTail + Length(MACRO_TAIL), MaxInt));
+      LURL := Config.GetImageURL(LName);
+      LRest := Copy(AString, LPosTail + Length(MACRO_TAIL), MaxInt);
+      InternalExpand(LRest);
+      Delete(AString, LPosHead, MaxInt);
+      Insert(LURL, AString, Length(AString) + 1);
+      Insert(LRest, AString, Length(AString) + 1);
     end;
   end;
 end;

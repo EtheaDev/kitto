@@ -1698,10 +1698,16 @@ begin
 end;
 
 function TKModelField.GetDefaultValue: Variant;
+var
+  LStringValue: string;
 begin
   Result := EvalExpression(GetValue('DefaultValue'));
   if DataType is TEFStringDataType then
-    Result := TKConfig.Instance.MacroExpansionEngine.Expand(EFVarToStr(Result));
+  begin
+    LStringValue := EFVarToStr(Result);
+    TKConfig.Instance.MacroExpansionEngine.Expand(LStringValue);
+    Result := LStringValue;
+  end;
 end;
 
 function TKModelField.GetDefaultDisplayWidth: Integer;
