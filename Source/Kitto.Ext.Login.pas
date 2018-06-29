@@ -161,7 +161,9 @@ procedure TKExtLoginPanel.DoDisplay;
 var
   LDummyHeight: Integer;
   LFormPanel: TKExtLoginFormPanel;
+  LBorderPanel: TKExtBorderPanelController;
   LFormPanelBodyStyle: string;
+  LBorderPanelConfigNode: TEFNode;
 begin
   inherited;
   Frame := False;
@@ -173,7 +175,22 @@ begin
   PaddingString := Config.GetString('Padding', '10px');
   RenderTo := Config.GetString('ContainerElementId');
 
-  LFormPanel := TKExtLoginFormPanel.CreateAndAddTo(Items);
+  //If BorderPanel configuration Node exists, use a BorderPanelController
+  LBorderPanelConfigNode := Config.FindNode('BorderPanel');
+  if Assigned(LBorderPanelConfigNode) then
+  begin
+    LBorderPanel := TKExtBorderPanelController.CreateAndAddTo(Items);
+    LBorderPanel.Config.Assign(LBorderPanelConfigNode);
+    //FBorderPanel.Border := False;
+    LBorderPanel.Frame := False;
+    LBorderPanel.View := View;
+    LBorderPanel.Display;
+    LFormPanel := TKExtLoginFormPanel.CreateAndAddTo(LBorderPanel.Items);
+    LFormPanel.Region := rgCenter;
+  end
+  else
+    LFormPanel := TKExtLoginFormPanel.CreateAndAddTo(Items);
+
   LFormPanel.LabelWidth := Config.GetInteger('FormPanel/LabelWidth', 150);
   LFormPanelBodyStyle := Config.GetString('FormPanel/BodyStyle');
   if LFormPanelBodyStyle <> '' then
@@ -212,18 +229,25 @@ var
   LLocalStorageAskUserDefault: Boolean;
   LLocalStorageAutoLogin: Boolean;
   LLocalStorageOptions: TEFNode;
+  LInputStyle, LResetPasswordStyle, LButtonStyle: string;
 begin
   FStatusBar := TKExtStatusBar.Create(Self);
   FStatusBar.DefaultText := '';
+  FStatusBar.StatusAlign := AConfig.GetString('FormPanel/StatusAlign', 'left');
   FStatusBar.BusyText := _('Logging in...');
   Bbar := FStatusBar;
 
   FLoginButton := TKExtButton.CreateAndAddTo(FStatusBar.Items);
   FLoginButton.SetIconAndScale('login', 'medium');
   FLoginButton.Text := _('Login');
+  LButtonStyle := AConfig.GetString('FormPanel/ButtonStyle');
+  if LButtonStyle <> '' then
+    FLoginButton.Style := LButtonStyle;
 
   with TExtBoxComponent.CreateAndAddTo(Items) do
     Height := 10;
+
+  LInputStyle := AConfig.GetString('FormPanel/InputStyle');
 
   FUserName := TExtFormTextField.CreateAndAddTo(Items);
   FUserName.Name := 'UserName';
@@ -233,6 +257,9 @@ begin
   FUserName.EnableKeyEvents := True;
   FUserName.SelectOnFocus := True;
   FUserName.Width := AEditWidth;
+  if LInputStyle <> '' then
+    FUserName.Style := LInputStyle;
+
   Inc(ACurrentHeight, CONTROL_HEIGHT);
 
   FPassword := TExtFormTextField.CreateAndAddTo(Items);
@@ -244,6 +271,8 @@ begin
   FPassword.EnableKeyEvents := True;
   FPassword.SelectOnFocus := True;
   FPassword.Width := AEditWidth;
+  if LInputStyle <> '' then
+    FPassword.Style := LInputStyle;
   Inc(ACurrentHeight, CONTROL_HEIGHT);
 
   FUserName.On('specialkey', JSFunction('field, e', GetSubmitJS));
@@ -253,19 +282,6 @@ begin
     '%s.enableTask = Ext.TaskMgr.start({ ' + sLineBreak +
     '  run: function() {' + GetEnableButtonJS + '},' + sLineBreak +
     '  interval: 500});', [JSName]));
-
-  FResetPassword := AConfig.FindNode('ResetPassword');
-  if Assigned(FResetPassword) and FResetPassword.AsBoolean then
-  begin
-    FResetPasswordLink := TExtBoxComponent.CreateAndAddTo(Items);
-    FResetPasswordLink.Html := Format(
-      '<div style="text-align:right;"><a href="#" onclick="%s">%s</a></div>',
-      [HTMLEncode(JSMethod(Ajax(DoResetPassword))), HTMLEncode(_('Password forgotten?'))]);
-    FResetPasswordLink.Width := AEditWidth + LabelWidth;
-    Inc(ACurrentHeight, CONTROL_HEIGHT);
-  end
-  else
-    FResetPasswordLink := nil;
 
   if Session.Config.LanguagePerSession then
   begin
@@ -281,10 +297,30 @@ begin
     FLanguage.ForceSelection := True;
     FLanguage.TriggerAction := 'all'; // Disable filtering list items based on current value.
     FLanguage.Width := AEditWidth;
+    if LInputStyle <> '' then
+      FLanguage.Style := LInputStyle;
+
     Inc(ACurrentHeight, CONTROL_HEIGHT);
   end
   else
     FLanguage := nil;
+
+  FResetPassword := AConfig.FindNode('ResetPassword');
+  if Assigned(FResetPassword) and FResetPassword.AsBoolean then
+  begin
+    LResetPasswordStyle := FResetPassword.GetString('Style');
+    FResetPasswordLink := TExtBoxComponent.CreateAndAddTo(Items);
+    FResetPasswordLink.Html := Format(
+      '<div style="text-align:right;"><a href="#" onclick="%s">%s</a></div>',
+      [HTMLEncode(JSMethod(Ajax(DoResetPassword))), HTMLEncode(_('Password forgotten?'))]);
+    FResetPasswordLink.Width := AEditWidth + LabelWidth;
+    if LResetPasswordStyle <> '' then
+      FResetPasswordLink.Style := LResetPasswordStyle;
+
+    Inc(ACurrentHeight, CONTROL_HEIGHT);
+  end
+  else
+    FResetPasswordLink := nil;
 
   LLocalStorageOptions := AConfig.FindNode('LocalStorage');
   if Assigned(LLocalStorageOptions) then
