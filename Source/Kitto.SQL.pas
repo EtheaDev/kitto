@@ -172,7 +172,7 @@ implementation
 uses
   StrUtils, Types, Variants,
   EF.Intf, EF.Localization, EF.Types, EF.StrUtils, EF.SQL, EF.Macros,
-  Kitto.Types, Ef.Logger;
+  Kitto.Types;
 
 { TKSQLQueryBuilder }
 
@@ -984,7 +984,12 @@ begin
     ExpandQualification(Result, AViewField.Table.Model.DBTableName);
   end
   else if AViewField.IsReference then
-    Result := AViewField.QualifiedDBNameOrExpression
+    if AViewField.ModelField.ReferencedModel.CaptionField.Expression <> '' then begin
+      Result := AViewField.ModelField.ReferencedModel.CaptionField.Expression;
+      ExpandQualification(Result, AViewField.DBName);
+    end
+    else
+      Result := AViewField.QualifiedDBNameOrExpression
   else begin
     Result := AViewField.DBNameOrExpression;
     ExpandQualification(Result, AViewField.DBName);
