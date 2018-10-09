@@ -1009,6 +1009,7 @@ var
   LWidth: Integer;
   LSplit: TEFNode;
   LCollapsible: TEFNode;
+  LCollapsed: TEFNode;
   LBorder: TEFNode;
   LHeight: Integer;
   LHeader: TEFNode;
@@ -1069,6 +1070,12 @@ begin
     Collapsible := LCollapsible.AsBoolean
   else
     Collapsible := False;
+
+  LCollapsed := Config.FindNode('Collapsed');
+  if Assigned(LCollapsed) then
+    Collapsed := LCollapsed.AsBoolean
+  else
+    Collapsed := False;
 
   LHeader := Config.FindNode('Header');
   if Assigned(LHeader) then

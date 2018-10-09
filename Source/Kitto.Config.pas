@@ -626,9 +626,12 @@ begin
 end;
 
 class constructor TKConfig.Create;
+var
+  LAppName: string;
 begin
+  LAppName := ChangeFileExt(ExtractFileName(ParamStr(0)),'');
   FConfigClass := TKConfig;
-  FBaseConfigFileName := 'Config.yaml';
+  FBaseConfigFileName := Format('Config_%s.yaml',[LAppName]);
 
   FResourcePathsURLs := TList<TPathURL>.Create;
   SetupResourcePathsURLs;
