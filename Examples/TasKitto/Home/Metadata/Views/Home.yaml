@@ -11,6 +11,7 @@ Controller: Viewport
           TreeView: MainMenu
           Width: 150
           Collapsible: True
+          .Collapsed: True
           Border: True
           Header: True
 

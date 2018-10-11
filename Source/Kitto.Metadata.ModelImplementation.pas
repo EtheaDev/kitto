@@ -280,9 +280,7 @@ function TKDefaultModel.InternalLoadRecords(const AStore: TKViewTableStore;
   const AForEachRecord: TProc<TKViewTableRecord>): Integer;
 begin
   Assert(Assigned(AStore));
-  TEFLogger.Instance.Log('inizio InternalLoadRecords ' );
   Result := AStore.Load(AFilter, ASort, AStart, ALimit, AForEachRecord);
-  TEFLogger.Instance.Log('fine InternalLoadRecords ' );
 end;
 
 procedure TKDefaultModel.AfterApplyAfterRulesToRecord(const ARecord: TKViewTableRecord);

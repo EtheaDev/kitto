@@ -1,4 +1,4 @@
-﻿DisplayLabel: %Config:AppTitle%
+﻿DisplayLabel: _(%Config:AppTitle%)
 # Valid top-level controllers are Window and Viewport
 Controller: Viewport
 

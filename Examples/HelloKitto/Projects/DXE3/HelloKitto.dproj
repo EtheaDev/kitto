@@ -3,7 +3,7 @@
         <ProjectGuid>{1FBC6B9D-04F2-4238-A7C5-07DEC4D673EA}</ProjectGuid>
         <MainSource>HelloKitto.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
@@ -121,7 +121,7 @@
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-a</Debugger_RunParams>
+        <Debugger_RunParams>-a -c Config_FileLogger.yaml</Debugger_RunParams>
         <Icon_MainIcon>..\HelloKitto_Icon.ico</Icon_MainIcon>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>

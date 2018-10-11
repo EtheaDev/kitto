@@ -324,7 +324,7 @@ implementation
 
 uses
   StrUtils, Variants,
-  EF.SysUtils, EF.YAML, EF.Localization,
+  EF.SysUtils, EF.StrUtils, EF.YAML, EF.Localization,
   Kitto.Types, Kitto.DatabaseRouter;
 
 procedure TKConfig.AfterConstruction;
@@ -628,10 +628,15 @@ end;
 class constructor TKConfig.Create;
 var
   LAppName: string;
+  LDefaultConfig: string;
 begin
   LAppName := ChangeFileExt(ExtractFileName(ParamStr(0)),'');
   FConfigClass := TKConfig;
-  FBaseConfigFileName := Format('Config_%s.yaml',[LAppName]);
+  LDefaultConfig := Format('Config_%s.yaml',[LAppName]);
+  if FileExists(GetMetadataPath + LDefaultConfig) then
+    FBaseConfigFileName := LDefaultConfig
+  else
+    FBaseConfigFileName := 'Config.yaml';
 
   FResourcePathsURLs := TList<TPathURL>.Create;
   SetupResourcePathsURLs;

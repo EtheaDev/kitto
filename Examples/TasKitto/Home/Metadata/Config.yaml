@@ -14,7 +14,7 @@ Defaults:
     MaxFieldWidth: 70
     MinFieldWidth: 6
     RequiredLabelTemplate: <i>{label}*</i>
-# Default/Layout/LabelSeparator empty if you don't want hide the default LabelSeparator (:)
+    # Default/Layout/LabelSeparator empty if you don't want hide the default LabelSeparator (:)
     LabelSeparator:
 
 Databases:
@@ -31,7 +31,7 @@ Databases:
 
 Auth: TasKitto
   IsClearPassword: True
-  .Defaults:
+  Defaults:
     UserName: admin
     Password: admin
   ReadUserCommandText: select USER_NAME, PASSWORD_HASH, EMAIL_ADDRESS, MUST_CHANGE_PASSWORD, FIRST_NAME, LAST_NAME from KITTO_USERS where IS_ACTIVE = 1 and UPPER(USER_NAME) = UPPER(:USER_NAME)

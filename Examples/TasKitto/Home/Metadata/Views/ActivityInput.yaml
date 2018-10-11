@@ -3,6 +3,7 @@
 Controller: List
   Filters:
     DisplayLabel: Search panel
+    .Collapsed: True
     LabelWidth: 90
     Connector: and
     Items:

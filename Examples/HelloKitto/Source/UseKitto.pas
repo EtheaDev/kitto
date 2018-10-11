@@ -7,6 +7,7 @@ uses
   DBXFirebird,
   EF.DB.ADO,
   EF.DB.DBX,
+  EF.Logger.TextFile,
 {$IFDEF D20+}
   EF.DB.FD, //FireDac support
   FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLMeta, //FireDac support for MS-SQL

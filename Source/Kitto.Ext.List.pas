@@ -275,6 +275,8 @@ begin
     if Assigned(LItems) and (LItems.ChildCount > 0) then
     begin
       FFilterPanel := TKExtFilterPanel.CreateAndAddTo(Items);
+      FFilterPanel.Collapsible := Config.GetBoolean('Filters/Collapsible', True);
+      FFilterPanel.Collapsed := Config.GetBoolean('Filters/Collapsed', False);
       FFilterPanel.Region := rgNorth;
       FFilterPanel.OnChange := FilterPanelChange;
       FFilterPanel.Configure(ViewTable, LItems.Parent as TEFNode);

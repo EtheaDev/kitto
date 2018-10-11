@@ -42,6 +42,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 ; Application files
 Source: "..\Home\KEmployee.exe"; DestDir: "{app}\Home"; Flags: ignoreversion
+Source: "..\Home\*.cmd"; DestDir: "{app}\Home"; Flags: ignoreversion
 Source: "..\Home\FileAuthenticator.txt"; DestDir: "{app}\Home"; Flags: ignoreversion
 Source: "..\Home\Metadata\Models\*"; DestDir: "{app}\Home\Metadata\Models"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\Home\Metadata\Views\*"; DestDir: "{app}\Home\Metadata\Views"; Flags: ignoreversion recursesubdirs createallsubdirs

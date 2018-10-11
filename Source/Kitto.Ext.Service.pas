@@ -27,10 +27,15 @@ type
     procedure ServiceStart(Sender: TService; var Started: Boolean);
     procedure ServiceStop(Sender: TService; var Stopped: Boolean);
     procedure ServiceShutdown(Sender: TService);
+    procedure ServiceCreate(Sender: TObject);
+    procedure ServiceAfterInstall(Sender: TService);
   private
     FThread: TKExtAppThread;
+    FServiceDescription: string;
     function CreateThread: TKExtAppThread;
     procedure StopAndFreeThread;
+    procedure SetDescription(const ADescription: string);
+    procedure Configure;
   public
     function GetServiceController: TServiceController; override;
   end;
@@ -43,7 +48,8 @@ implementation
 {$R *.dfm}
 
 uses
-  EF.Logger;
+  Winapi.WinSvc,
+  EF.Localization, EF.Logger, Kitto.Config;
 
 procedure ServiceController(CtrlCode: DWord); stdcall;
 begin
@@ -51,6 +57,51 @@ begin
 end;
 
 { TKExtService }
+
+procedure TKExtService.SetDescription(const ADescription: string);
+var
+  LSCManager: SC_HANDLE;
+  LService: SC_HANDLE;
+  LDescription: SERVICE_DESCRIPTION;
+begin
+  LSCManager := OpenSCManager(nil, nil, SC_MANAGER_ALL_ACCESS);
+  if LSCManager <> 0 then
+  begin
+    LService := OpenService(LSCManager, PChar(Name), STANDARD_RIGHTS_REQUIRED or SERVICE_CHANGE_CONFIG);
+    if LService <> 0 then
+    begin
+      LDescription.lpDescription := PChar(ADescription);
+      ChangeServiceConfig2(LService, SERVICE_CONFIG_DESCRIPTION, @LDescription);
+      CloseServiceHandle(LService);
+    end;
+    CloseServiceHandle(LSCManager);
+  end;
+end;
+
+procedure TKExtService.ServiceCreate(Sender: TObject);
+begin
+  Name := TKConfig.AppName;
+  DisplayName := FServiceDescription;
+  Configure;
+end;
+
+procedure TKExtService.ServiceShutdown(Sender: TService);
+begin
+  TEFLogger.Instance.Log('Service shutdown.');
+  StopAndFreeThread;
+end;
+
+procedure TKExtService.Configure;
+var
+  LConfig: TKConfig;
+begin
+  LConfig := TKConfig.Create;
+  try
+    FServiceDescription := _(LConfig.AppTitle);
+  finally
+    FreeAndNil(LConfig);
+  end;
+end;
 
 procedure TKExtService.StopAndFreeThread;
 begin
@@ -73,10 +124,9 @@ begin
   Result := ServiceController;
 end;
 
-procedure TKExtService.ServiceShutdown(Sender: TService);
+procedure TKExtService.ServiceAfterInstall(Sender: TService);
 begin
-  TEFLogger.Instance.Log('Service shutdown.');
-  StopAndFreeThread;
+  SetDescription(FServiceDescription);
 end;
 
 procedure TKExtService.ServiceStart(Sender: TService; var Started: Boolean);

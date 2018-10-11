@@ -21,66 +21,59 @@ interface
 type
   TKExtStart = class
   private
-  class var
-    FServiceName: string;
-    FServiceDisplayName: string;
-    class procedure Configure;
+    class var FIsService: Boolean;
   public
-    class property ServiceName: string read FServiceName write FServiceName;
-    class property ServiceDisplayName: string read FServiceDisplayName write FServiceDisplayName;
     class procedure Start;
+
+    class property IsService: Boolean read FIsService;
   end;
 
 implementation
 
 uses
   SysUtils, Forms, Classes, SvcMgr, ShlObj, Themes, Styles,
-  EF.SysUtils, EF.Logger, EF.Localization,
+  EF.SysUtils, EF.Logger, EF.Localization, EF.Tree,
   Kitto.Config,
   Kitto.Ext.MainFormUnit, Kitto.Ext.Service;
 
 { TKExtStart }
 
-class procedure TKExtStart.Configure;
-var
-  LConfig: TKConfig;
-begin
-  LConfig := TKConfig.Create;
-  try
-    TEFLogger.Instance.Configure(LConfig.Config.FindNode('Log'), LConfig.MacroExpansionEngine);
-    FServiceName := TKConfig.AppName;
-    FServiceDisplayName := _(LConfig.AppTitle);
-  finally
-    FreeAndNil(LConfig);
-  end;
-end;
-
 class procedure TKExtStart.Start;
-begin
-  Configure;
 
-  if not FindCmdLineSwitch('a') then
+  procedure Configure;
+  var
+    LConfig: TKConfig;
+    LLogNode: TEFNode;
   begin
+    LConfig := TKConfig.Create;
+    try
+      LLogNode := LConfig.Config.FindNode('Log');
+      TEFLogger.Instance.Configure(LLogNode, LConfig.MacroExpansionEngine);
+      TEFLogger.Instance.Log(Format('Using configuration: %s',[LConfig.BaseConfigFileName]));
+    finally
+      FreeAndNil(LConfig);
+    end;
+  end;
+
+begin
+  FIsService := not FindCmdLineSwitch('a');
+  if FIsService then
+  begin
+    Configure;
     TEFLogger.Instance.Log('Starting as service.');
     if not SvcMgr.Application.DelayInitialize or SvcMgr.Application.Installing then
       SvcMgr.Application.Initialize;
     SvcMgr.Application.CreateForm(TKExtService, KExtService);
-    KExtService.Name := FServiceName;
-    KExtService.DisplayName := FServiceDisplayName;
     SvcMgr.Application.Run;
   end
   else
   begin
+    if FindCmdLineSwitch('c') then
+      TKConfig.BaseConfigFileName := ParamStr(3);
+    Configure;
     TEFLogger.Instance.Log('Starting as application.');
     Forms.Application.Initialize;
     Forms.Application.CreateForm(TKExtMainForm, KExtMainForm);
-	if FindCmdLineSwitch('c') then
-	begin
-	  try
-	    KExtMainForm.SetConfig(ParamStr(3));		// better test real position - now hammering it down
-	  finally
-	  end;
-	end;  
     Forms.Application.Run;
   end;
 end;

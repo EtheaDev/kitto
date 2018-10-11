@@ -542,7 +542,7 @@ begin
       LCommand.Params.ParamByName('EMAIL_ADDRESS').AsString := LEmailAddress;
       LCommand.Params.ParamByName('PASSWORD_HASH').AsString := LPasswordHash;
       if LCommand.Execute <> 1 then
-        raise EKError.Create(_('Error resetting password.'));
+        raise EKError.Create(_('Error: email address not found.'));
       AfterResetPassword(LCommand.Connection, AParams);
       LCommand.Connection.CommitTransaction;
     except

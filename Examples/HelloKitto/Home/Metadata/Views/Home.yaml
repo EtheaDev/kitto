@@ -1,6 +1,6 @@
-﻿DisplayLabel: %Config:AppTitle%
+﻿DisplayLabel: _(%Config:AppTitle%)
 # Valid top-level controllers are Window and Viewport
-Controller: Window
+Controller: Viewport
   Width: 1000
   Height: 600
 
