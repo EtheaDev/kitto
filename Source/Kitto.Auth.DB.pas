@@ -34,7 +34,7 @@ const
   DEFAULT_SETPASSWORDCOMMANDTEXT =
     'update KITTO_USERS set PASSWORD_HASH = :PASSWORD_HASH, MUST_CHANGE_PASSWORD = 0 where IS_ACTIVE = 1 and USER_NAME = :USER_NAME';
   DEFAULT_RESETPASSWORDCOMMANDTEXT =
-    'update KITTO_USERS set PASSWORD_HASH = :PASSWORD_HASH, MUST_CHANGE_PASSWORD = 1 where IS_ACTIVE = 1 and EMAIL_ADDRESS = :EMAIL_ADDRESS';
+    'update KITTO_USERS set PASSWORD_HASH = :PASSWORD_HASH, MUST_CHANGE_PASSWORD = 1 where IS_ACTIVE = 1 and EMAIL_ADDRESS = :EMAIL_ADDRESS AND USER_NAME = :USER_NAME';
 
 type
   /// <summary>User data read from the database. Used internally as a helper
@@ -512,6 +512,7 @@ end;
 
 procedure TKDBAuthenticator.ResetPassword(const AParams: TEFNode);
 var
+  LUserName: string;
   LEmailAddress: string;
   LPassword: string;
   LPasswordHash: string;
@@ -519,6 +520,10 @@ var
   LCommand: TEFDBCommand;
 begin
   Assert(Assigned(AParams));
+
+  LUserName := AParams.GetString('UserName');
+  if LUserName = '' then
+    raise Exception.Create(_('UserName not specified.'));
 
   LEmailAddress := AParams.GetString('EmailAddress');
   if LEmailAddress = '' then
@@ -539,10 +544,11 @@ begin
     LCommand.Connection.StartTransaction;
     try
       LCommand.CommandText := LCommandText;
+      LCommand.Params.ParamByName('USER_NAME').AsString := LUserName;
       LCommand.Params.ParamByName('EMAIL_ADDRESS').AsString := LEmailAddress;
       LCommand.Params.ParamByName('PASSWORD_HASH').AsString := LPasswordHash;
       if LCommand.Execute <> 1 then
-        raise EKError.Create(_('Error: email address not found.'));
+        raise EKError.Create(_('Error: user name and email address not found.'));
       AfterResetPassword(LCommand.Connection, AParams);
       LCommand.Connection.CommitTransaction;
     except

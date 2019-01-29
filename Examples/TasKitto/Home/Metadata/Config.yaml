@@ -42,12 +42,14 @@ Auth: TasKitto
     From: <support@kitto.org>
     Subject: Reset password required from %Config:AppTitle%
     Body: |
+      Hello #UserName#.
       You have requested a password reset. 
       The new temporary password you need to use the next time you log in is #TempPassword#.
       Best regards.
       
       The team of %Config:AppTitle%
     HTMLBody: |
+      <p>Hello <b>#UserName#</b>.<br>
       <p>You have requested a password reset.<br> 
       The new temporary password you need to use the next time you log in is <b>#TempPassword#</b>.<br>
       Best regards.</p>

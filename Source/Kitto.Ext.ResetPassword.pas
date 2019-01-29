@@ -30,6 +30,7 @@ type
   // Utility class uses in the reset password controllers.
   TKExtResetPasswordFormPanel = class(TExtFormFormPanel)
   private
+    FUserName: TExtFormTextField;
     FEmailAddress: TExtFormTextField;
     FSendButton: TKExtButton;
     FStatusBar: TKExtStatusBar;
@@ -76,7 +77,7 @@ begin
   Layout := lyFit;
   Title := Config.GetString('Title');
   Width := Config.GetInteger('Width', 600);
-  Height := Config.GetInteger('Height', 160);
+  Height := Config.GetInteger('Height', 190);
   PaddingString := Config.GetString('Padding', '0px');
   RenderTo := Config.GetString('ContainerElementId');
 
@@ -110,7 +111,7 @@ begin
   Result := Format(
     // For some reason != does not survive rendering.
     'if (e.getKey() == 13 && !(%s.getValue() == "")) %s.handler.call(%s.scope, %s);',
-    [FEmailAddress.JSName, FSendButton.JSName, FSendButton.JSName, FSendButton.JSName]);
+    [FUserName.JSName, FEmailAddress.JSName, FSendButton.JSName, FSendButton.JSName, FSendButton.JSName]);
 end;
 
 procedure TKExtResetPasswordFormPanel.Display(const AEditWidth: Integer; const AConfig: TEFNode;
@@ -130,6 +131,15 @@ begin
   with TExtBoxComponent.CreateAndAddTo(Items) do
     Height := 10;
 
+  FUserName := TExtFormTextField.CreateAndAddTo(Items);
+  FUserName.Name := 'UserName';
+  FUserName.FieldLabel := _('User Name');
+  FUserName.AllowBlank := False;
+  FUserName.EnableKeyEvents := True;
+  FUserName.SelectOnFocus := True;
+  FUserName.Width := AEditWidth;
+  Inc(ACurrentHeight, CONTROL_HEIGHT);
+
   FEmailAddress := TExtFormTextField.CreateAndAddTo(Items);
   FEmailAddress.Name := 'EmailAddress';
   FEmailAddress.FieldLabel := _('Email address');
@@ -139,6 +149,7 @@ begin
   FEmailAddress.Width := AEditWidth;
   Inc(ACurrentHeight, CONTROL_HEIGHT);
 
+  FUserName.On('specialkey', JSFunction('field, e', GetSubmitJS));
   FEmailAddress.On('specialkey', JSFunction('field, e', GetSubmitJS));
 
   Session.ResponseItems.ExecuteJSCode(Self, Format(
@@ -147,9 +158,9 @@ begin
     '  interval: 500});', [JSName]));
   On('beforedestroy', JSFunction(Format('Ext.TaskMgr.stop(%s.enableTask);', [JSName])));
 
-  FSendButton.Handler := Ajax(DoSend, ['Dummy', FStatusBar.ShowBusy, 'EmailAddress', FEmailAddress.GetValue]);
+  FSendButton.Handler := Ajax(DoSend, ['Dummy', FStatusBar.ShowBusy, 'UserName', FUserName.GetValue, 'EmailAddress', FEmailAddress.GetValue]);
   FSendButton.Disabled := (FEmailAddress.Value = '');
-  FEmailAddress.Focus(False, 750);
+  FUserName.Focus(False, 750);
 end;
 
 procedure TKExtResetPasswordFormPanel.InitDefaults;
@@ -168,6 +179,7 @@ var
 begin
   LParams := TEFNode.Create;
   try
+    LParams.SetString('UserName', Session.Query['UserName']);
     LParams.SetString('EmailAddress', Session.Query['EmailAddress']);
     try
       Session.Config.Authenticator.ResetPassword(LParams);

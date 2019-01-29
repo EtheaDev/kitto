@@ -43,7 +43,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; Application files
 Source: "..\Home\Taskitto.exe"; DestDir: "{app}\Home"; Flags: ignoreversion
 Source: "..\Home\*.cmd"; DestDir: "{app}\Home"; Flags: ignoreversion
-Source: "..\Home\Locale\*"; DestDir: "{app}\Home\Locale"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\Home\Metadata\Models\*"; DestDir: "{app}\Home\Metadata\Models"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\Home\Metadata\Views\*"; DestDir: "{app}\Home\Metadata\Views"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\Home\ReportTemplates\*"; DestDir: "{app}\Home\ReportTemplates"; Flags: ignoreversion recursesubdirs createallsubdirs

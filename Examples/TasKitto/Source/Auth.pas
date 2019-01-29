@@ -12,7 +12,7 @@ uses
 type
   TTasKittoAuthenticator = class(TKDBAuthenticator)
   strict private
-    procedure SendResetPasswordEmail(const AEmailAddress, APassword: string);
+    procedure SendResetPasswordEmail(const AUserName, AEmailAddress, APassword: string);
   protected
     procedure SetPassword(const AValue: string); override;
     procedure BeforeResetPassword(const AParams: TEFNode); override;
@@ -28,7 +28,7 @@ uses
 { TTasKittoAuth }
 
 
-procedure TTasKittoAuthenticator.SendResetPasswordEmail(const AEmailAddress, APassword: string);
+procedure TTasKittoAuthenticator.SendResetPasswordEmail(const AUserName, AEmailAddress, APassword: string);
 var
   LSMTP: TIdSMTP;
   LIdSSLIOHandler: TIdSSLIOHandlerSocketOpenSSL;
@@ -65,7 +65,7 @@ begin
     //For this demo, if the SMTP parameters are not configured we just log it.
     if LSMTP.Host = '' then
     begin
-      TEFLogger.Instance.Log(Format(_('Password generated: %s'), [APassword]));
+      TEFLogger.Instance.Log(Format(_('Password generated for user %s: %s'), [AUserName, APassword]));
       Exit;
     end;
 
@@ -95,6 +95,8 @@ begin
 
       // Body in Text
       LBody := LMessageNode.GetExpandedString('Body');
+      // Substitute Template #UserName#
+      LBody := StringReplace(LBody, '#UserName#', AUserName, [rfReplaceAll]);
       // Substitute Template #TempPassword#
       LBody := StringReplace(LBody, '#TempPassword#', APassword, [rfReplaceAll]);
 
@@ -102,6 +104,8 @@ begin
       LHTMLBody := LMessageNode.GetExpandedString('HTMLBody');
       if LHTMLBody <> '' then
       begin
+        // Substitute Template #UserName#
+        LHTMLBody := StringReplace(LHTMLBody, '#UserName#', AUserName, [rfReplaceAll]);
         // Substitute Template #TempPassword#
         LHTMLBody := StringReplace(LHTMLBody, '#TempPassword#', APassword, [rfReplaceAll]);
         // HTML body present.
@@ -142,11 +146,16 @@ begin
 end;
 
 procedure TTasKittoAuthenticator.BeforeResetPassword(const AParams: TEFNode);
+var
+  LUserName, LEmailAddress, LPassword: string;
 begin
   // We should send the generated password to the user here.
   // AParams contains the nodes EmailAddress and Password.
   // configure Email parameters in config and ResetMailMessage Node
-  SendResetPasswordEmail(AParams.GetString('EmailAddress'), AParams.GetString('Password'));
+  LUserName := AParams.GetString('UserName');
+  LEmailAddress := AParams.GetString('EmailAddress');
+  LPassword := AParams.GetString('Password');
+  SendResetPasswordEmail(LUserName, LEmailAddress, LPassword);
 end;
 
 procedure TTasKittoAuthenticator.SetPassword(const AValue: string);
