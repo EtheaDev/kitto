@@ -776,7 +776,7 @@ end;
 procedure TEFEnvironmentVariableMacroExpander.InternalExpand(var AString: string);
 begin
   inherited InternalExpand(AString);
-  AString := ExpandEnvironmentVariables(AString);
+  ExpandEnvironmentVariables(AString);
 end;
 
 { TEFCmdLineParamMacroExpander }
