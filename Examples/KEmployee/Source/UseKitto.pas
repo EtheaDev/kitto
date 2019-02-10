@@ -3,6 +3,7 @@ unit UseKitto;
 interface
 
 uses
+  DBXFirebird,
   EF.DB.ADO,
   EF.DB.DBX,
   //EF.DB.FD,
