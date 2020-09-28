@@ -146,7 +146,7 @@ function TKExtCalendarPanel.GetSelectConfirmCall(const AMessage: string;
   const AMethod: TExtProcedure): string;
 begin
   Result := Format('selectCalendarConfirmCall("%s", "%s", %s, "%s", {methodURL: "%s", calendarPanel: %s, fieldNames: "%s"});',
-    [_(Session.Config.AppTitle), AMessage, FCalendarPanel.JSName, ViewTable.Model.CaptionField.FieldName, MethodURI(AMethod),
+    [_('Confirm operation'), AMessage, FCalendarPanel.JSName, ViewTable.Model.CaptionField.FieldName, MethodURI(AMethod),
     FCalendarPanel.JSName, Join(ViewTable.GetKeyFieldAliasedNames, ',')]);
 end;
 

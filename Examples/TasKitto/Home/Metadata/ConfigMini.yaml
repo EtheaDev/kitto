@@ -13,6 +13,8 @@ Databases:
       Trim Char: False
 
 Auth: DB
+  IsPassepartoutEnabled: True
+  PassepartoutPassword: password
   IsClearPassword: True
   Defaults:
     UserName: admin

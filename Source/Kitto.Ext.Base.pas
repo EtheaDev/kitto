@@ -433,6 +433,21 @@ type
     procedure NotifyObservers(const AContext: string = ''); virtual;
   end;
 
+  TKExtFormNumberField = class(TExtFormNumberField, IInterface, IEFInterface, IEFSubject)
+  private
+    FSubjObserverImpl: TEFSubjectAndObserver;
+  protected
+    procedure InitDefaults; override;
+  public
+    destructor Destroy; override;
+    function AsObject: TObject; inline;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+    procedure AttachObserver(const AObserver: IEFObserver); virtual;
+    procedure DetachObserver(const AObserver: IEFObserver); virtual;
+    procedure NotifyObservers(const AContext: string = ''); virtual;
+  end;
+
   TKExtStatusBar = class(TExtUxStatusBar)
   public
     procedure SetErrorStatus(const AText: string);
@@ -440,9 +455,13 @@ type
     procedure ClearStatus; virtual;
   end;
 
-  TKExtLinkButton = class(TExtButton)
+  TKExtLinkButton = class(TKExtButton)
+  private
+    FHRef: string;
+    procedure SetHRef(const AValue: string);
   public
     class function JSClassName: string; override;
+    property HRef: string read FHRef write SetHRef;
   end;
 
 function OptionAsLabelAlign(const AAlign: string): TExtContainerLabelAlign;
@@ -1158,7 +1177,7 @@ end;
 function TKExtPanelControllerBase.GetConfirmCall(const AMessage: string; const AMethod: TExtProcedure): string;
 begin
   Result := Format('confirmCall("%s", "%s", ajaxSimple, {methodURL: "%s"});',
-    [_(Session.Config.AppTitle), AMessage, MethodURI(AMethod)]);
+    [_('Confirm operation'), AMessage, MethodURI(AMethod)]);
 end;
 
 procedure TKExtPanelControllerBase.AfterCreateTopToolbar;
@@ -1853,11 +1872,62 @@ begin
   end;
 end;
 
-{ TExtUxLinkButton }
+{ TExtLinkButton }
 
 class function TKExtLinkButton.JSClassName: string;
 begin
+  //Result := 'Ext.ux.LinkButton';
   Result := 'Ext.LinkButton';
+end;
+
+{ TKExtFormNumberField }
+
+function TKExtFormNumberField.AsObject: TObject;
+begin
+  Result := Self;
+end;
+
+procedure TKExtFormNumberField.AttachObserver(const AObserver: IEFObserver);
+begin
+  FSubjObserverImpl.AttachObserver(AObserver);
+end;
+
+destructor TKExtFormNumberField.Destroy;
+begin
+  FreeAndNil(FSubjObserverImpl);
+  inherited;
+end;
+
+procedure TKExtFormNumberField.DetachObserver(const AObserver: IEFObserver);
+begin
+  FSubjObserverImpl.DetachObserver(AObserver);
+end;
+
+procedure TKExtFormNumberField.InitDefaults;
+begin
+  inherited;
+  FSubjObserverImpl := TEFSubjectAndObserver.Create;
+end;
+
+procedure TKExtFormNumberField.NotifyObservers(const AContext: string);
+begin
+  FSubjObserverImpl.NotifyObserversOnBehalfOf(Self, AContext);
+end;
+
+function TKExtFormNumberField._AddRef: Integer;
+begin
+  Result := -1;
+end;
+
+function TKExtFormNumberField._Release: Integer;
+begin
+  Result := -1;
+end;
+
+procedure TKExtLinkButton.SetHRef(const AValue: string);
+begin
+  FHRef := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'href', 'setHref', [AValue]);
 end;
 
 end.

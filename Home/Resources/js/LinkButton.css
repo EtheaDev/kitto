@@ -1,0 +1,7 @@
+a.x-linkbutton-default,
+a.x-linkbutton-default:visited {
+    color:#00A;
+}
+a.x-linkbutton-default:hover {
+    text-decoration:underline;
+}

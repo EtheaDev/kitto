@@ -517,7 +517,8 @@ end;
 
 procedure TKExtForceCamelCaps.SetEventListener(const AField: TExtFormTextField);
 begin
-  AField.On('change', AField.JSFunction('f, newValue, oldValue', 'f.setValuePreservingCaretPos(newValue.capitalize());'));
+  // Filter control characters - don't use >= as it's not rendered correctly.
+  AField.On('keyup', AField.JSFunction('f, e', 'if (e.getCharCode() > 31) f.setValuePreservingCaretPos(f.getRawValue().capitalize());'));
 end;
 
 initialization

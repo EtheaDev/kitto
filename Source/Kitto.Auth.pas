@@ -120,7 +120,7 @@ type
     property AuthData: TEFNode read FAuthData;
 
     /// <summary>Clears AuthData and turns off IsAuthenticated.</summary>
-    procedure Logout;
+    procedure Logout; virtual;
 
     /// <summary>A unique identifier for the currently logged in user. The
     /// value depends on the particular descendant. By default, it's
@@ -152,7 +152,7 @@ type
     ///  Override this method to implement an application-defined scheme, such
     ///  as generating a random password and emailing it to the user.
     ///  The specified params depend on the calling controller.
-    ///  A standard controller might specify the user name (UserName) or
+    ///  A standard controller might specify the user name (UserName) and
     ///  email address (EmailAddress) to which the generated password should be sent.
     /// </summary>
     procedure ResetPassword(const AParams: TEFNode); virtual; abstract;
@@ -161,6 +161,8 @@ type
     ///   Access to the authenticator macro expander, that expands auth data.
     /// </summary>
     property MacroExpander: TEFMacroExpander read FMacroExpander;
+  public
+    function CanBypassURLParam(const AParamName: string): Boolean; virtual;
   end;
   TKAuthenticatorClass = class of TKAuthenticator;
 
@@ -176,7 +178,8 @@ type
     procedure InternalDefineAuthData(const AAuthData: TEFNode); override;
     function GetUserName: string; override;
     function GetPassword: string; override;
-    procedure SetPassword(const AValue: string); override;
+  public
+    function CanBypassURLParam(const AParamName: string): Boolean; override;
   end;
 
   /// <summary>The Null authenticator does not require authentication data and
@@ -338,6 +341,12 @@ procedure TKAuthenticator.InternalBeforeAuthenticate(const AAuthData: TEFNode);
 begin
 end;
 
+function TKAuthenticator.CanBypassURLParam(const AParamName: string): Boolean;
+begin
+  //No URL param is protected: Session can pass it to login
+  Result := False;
+end;
+
 procedure TKAuthenticator.Logout;
 begin
   ClearAuthData;
@@ -404,9 +413,12 @@ begin
   AAuthData.SetString('Language', '');
 end;
 
-procedure TKClassicAuthenticator.SetPassword(const AValue: string);
+function TKClassicAuthenticator.CanBypassURLParam(
+  const AParamName: string): Boolean;
 begin
-  inherited;
+  //No UserName and Password params are protected: Session cannot pass it to login
+  Result := not SameText(AParamName, 'UserName') and
+    not SameText(AParamName, 'Password');
 end;
 
 initialization

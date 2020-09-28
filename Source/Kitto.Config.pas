@@ -70,6 +70,7 @@ type
     class procedure SetAppHomePath(const AValue: string); static;
     class function GetSystemHomePath: string; static;
     class procedure SetSystemHomePath(const AValue: string); static;
+    class function GetDatabase: TEFDBConnection; static;
 
     function GetDBConnectionNames: TStringDynArray;
     function GetMultiFieldSeparator: string;
@@ -90,9 +91,11 @@ type
     class function AdaptImageName(const AResourceName: string; const ASuffix: string = ''): string;
     function GetDefaultDBConnection: TEFDBConnection;
   strict protected
+    function GetUploadPath: string;
     function GetConfigFileName: string; override;
     class function FindSystemHomePath: string;
   public
+    class procedure DestroyInstance;
     procedure AfterConstruction; override;
     destructor Destroy; override;
     class constructor Create;
@@ -171,6 +174,11 @@ type
     class property Instance: TKConfig read GetInstance;
 
     /// <summary>
+    ///   Returns the database instance.
+    /// </summary>
+    class property Database: TEFDBConnection read GetDatabase;
+
+    /// <summary>
     ///   Returns the URL for the specified resource, based on the first
     ///   existing file in the ordered list of resource folders. If no existing
     ///   file is found, an exception is raised.
@@ -214,6 +222,11 @@ type
 
     function FindImageURL(const AResourceName: string; const ASuffix: string = ''): string;
     function GetImageURL(const AResourceName: string; const ASuffix: string = ''): string;
+
+    /// <summary>Returns informations about Help support for the application:
+    /// AHRef, AHrefStyle, AHrefCaption.</summary>
+    procedure GetHelpSupport(out AShowLink: Boolean;
+      out AHRef, AHrefStyle, AShortText, ALongText: string);
 
     /// <summary>A reference to the model catalog, opened on first
     /// access.</summary>
@@ -292,6 +305,11 @@ type
     ///   <para>Returns or changes the home path for FOP engine.</para>
     /// </summary>
     property FOPEnginePath: string read GetFOPEnginePath;
+
+    /// <summary>
+    ///   <para>Returns or changes the Upload path accessible via %UPLOAD_PATH% macro.</para>
+    /// </summary>
+    property UploadPath: string read GetUploadPath;
   end;
 
   /// <summary>
@@ -469,6 +487,16 @@ begin
   Result := Config.GetExpandedString('FOPEnginePath');
 end;
 
+procedure TKConfig.GetHelpSupport(out AShowLink: Boolean;
+  out AHRef, AHrefStyle, AShortText, ALongText: string);
+begin
+  AHRef := Config.GetExpandedString('Defaults/Help/HRef','');
+  AHrefStyle := Config.GetExpandedString('Defaults/Help/HrefStyle','font-size: small');
+  AShortText := Config.GetExpandedString('Defaults/Help/ShortText',_('Help...'));
+  ALongText := Config.GetExpandedString('Defaults/Help/LongText',_('Help guide for "%s"...'));
+  AShowLink := AHRef <> '';
+end;
+
 function TKConfig.GetHomeURL: string;
 begin
   Result := Config.GetString('HomeUrl', LowerCase(Format('http://localhost/kitto/%s', [Self.AppName])));
@@ -595,6 +623,11 @@ begin
   else
     Result := FindSystemHomePath;
   Result := IncludeTrailingPathDelimiter(Result);
+end;
+
+function TKConfig.GetUploadPath: string;
+begin
+  Result := Config.GetExpandedString('UploadPath');
 end;
 
 function TKConfig.GetViews: TKViews;
@@ -766,6 +799,11 @@ begin
   end;
 end;
 
+class function TKConfig.GetDatabase: TEFDBConnection;
+begin
+  Result := TKConfig.Instance.DBConnections[TKConfig.Instance.DatabaseName];
+end;
+
 function TKConfig.GetLanguagePerSession: Boolean;
 begin
   Result := Config.GetBoolean('LanguagePerSession', False);
@@ -840,6 +878,12 @@ begin
   end;
 end;
 
+class procedure TKConfig.DestroyInstance;
+begin
+  FreeAndNil(FResourcePathsURLs);
+  FreeAndNil(FInstance);
+end;
+
 { TKConfigMacroExpander }
 
 constructor TKConfigMacroExpander.Create(const AConfig: TKConfig);
@@ -854,6 +898,7 @@ procedure TKConfigMacroExpander.InternalExpand(var AString: string);
 const
   IMAGE_MACRO_HEAD = '%IMAGE(';
   MACRO_TAIL = ')%';
+  UPLOAD_PATH = '%UPLOAD_PATH%';
 var
   LPosHead: Integer;
   LPosTail: Integer;
@@ -863,6 +908,8 @@ var
 begin
   inherited InternalExpand(AString);
   ExpandMacros(AString, '%HOME_PATH%', TKConfig.AppHomePath);
+  if Pos(UPLOAD_PATH, AString) > 0 then
+    ExpandMacros(AString, UPLOAD_PATH, IncludeTrailingPathDelimiter(Config.UploadPath));
 
   LPosHead := Pos(IMAGE_MACRO_HEAD, AString);
   if LPosHead > 0 then

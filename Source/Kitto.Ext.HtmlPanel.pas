@@ -52,7 +52,12 @@ begin
     if Assigned(LView) then
       Title := _(LView.DisplayLabel);
   end;
-  AutoScroll := False;
+  AutoScroll := Config.GetBoolean('AutoScroll', False);
+  Frame := Config.GetBoolean('Frame', False);
+  Collapsible := Config.GetBoolean('Collapsible', False);
+  Collapsed := Config.GetBoolean('Collapsed', False);
+  if Collapsible then
+    Header := True;
 
   LFileName := Config.GetExpandedString('FileName');
   if LFileName <> '' then

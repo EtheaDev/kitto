@@ -271,6 +271,28 @@ type
     function GetEditItemId: string;
   end;
 
+  TKExtFormHTMLEditor = class(TExtFormHTMLEditor, IKExtEditItem, IKExtEditor)
+  private
+    FFieldName: string;
+    FRecordField: TKViewTableField;
+    procedure FieldChange(This: TExtFormField; NewValue, OldValue: string);
+  public
+    function AsObject: TObject; inline;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+    procedure SetOption(const ANode: TEFNode);
+    function AsExtObject: TExtObject; inline;
+    function AsExtFormField: TExtFormField; inline;
+    function GetRecordField: TKViewTableField;
+    procedure SetRecordField(const AValue: TKViewTableField);
+    function GetFieldName: string;
+    procedure SetFieldName(const AValue: string);
+    procedure RefreshValue;
+    procedure StoreValue(const AObjectName: string);
+    procedure SetTransientProperty(const APropertyName: string; const AValue: Variant);
+    function GetEditItemId: string;
+  end;
+
   TKExtFormTextArea = class(TExtFormTextArea, IKExtEditItem, IKExtEditor)
   private
     FFieldName: string;
@@ -726,6 +748,9 @@ type
     function TryCreateFileEditor(const AOwner: TComponent; const AViewField: TKViewField;
       const ARowField: TKExtFormRowField; const AFieldCharWidth: Integer;
       const AIsReadOnly: Boolean; const ALabel: string): IKExtEditor;
+    function TryCreateHtmlEditor(const AOwner: TComponent; const AViewField: TKViewField;
+      const ARowField: TKExtFormRowField; const AFieldCharWidth: Integer;
+      const AIsReadOnly: Boolean): IKExtEditor;
     function CreateTextField(const AOwner: TComponent; const AViewField: TKViewField;
       const ARowField: TKExtFormRowField; const AFieldCharWidth: Integer;
       const AIsReadOnly: Boolean): IKExtEditor;
@@ -773,7 +798,7 @@ uses
   EF.DB, EF.Macros, EF.VariantUtils,
   Kitto.Config, Kitto.SQL, Kitto.Metadata, Kitto.Metadata.Models, Kitto.Types,
   Kitto.AccessControl, Kitto.Rules, Kitto.Ext.Form,
-  Kitto.Ext.Utils, Kitto.Ext.Rules;
+  Kitto.Ext.Utils, Kitto.Ext.Rules, Kitto.Ext.Graphics;
 
 procedure InvalidOption(const ANode: TEFNode);
 begin
@@ -830,34 +855,34 @@ end;
 
 function IsChangeHandlerNeeded(const AViewTableField: TKViewTableField): Boolean;
 begin
-  { This method optimize some callbacks but reduce performances drammatically,
-    so it was removed! }
-  Result := True;
-  Exit;
-  { TODO : Consider dependencies such as field names used in layout elements
-    (such as field set titles). In order to do that, build a dependency list/tree.
-  if AViewTableField.ViewField.FileNameField <> '' then
-    // Uploads always need the change handler.
-    Result := True
-  else if AViewTableField.ViewField.DerivedFieldsExist then
-    // Derived fields must be updated when source field changes.
-    Result := True
-  else if AViewTableField.ViewField.HasServerSideRules then
-    // Server-side rules need the change handler in order to be applied.
-    Result := True
-  else if AViewTableField.ViewField.GetBoolean('NotifyChange') then
-    // Temporary, for cases not handled by this detector and setup manually.
-    Result := True
-  else if Length(AViewTableField.ViewField.Table.GetFilterByFields(
-      function (AFilterByViewField: TKFilterByViewField): Boolean
-      begin
-        Result := AFilterByViewField.SourceField = AViewTableField.ViewField;
-      end)) > 0 then
-    // If any fields are filtered by this field, then the change must be notified.
+  if Session.Config.Config.GetBoolean('Defaults/AlwaysNotifyChange', True) then
     Result := True
   else
-    Result := False;
-  }
+  begin
+    { TODO : Consider dependencies such as field names used in layout elements
+      (such as field set titles). In order to do that, build a dependency list/tree.}
+    if AViewTableField.ViewField.FileNameField <> '' then
+      // Uploads always need the change handler.
+      Result := True
+    else if AViewTableField.ViewField.DerivedFieldsExist then
+      // Derived fields must be updated when source field changes.
+      Result := True
+    else if AViewTableField.ViewField.HasRules then
+      // Server-side rules need the change handler in order to be applied.
+      Result := True
+    else if AViewTableField.ViewField.GetBoolean('NotifyChange') then
+      // Temporary, for cases not handled by this detector and setup manually.
+      Result := AViewTableField.ViewField.GetBoolean('NotifyChange')
+    else if Length(AViewTableField.ViewField.Table.GetFilterByFields(
+        function (AFilterByViewField: TKFilterByViewField): Boolean
+        begin
+          Result := AFilterByViewField.SourceField = AViewTableField.ViewField;
+        end)) > 0 then
+      // If any fields are filtered by this field, then the change must be notified.
+      Result := True
+    else
+      Result := False;
+  end;
 end;
 
 procedure InvalidTransientProperty(APropertyName: string; const AValue: Variant);
@@ -871,6 +896,8 @@ begin
     AComponent.SetVisible(AValue)
   else if SameText(APropertyName, 'Enabled') then
     AComponent.SetDisabled(not AValue)
+  else if SameText(APropertyName, 'CharWidth') then
+    AComponent.SetWidth(AComponent.CharsToPixels(AValue))
   else
     InvalidTransientProperty(APropertyName, AValue);
 end;
@@ -882,7 +909,7 @@ begin
   raise EEFError.CreateFmt(_('Layout parsing error. %s.'), [AErrorMessage]);
 end;
 
-procedure TKExtLayoutProcessor.InitLabelAlignAndWidth(const ANode: TEfTree);
+procedure TKExtLayoutProcessor.InitLabelAlignAndWidth(const ANode: TEFTree);
 var
   LNode: TEFNode;
 begin
@@ -998,7 +1025,7 @@ begin
     if Supports(FCurrentEditItem, IKExtEditContainer, LIntf) then
       FEditContainers.Push(LIntf);
   end
-  else if SameText(LNodeName, 'DisplayLabel') then
+  else if SameText(LNodeName, 'DisplayLabel') or SameText(LNodeName, 'HideLabel')  then
     // DisplayLabel is handled earlier by CreateEditItem, so we just ignore it here.
     Exit
   // Unknown name - must be an option.
@@ -1015,7 +1042,7 @@ begin
       FCurrentEditItem.SetOption(ANode);
   end;
 
-  if (FCurrentEditItem is TKExtFormRowField) then
+  if FCurrentEditItem is TKExtFormRowField then
   begin
     TKExtFormRowField(FCurrentEditItem).LabelAlign := FCurrentLabelAlign;
     if (FCurrentLabelAlign <> laTop) then
@@ -1117,6 +1144,7 @@ var
   LFieldCharWidth: Integer;
   LIsReadOnly: Boolean;
   LLabel: string;
+  LHideLabel: Boolean;
   LEmptyText: string;
   LViewField: TKViewField;
   LRowField: TKExtFormRowField;
@@ -1152,13 +1180,18 @@ begin
     LIsReadOnly := True;
 
   LLabel := '';
+  LHideLabel := False;
   if Assigned(AOptions) then
   begin
     LLabel := _(AOptions.GetString('DisplayLabel'));
     LEmptyText := _(AOptions.GetString('Hint'));
+    LHideLabel := AOptions.GetBoolean('HideLabel', False);
   end;
-  if LLabel = '' then
-    LLabel := _(LViewField.DisplayLabel);
+  if not LHideLabel then
+  begin
+    if (LLabel = '') then
+      LLabel := _(LViewField.DisplayLabel);
+  end;
   if LEmptyText = '' then
     LEmptyText := _(LViewField.Hint);
 
@@ -1179,12 +1212,18 @@ begin
 
   Result.SetRecordField(LRecordField);
 
+  if Result is TKExtFormFileEditor then
+  begin
+    if FDefaults.LabelSeparator <> DEFAULT_LABEL_SEPARATOR then
+      TKExtFormFileEditor(Result).LabelSeparator := FDefaults.LabelSeparator;
+  end;
+
   LFormField := Result.AsExtFormField;
   if Assigned(LFormField) then
   begin
     if FCurrentEditPage.HideLabels and (LEmptyText = '') then
       LEmptyText := LLabel;
-    if not LIsReadOnly and LViewField.IsRequired then
+    if not LIsReadOnly and LViewField.IsRequired and not LHideLabel then
       LLabel := ReplaceText(FDefaults.RequiredLabelTemplate, '{label}', LLabel);
     LFormField.FieldLabel := LLabel;
     if FDefaults.LabelSeparator <> DEFAULT_LABEL_SEPARATOR then
@@ -1542,6 +1581,10 @@ begin
   end
   else if SameText(ANode.Name, 'Title') then
     UnexpandedTitle := _(ANode.AsExpandedString)
+
+  else
+  if SameText(ANode.Name, 'TitleField') then
+    UnexpandedTitle := _(DataRecord.ViewTable.FieldByAliasedName(ANode.AsExpandedString).AsString)
   else
     InvalidOption(ANode);
 end;
@@ -1681,7 +1724,8 @@ begin
   AsExtFormField.StoreValue(AObjectName);
 end;
 
-procedure TKExtFormTextField.FieldChange(This: TExtFormField; NewValue: string; OldValue: string);
+procedure TKExtFormTextField.FieldChange(This: TExtFormField; NewValue: string;
+  OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
 end;
@@ -1707,6 +1751,91 @@ begin
   Result := -1;
 end;
 
+{ TKExtFormHTMLEditor }
+
+function TKExtFormHTMLEditor.AsExtFormField: TExtFormField;
+begin
+  Result := Self;
+end;
+
+function TKExtFormHTMLEditor.AsExtObject: TExtObject;
+begin
+  Result := Self;
+end;
+
+function TKExtFormHTMLEditor.AsObject: TObject;
+begin
+  Result := Self;
+end;
+
+procedure TKExtFormHTMLEditor.FieldChange(This: TExtFormField; NewValue, OldValue: string);
+begin
+  FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
+end;
+
+function TKExtFormHTMLEditor.GetFieldName: string;
+begin
+  Result := FFieldName;
+end;
+
+function TKExtFormHTMLEditor.GetEditItemId: string;
+begin
+  Result := FRecordField.FieldName;
+end;
+
+function TKExtFormHTMLEditor.GetRecordField: TKViewTableField;
+begin
+  Result := FRecordField;
+end;
+
+procedure TKExtFormHTMLEditor.RefreshValue;
+begin
+  SetValue(JSONNullToEmptyStr(FRecordField.GetAsJSONValue(False, False)));
+end;
+
+procedure TKExtFormHTMLEditor.SetRecordField(const AValue: TKViewTableField);
+begin
+  FRecordField := AValue;
+  if not ReadOnly and IsChangeHandlerNeeded(FRecordField) then
+    OnChange := FieldChange;
+end;
+
+procedure TKExtFormHTMLEditor.SetTransientProperty(const APropertyName: string; const AValue: Variant);
+begin
+  AsExtFormField.SetTransientProperty(APropertyName, AValue);
+end;
+
+procedure TKExtFormHTMLEditor.StoreValue(const AObjectName: string);
+begin
+  AsExtFormField.StoreValue(AObjectName);
+end;
+
+procedure TKExtFormHTMLEditor.SetFieldName(const AValue: string);
+begin
+  FFieldName := AValue;
+end;
+
+procedure TKExtFormHTMLEditor.SetOption(const ANode: TEFNode);
+begin
+  if not SetExtFormFieldOption(AsExtFormField, ANode) then
+  begin
+    if SameText(ANode.Name, 'Lines') then
+      Height := LinesToPixels(ANode.AsInteger)
+    else
+      InvalidOption(ANode);
+  end;
+end;
+
+function TKExtFormHTMLEditor._AddRef: Integer;
+begin
+  Result := -1;
+end;
+
+function TKExtFormHTMLEditor._Release: Integer;
+begin
+  Result := -1;
+end;
+
 { TKExtFormTextArea }
 
 function TKExtFormTextArea.AsExtFormField: TExtFormField;
@@ -1724,7 +1853,8 @@ begin
   Result := Self;
 end;
 
-procedure TKExtFormTextArea.FieldChange(This: TExtFormField; NewValue, OldValue: string);
+procedure TKExtFormTextArea.FieldChange(This: TExtFormField; NewValue,
+  OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
 end;
@@ -1809,7 +1939,8 @@ begin
   Result := Self;
 end;
 
-procedure TKExtFormCheckbox.FieldChange(This: TExtFormField; NewValue, OldValue: string);
+procedure TKExtFormCheckbox.FieldChange(This: TExtFormField; NewValue,
+  OldValue: string);
 begin
   FRecordField.SetAsJSONValue(NewValue, False, Session.Config.UserFormatSettings);
 end;
@@ -2956,6 +3087,7 @@ var
   LToolbar: TKExtToolbar;
   LButtonCount: Integer;
   LIsPicture: Boolean;
+  LPreventDownload: Boolean;
 begin
   Layout := lyForm;
 
@@ -2964,6 +3096,7 @@ begin
   LPanel := TExtPanel.CreateAndAddTo(Items);
   FImageWidth := AViewField.GetInteger('IsPicture/Thumbnail/Width', 100);
   FImageHeight := AViewField.GetInteger('IsPicture/Thumbnail/Height', 100);
+  LPreventDownload := AViewField.GetBoolean('IsPicture/PreventDownload', False);
 
   if LIsPicture then
   begin
@@ -2990,12 +3123,17 @@ begin
 
   LToolbar.Style := 'background: none; border: none;';
 
-  FDownloadButton := TKExtButton.CreateAndAddTo(LToolbar.Items);
-  FDownloadButton.SetIconAndScale('download', Config.GetString('ButtonScale', 'small'));
-  FDownloadButton.Tooltip := _('Download file');
-  FDownloadButton.Handler := Ajax(StartDownload);
+  if not LPreventDownload then
+  begin
+    FDownloadButton := TKExtButton.CreateAndAddTo(LToolbar.Items);
+    FDownloadButton.SetIconAndScale('download', Config.GetString('ButtonScale', 'small'));
+    FDownloadButton.Tooltip := _('Download file');
+    FDownloadButton.Handler := Ajax(StartDownload);
+    LButtonCount := 1;
+  end
+  else
+    LButtonCount := 0;
 
-  LButtonCount := 1;
   if not FIsReadOnly then
   begin
     LUploadButton := TKExtButton.CreateAndAddTo(LToolbar.Items);
@@ -3014,8 +3152,8 @@ begin
     FClearButton := nil;
 
   if Assigned(FDescriptionField) then
-    // Keep 3 characters per button, leave the rest to the text field.
-    FDescriptionField.Width := CharsToPixels(FTotalCharWidth - (3 * LButtonCount))
+    // Keep 4 characters per button, leave the rest to the text field.
+    FDescriptionField.Width := CharsToPixels(FTotalCharWidth - (4 * LButtonCount))
   else if Assigned(FPictureView) then
   begin
     if FPictureView.Frame then
@@ -3073,7 +3211,8 @@ begin
     FDescriptionField.Value := GetContentDescription;
   if AUpdatePicture and Assigned(FPictureView) then
     PictureViewAfterRender(FPictureView);
-  FDownloadButton.SetDisabled(LIsEmpty);
+  if Assigned(FDownloadButton) then
+    FDownloadButton.SetDisabled(LIsEmpty);
   if Assigned(FClearButton) then
     FClearButton.SetDisabled(LIsEmpty);
 end;
@@ -3463,6 +3602,8 @@ begin
   if Result = nil then
     Result := TryCreateComboBox(AOwner, AViewField, ARowField, AFieldCharWidth, AIsReadOnly);
   if Result = nil then
+    Result := TryCreateHtmlEditor(AOwner, AViewField, ARowField, AFieldCharWidth, AIsReadOnly);
+  if Result = nil then
     Result := TryCreateTextArea(AOwner, AViewField, ARowField, AFieldCharWidth, AIsReadOnly);
   if Result = nil then
     Result := TryCreateCheckBox(AOwner, AViewField, AIsReadOnly);
@@ -3771,6 +3912,44 @@ begin
       LFileEditor.Free;
       raise;
     end;
+  end
+  else
+    Result := nil;
+end;
+
+function TKExtEditorManager.TryCreateHtmlEditor(
+  const AOwner: TComponent; const AViewField: TKViewField;
+  const ARowField: TKExtFormRowField; const AFieldCharWidth: Integer;
+  const AIsReadOnly: Boolean): IKExtEditor;
+var
+  LFormHTMLEditor: TKExtFormHTMLEditor;
+begin
+  Assert(Assigned(AOwner));
+
+  if (AViewField.DataType is TKHTMLMemoDataType) then
+  begin
+    LFormHTMLEditor := TKExtFormHTMLEditor.Create(AOwner);
+    try
+      if not Assigned(ARowField) then
+        LFormHTMLEditor.Width := LFormHTMLEditor.CharsToPixels(AFieldCharWidth)
+      else
+        ARowField.CharWidth := AFieldCharWidth;
+      LFormHTMLEditor.Height := LFormHTMLEditor.LinesToPixels(AViewField.GetInteger('EditLines', 5));
+      LFormHTMLEditor.AutoScroll := True;
+      LFormHTMLEditor.EnableAlignments := AViewField.GetBoolean('HTMLEditor/EnableAlignments', not AIsReadOnly);
+      LFormHTMLEditor.EnableColors     := AViewField.GetBoolean('HTMLEditor/EnableColors', not AIsReadOnly);
+      LFormHTMLEditor.EnableFont       := AViewField.GetBoolean('HTMLEditor/EnableFont', not AIsReadOnly);
+      LFormHTMLEditor.EnableFontSize   := AViewField.GetBoolean('HTMLEditor/EnableFontSize', not AIsReadOnly);
+      LFormHTMLEditor.EnableFormat     := AViewField.GetBoolean('HTMLEditor/EnableFormat', not AIsReadOnly);
+      LFormHTMLEditor.EnableLinks      := AViewField.GetBoolean('HTMLEditor/EnableLinks', not AIsReadOnly);
+      LFormHTMLEditor.EnableLists      := AViewField.GetBoolean('HTMLEditor/EnableLists', not AIsReadOnly);
+      LFormHTMLEditor.EnableSourceEdit := AViewField.GetBoolean('HTMLEditor/EnableSourceEdit', not AIsReadOnly);
+      Result := LFormHTMLEditor;
+    except
+      LFormHTMLEditor.Free;
+      raise;
+    end;
+
   end
   else
     Result := nil;

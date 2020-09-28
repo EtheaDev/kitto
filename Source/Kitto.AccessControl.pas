@@ -225,9 +225,12 @@ var
 begin
   Assert(AMode <> '');
 
+  // Empty UserId means a non authenticated session
+  if AUserId = '' then
+    Result := ACV_TRUE
   // Empty URIs identify nameless objects, access to which is always granted
   // and we don't even need to log it.
-  if AResourceURI = '' then
+  else if AResourceURI = '' then
     Result := ACV_TRUE
   else
   begin
@@ -302,6 +305,7 @@ end;
 
 procedure TKAccessController.InternalInit;
 var
+  LCreateFlag: Integer;
   LLogFileName: string;
   LFileStream: TFileStream;
 
@@ -318,16 +322,15 @@ begin
   LLogFileName := Config.GetExpandedString('Log/FileName');
   if LLogFileName <> '' then
   begin
-    if not DirectoryExists(ExtractFilePath(LLogFileName)) then
-      raise EKError.CreateFmt('Cannot create Access Controller log file %s. Directory does not exist.', [LLogFileName]);
-
     if FileExists(LLogFileName) then
-    begin
-      LFileStream := TFileStream.Create(LLogFileName, fmOpenWrite or fmShareDenyWrite);
-      LFileStream.Seek(0, soEnd);
-    end
+      LCreateFlag := 0
     else
-      LFileStream := TFileStream.Create(LLogFileName, fmCreate or fmShareDenyWrite);
+    begin
+      LCreateFlag := fmCreate;
+      ForceDirectories(ExtractFilePath(LLogFileName));
+    end;
+    LFileStream := TFileStream.Create(LLogFileName, LCreateFlag or fmOpenWrite or fmShareDenyWrite);
+    LFileStream.Seek(0, soEnd);
     FLogWriter := TStreamWriter.Create(LFileStream);
     FLogWriter.OwnStream;
 

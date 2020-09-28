@@ -181,13 +181,36 @@ var
     Result := Copy(ALine,1,ASize)+StringOfChar(' ', ASize - Length(ALine));
   end;
 
+  function BuildRecord(ARecord: TKViewTableRecord): string;
+  var
+    I: Integer;
+  begin
+    Result := '';
+    for I := 0 to LRecord.FieldCount - 1 do
+    begin
+      LField := LRecord.Fields[I];
+      if Assigned(LField.ViewField) then
+      begin
+        LValue := LField.GetAsJSONValue(True, False, True);
+        if LFixedLength then
+          Result := Result + FormatValue(LValue, LField.ViewField.DisplayWidth)
+        else
+        begin
+          if I <> 0 then
+            Result := Result + LDelimiter;
+          Result := Result + LQuoteChar + LValue + LQuoteChar;
+        end;
+      end;
+    end;
+  end;
+
 begin
-  LStore := ServerStore;
   LFixedLength := FixedLength;
   LDelimiter := Delimiter;
   LQuoteChar := QuoteChar;
   LIncludeHeader := IncludeHeader;
   LContent := '';
+  LStore := ServerStore;
   if LIncludeHeader then
   begin
     // Header.
@@ -215,30 +238,23 @@ begin
     AddRow(LLine);
   end;
 
-  // Rows.
-  for LRecordIndex := 0 to LStore.RecordCount -1 do
+  if Config.GetBoolean('RequireSelection', True) then
   begin
-    LRecord := LStore.Records[LRecordIndex];
-    if not LRecord.IsDeleted then
+    LRecord := ServerRecord;
+    LLine := BuildRecord(LRecord);
+    AddRow(LLine);
+  end
+  else
+  begin
+    // Rows.
+    for LRecordIndex := 0 to LStore.RecordCount -1 do
     begin
-      LLine := '';
-      for LFieldIndex := 0 to LRecord.FieldCount - 1 do
+      LRecord := LStore.Records[LRecordIndex];
+      if not LRecord.IsDeleted then
       begin
-        LField := LRecord.Fields[LFieldIndex];
-        if Assigned(LField.ViewField) then
-        begin
-          LValue := LField.GetAsJSONValue(True, False, True);
-          if LFixedLength then
-            LLine := LLine + FormatValue(LValue, LField.ViewField.DisplayWidth)
-          else
-          begin
-            if LFieldIndex <> 0 then
-              LLine := LLine + LDelimiter;
-            LLine := LLine + LQuoteChar + LValue + LQuoteChar;
-          end;
-        end;
+        LLine := BuildRecord(LRecord);
+        AddRow(LLine);
       end;
-      AddRow(LLine);
     end;
   end;
   Result := TStringStream.Create(LContent);

@@ -51,9 +51,15 @@ Controller: List
 MainTable:
   Model: ACTIVITY
   IsLarge: True
-  Controller:
+  Controller:      
     FormController:
       CloneButton:
+      ToolViews:
+        DownloadText:
+          DisplayLabel: Download in TXT
+          Controller: ExportTextTool
+            RequireSelection: True
+            ClientFileName: ActivityList_%YYYYMMDD_DATE%_%HHMM_TIME%.txt
     PopupWindow:
       Width: 600
       Height: 400
@@ -61,7 +67,7 @@ MainTable:
       DownloadText:
         DisplayLabel: Download in TXT
         Controller: ExportTextTool
-          RequireSelection: False
+          RequireSelection: True
           ClientFileName: ActivityList_%YYYYMMDD_DATE%_%HHMM_TIME%.txt
       DownloadCSV:
         DisplayLabel: Download in CSV
@@ -77,7 +83,7 @@ MainTable:
       PDFReport:
         DisplayLabel: Activity report PDF
         Controller: MergePDFTool
-          ClientFileName: Activity_{Description}.pdf
+          ClientFileName: Activity_{DESCRIPTION}.pdf
           BaseFileName: %APP_PATH%ReportTemplates\ActivityReport.pdf
           LayoutFileName: %APP_PATH%ReportTemplates\ActivityPDFMerge.yaml
           RequireSelection: True

@@ -95,7 +95,7 @@ implementation
 
 uses
   SysUtils, StrUtils, Math, Types,
-  superobject,
+  superobject, Kitto.Utils,
   EF.StrUtils, EF.Localization, EF.JSON, EF.Macros,
   Kitto.Metadata.Models, Kitto.Rules, Kitto.AccessControl, Kitto.Config,
   Kitto.Ext.Session, Kitto.Ext.Utils, Kitto.Ext.Form {temporary};
@@ -240,8 +240,7 @@ begin
     FGridView := TExtGridGridView.Create(Self);
   FGridView.EmptyText := _('No data to display.');
   FGridView.EnableRowBody := True;
-  { TODO : make ForceFit configurable? }
-  //FGridView.ForceFit := False;
+  FGridView.ForceFit := ViewTable.GetBoolean('Controller/Grid/ForceFit', False);
   LRowClassProvider := ViewTable.GetExpandedString('Controller/RowClassProvider');
   if LRowClassProvider <> '' then
     FGridView.GetRowClass :=  FGridView.JSFunctionInLine(LRowClassProvider)
@@ -656,9 +655,12 @@ begin
       for I := 0 to ViewTable.FieldCount - 1 do
         AddColumn(ViewTable.Fields[I], nil);
     end;
-    LAutoExpandColumn := ViewTable.GetString('Controller/AutoExpandFieldName');
-    if LAutoExpandColumn <> '' then
-      FEditorGridPanel.AutoExpandColumn := LAutoExpandColumn;
+    if FGridView.ForceFit then
+    begin
+      LAutoExpandColumn := ViewTable.GetString('Controller/Grid/ForceFit/AutoExpandFieldName');
+      if LAutoExpandColumn <> '' then
+        FEditorGridPanel.AutoExpandColumn := LAutoExpandColumn;
+    end;
   finally
     FreeAndNil(LEditorManager);
   end;
@@ -1099,7 +1101,7 @@ begin
     Add CaptionField to ViewTable for cases when the model's CaptionField
     is not part of the ViewTable or is aliased. }
   Result := Format('selectConfirmCall("%s", "%s", %s, "%s", {methodURL: "%s", selModel: %s, fieldNames: "%s"});',
-    [_(Session.Config.AppTitle), AMessage, FSelectionModel.JSName, ViewTable.Model.CaptionField.FieldName,
+    [_('Confirm operation'), AMessage, FSelectionModel.JSName, ViewTable.Model.CaptionField.FieldName,
     MethodURI(AMethod), FSelectionModel.JSName, Join(ViewTable.GetKeyFieldAliasedNames, ',')]);
 end;
 

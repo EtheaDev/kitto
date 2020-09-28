@@ -60,6 +60,13 @@ function StripSuffix(const AString, ASuffix: string): string;
 function GetRandomString(const ALength: Integer; const AExcludeChars: string = ''): string;
 
 ///	<summary>
+///	  Generates a random string of ALength characters in the
+///   'A'..'Z' and 'a'..'z' and '0'..'9' printable sets.
+///   Excludes the specified characters.
+///	</summary>
+function GetRandomStringEx(const ALength: Integer; const AExcludeChars: string = ''): string;
+
+///	<summary>
 ///	  Returns True if APattern matches AString. APattern may contain the
 ///	  following jolly characters: ? matches any one character. * matches any
 ///	  sequence of zero or more characters. Everything else is compared
@@ -72,6 +79,11 @@ function StrMatches(const AString, APattern: string): Boolean;
 ///	  symbol. Otherwise it's identical to StrMatches.
 ///	</summary>
 function StrMatchesEx(const AString, APattern: string): Boolean;
+
+///	<summary>
+///	 Strips any jolly characters used by StrMatches and StrMatchesEx from AString.
+///	</summary>
+function StripJollyCharacters(const AString: string): string;
 
 ///	<summary>
 ///	  Returns the number of occurences of ASubstring in AString.
@@ -193,6 +205,11 @@ function CamelToUpperUnderscore(const AString: string): string;
 function CamelToSpaced(const AString: string): string;
 
 ///	<summary>
+///	 Converts the first character of AString to lower case.
+///	</summary>
+function FirstLowerCase(const AString: string): string;
+
+///	<summary>
 ///	  Tries to make the plural form of a specified singular name acoording to
 ///	  the rules of the english language.
 ///	</summary>
@@ -296,7 +313,7 @@ procedure ReplaceAllCaseSensitive(var AString: string; const AOldPattern, ANewPa
 implementation
 
 uses
-  StrUtils, Character,
+  Windows, StrUtils, Character,
   IdHashMessageDigest, IdHash;
 
 function RightPos(const ASubString, AString: string): Integer;
@@ -348,6 +365,33 @@ begin
     if Random(2) = 1 then
       // A random character between '0' and '9'.
       LNextChar := Chr(Random(Ord('9') - Ord('0') + 1) + Ord('0'))
+    else
+      // A random character between 'A' e 'Z'.
+      LNextChar := Chr(Random(Ord('Z') - Ord('A') + 1) + Ord('A'));
+
+    if (AExcludeChars = '') or not AExcludeChars.Contains(LNextChar) then
+      Result := Result + LNextChar;
+  end;
+end;
+
+function GetRandomStringEx(const ALength: Integer; const AExcludeChars: string = ''): string;
+var
+  LNextChar: Char;
+  LRandom: Integer;
+begin
+  // If this function is moved out of this unit, then a call to Randomize should
+  // be made somewhere in the application. See this unit's initialization section.
+  Result := '';
+  while Length(Result) < ALength do
+  begin
+    LRandom := Random(3);
+    // Randomly decide whether the next character will be a letter or a number.
+    if LRandom = 0 then
+      // A random character between '0' and '9'.
+      LNextChar := Chr(Random(Ord('9') - Ord('0') + 1) + Ord('0'))
+    else if LRandom = 1 then
+      // A random character between 'a' e 'z'.
+      LNextChar := Chr(Random(Ord('z') - Ord('a') + 1) + Ord('a'))
     else
       // A random character between 'A' e 'Z'.
       LNextChar := Chr(Random(Ord('Z') - Ord('A') + 1) + Ord('A'));
@@ -417,6 +461,11 @@ begin
     Result := not StrMatches(AString, Copy(APattern, 2, MaxInt))
   else
     Result := StrMatches(AString, APattern);
+end;
+
+function StripJollyCharacters(const AString: string): string;
+begin
+  Result := AString.Replace('*', '').Replace('?', '').Replace('', '~');
 end;
 
 function CountSubstrings(const AString, ASubstring: string): Integer;
@@ -675,6 +724,13 @@ begin
         Result := Result + ' ';
     Result := Result + AString[I];
   end;
+end;
+
+function FirstLowerCase(const AString: string): string;
+begin
+  Result := AString;
+  if not Result.IsEmpty then
+    Result := Lowercase(Copy(Result,1,1))+Copy(Result,2,MaxInt);
 end;
 
 function UpperUnderscoreToSpaced(const AString: string): string;

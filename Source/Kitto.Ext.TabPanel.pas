@@ -161,7 +161,7 @@ procedure TKExtTabPanel.ClosePanel(const APanel: TExtComponent);
 begin
   Remove(APanel, True);
   Items.Remove(APanel);
-  APanel.Free;
+  APanel.Free(True);
 end;
 
 destructor TKExtTabPanel.Destroy;

@@ -35,6 +35,8 @@ const
     'update KITTO_USERS set PASSWORD_HASH = :PASSWORD_HASH, MUST_CHANGE_PASSWORD = 0 where IS_ACTIVE = 1 and USER_NAME = :USER_NAME';
   DEFAULT_RESETPASSWORDCOMMANDTEXT =
     'update KITTO_USERS set PASSWORD_HASH = :PASSWORD_HASH, MUST_CHANGE_PASSWORD = 1 where IS_ACTIVE = 1 and EMAIL_ADDRESS = :EMAIL_ADDRESS AND USER_NAME = :USER_NAME';
+  DEFAULT_REGISTERNEWUSERCOMMANDTEXT =
+    'insert into KITTO_USERS (USER_NAME, PASSWORD_HASH, IS_ACTIVE, MUST_CHANGE_PASSWORD, EMAIL_ADDRESS) VALUES (:USER_NAME, :PASSWORD_HASH, 1, 1, :EMAIL_ADDRESS)';
 
 type
   /// <summary>User data read from the database. Used internally as a helper
@@ -187,6 +189,15 @@ type
     /// record and update the password.</remarks>
     function GetResetPasswordCommandText: string;
 
+    /// <summary>Returns the SQL statement to be used to register a new user
+    /// (with temporary password hash) in a user's record in the database.
+    /// Override this method to change the name or the structure of the predefined
+    /// table of users.</summary>
+    /// <remarks>The statement should have three params named USER_NAME, PASSWORD_HASH
+    /// and EMAIL_ADDRESS that will be filled in with the data used to locate the
+    /// record and update the password.</remarks>
+    function GetRegisterNewUserCommandText: string;
+
     /// <summary>Creates and returns an object with the user data read from the
     /// database. It is actually a template method that calls a set of virtual
     /// methods to do its job.</summary>
@@ -209,6 +220,10 @@ type
     /// structure of the predefined table of users.</summary>
     function GetReadUserCommandText(const AUserName: string): string; virtual;
 
+    procedure GetSuppliedAuthData(const AAuthData: TEFNode; const AHashNeeded: Boolean;
+      out ASuppliedUserName, ASuppliedPasswordHash: string;
+      out AIsPassepartoutAuthentication: Boolean); virtual;
+
     /// <summary>Extracts from AAuthData the supplied password, in order to use
     /// it in an authentication attempt. If AHashNeeded is True, the password
     /// hash will be returned instead of the clear password.</summary>
@@ -222,7 +237,7 @@ type
     /// <summary>True if passepartout mode is enabled and the supplied password
     /// matches the passepartout password.</summary>
     function IsPassepartoutAuthentication(
-      const ASuppliedPasswordHash: string): Boolean; virtual;
+      const ASuppliedPassword: string): Boolean; virtual;
 
     /// <summary>Returns True if ASuppliedPasswordHash matches
     /// AStoredPasswordHash. By default this means that they are the same
@@ -373,6 +388,11 @@ begin
     DEFAULT_READUSERCOMMANDTEXT);
 end;
 
+function TKDBAuthenticator.GetRegisterNewUserCommandText: string;
+begin
+  Result := Config.GetString('RegisterNewUserCommandText', DEFAULT_REGISTERNEWUSERCOMMANDTEXT);
+end;
+
 function TKDBAuthenticator.GetResetPasswordCommandText: string;
 begin
   Result := Config.GetString('ResetPasswordCommandText', DEFAULT_RESETPASSWORDCOMMANDTEXT);
@@ -426,6 +446,19 @@ begin
   end;
 end;
 
+procedure TKDBAuthenticator.GetSuppliedAuthData(
+  const AAuthData: TEFNode; const AHashNeeded: Boolean;
+  out ASuppliedUserName, ASuppliedPasswordHash: string;
+  out AIsPassepartoutAuthentication: Boolean);
+var
+  LSuppliedPassword: string;
+begin
+  ASuppliedUserName := GetSuppliedUserName(AAuthData);
+  ASuppliedPasswordHash := GetSuppliedPasswordHash(AAuthData, AHashNeeded);
+  LSuppliedPassword := GetSuppliedPasswordHash(AAuthData, False);
+  AIsPassepartoutAuthentication := IsPassepartoutAuthentication(LSuppliedPassword);
+end;
+
 function TKDBAuthenticator.InternalAuthenticate(const AAuthData: TEFNode): Boolean;
 var
   LSuppliedUserName: string;
@@ -433,9 +466,8 @@ var
   LIsPassepartoutAuthentication: Boolean;
   LUser: TKAuthUser;
 begin
-  LSuppliedUserName := GetSuppliedUserName(AAuthData);
-  LSuppliedPasswordHash := GetSuppliedPasswordHash(AAuthData, not IsClearPassword);
-  LIsPassepartoutAuthentication := IsPassepartoutAuthentication(LSuppliedPasswordHash);
+  GetSuppliedAuthData(AAuthData, not IsClearPassword,
+    LSuppliedUserName, LSuppliedPasswordHash, LIsPassepartoutAuthentication);
 
   if LSuppliedUserName <> '' then
   begin
@@ -457,7 +489,7 @@ begin
     Result := False;
 end;
 
-function TKDBAuthenticator.IsPassepartoutAuthentication(const ASuppliedPasswordHash: string): Boolean;
+function TKDBAuthenticator.IsPassepartoutAuthentication(const ASuppliedPassword: string): Boolean;
 var
   LIsPassepartoutEnabled: Boolean;
   LPassepartoutPassword: string;
@@ -465,7 +497,7 @@ begin
   LIsPassepartoutEnabled := Config.GetBoolean('IsPassepartoutEnabled', False);
   if LIsPassepartoutEnabled then
     LPassepartoutPassword := Config.GetString('PassepartoutPassword', '');
-  Result := LIsPassepartoutEnabled and (ASuppliedPasswordHash = LPassepartoutPassword);
+  Result := LIsPassepartoutEnabled and (ASuppliedPassword = LPassepartoutPassword);
 end;
 
 function TKDBAuthenticator.IsValidUserName(const AUserName: string): Boolean;
@@ -473,7 +505,6 @@ var
   LQuery: TEFDBQuery;
 begin
   Result := False;
-
   LQuery := TKConfig.Instance.DBConnections[GetDatabaseName].CreateDBQuery;
   try
     LQuery.CommandText := GetReadUserCommandText(AUserName);

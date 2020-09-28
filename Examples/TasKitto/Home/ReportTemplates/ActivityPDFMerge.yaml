@@ -5,9 +5,9 @@ DefaultFont: Courier
 Information:
   Author: %Auth:UserName%
   Title: Activity Form
-  Subject: {Description}
+  Subject: {DESCRIPTION}
   Creator: Taskitto
-  Keywords: Activity, Taskitto, {Description}
+  Keywords: Activity, Taskitto, {DESCRIPTION}
   CreationDate: %DATETIME%
   
 Items:
@@ -24,14 +24,14 @@ Items:
     Width: 100
     Height: 31
   Text: 
-    Expression: Activity: {Description} on %DATETIME%
+    Expression: Activity: {DESCRIPTION} on %DATETIME%
     XPos: 10
     YPos: 600
     Font: Helvetica
       Size: 12
       Color: Green
   Text: 
-    Expression: {Employee}
+    Expression: {EMPLOYEE}
     XPos: 10
     YPos: 550
     Font: HelveticaBold

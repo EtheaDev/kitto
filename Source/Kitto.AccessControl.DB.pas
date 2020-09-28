@@ -227,7 +227,8 @@ function TKDBAccessController.EnsureUserPermissions(
 var
   LIndex: Integer;
 begin
-  Assert(AUserId <> '');
+  if AUserId = '' then
+    Exit;
 
   if FUserPermissions.Find(AUserId, LIndex) then
     Result := TKUserPermissionStorage(FUserPermissions.Objects[LIndex])

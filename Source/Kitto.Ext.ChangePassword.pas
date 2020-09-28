@@ -27,9 +27,11 @@ uses
 type
   TKExtChangePasswordWindow = class(TKExtWindowControllerBase)
   private
+    FShowOldPassword: Boolean;
     FOldPassword: TExtFormTextField;
     FNewPassword: TExtFormTextField;
     FConfirmNewPassword: TExtFormTextField;
+    FPasswordRules: TExtFormLabel;
     FConfirmButton: TKExtButton;
     FStatusBar: TKExtStatusBar;
     FFormPanel: TExtFormFormPanel;
@@ -53,7 +55,7 @@ implementation
 
 uses
   SysUtils, StrUtils, Math,
-  ExtPascalUtils,
+  ExtPascalUtils, ExtPascal,
   EF.Classes, EF.Localization, EF.Tree, EF.StrUtils,
   Kitto.Types, Kitto.Config,
   Kitto.Ext.Controller, Kitto.Ext.Session;
@@ -70,7 +72,7 @@ end;
 
 procedure TKExtChangePasswordWindow.DoChangePassword;
 begin
-  if GetPasswordHash(Session.Query['OldPassword']) <> FOldPasswordHash then
+  if FShowOldPassword and (GetPasswordHash(Session.Query['OldPassword']) <> FOldPasswordHash) then
   begin
     FStatusBar.SetErrorStatus(_('Old Password is wrong.'));
     FOldPassword.Focus(False, 500);
@@ -92,6 +94,7 @@ begin
       Close;
       Session.Logout;
     except
+      on E: ERedirectError do raise; //Reraise ERedirectError
       on E: Exception do
       begin
         FStatusBar.SetErrorStatus(E.Message);
@@ -112,41 +115,70 @@ begin
 end;
 
 procedure TKExtChangePasswordWindow.InitDefaults;
+var
+  LEditWidth: Integer;
+  LPasswordRules: string;
 
   function ReplaceMacros(const ACode: string): string;
   begin
     Result := ReplaceStr(ACode, '%BUTTON%', FConfirmButton.JSName);
-    Result := ReplaceStr(Result, '%OLDPW%', FOldPassword.JSName);
+    if FShowOldPassword then
+      Result := ReplaceStr(Result, '%OLDPW%', FOldPassword.JSName);
     Result := ReplaceStr(Result, '%NEWPW%', FNewPassword.JSName);
     Result := ReplaceStr(Result, '%NEWPW2%', FConfirmNewPassword.JSName);
+    Result := ReplaceStr(Result, '%STATUSBAR%', FStatusBar.JSName);
+    Result := ReplaceStr(Result, '%CAPS_ON%', _('Caps On'));
   end;
 
   function GetEnableButtonJS: string;
   begin
+    if FShowOldPassword then
+      Result := ReplaceMacros(
+        '%BUTTON%.setDisabled(%OLDPW%.getValue() == "" || %NEWPW%.getValue() == "" ' +
+        '|| !(%NEWPW%.getValue() == %NEWPW2%.getValue()));')
+    else
+      Result := ReplaceMacros(
+        '%BUTTON%.setDisabled(%NEWPW%.getValue() == "" ' +
+        '|| !(%NEWPW%.getValue() == %NEWPW2%.getValue()));')
+  end;
+
+  function GetCheckCapsLockJS: string;
+  begin
     Result := ReplaceMacros(
-      '%BUTTON%.setDisabled(%OLDPW%.getValue() == "" || %NEWPW%.getValue() == "" ' +
-      '|| !(%NEWPW%.getValue() == %NEWPW2%.getValue()));');
+      'if (event.keyCode !== 13 && event.getModifierState("CapsLock")) ' +
+      '{%STATUSBAR%.setText(''%CAPS_ON%''); %STATUSBAR%.setIcon('''');} ' +
+      'else {%STATUSBAR%.setText('''');}');
   end;
 
   function GetSubmitJS: string;
   begin
-    Result := ReplaceMacros(
-      'if (e.getKey() == 13 && !(%OLDPW%.getValue() == "") && !(%NEWPW%.getValue() == "") ' +
-      '&& %NEWPW%.getValue() == %NEWPW2%.getValue()) %BUTTON%.handler.call(%BUTTON%.scope, %BUTTON%);');
+    if FShowOldPassword then
+      Result := ReplaceMacros(
+        'if (e.getKey() == 13 && !(%OLDPW%.getValue() == "") && !(%NEWPW%.getValue() == "") ' +
+        '&& %NEWPW%.getValue() == %NEWPW2%.getValue()) %BUTTON%.handler.call(%BUTTON%.scope, %BUTTON%);')
+    else
+      Result := ReplaceMacros(
+        'if (e.getKey() == 13 && !(%NEWPW%.getValue() == "") ' +
+        '&& %NEWPW%.getValue() == %NEWPW2%.getValue()) %BUTTON%.handler.call(%BUTTON%.scope, %BUTTON%);');
   end;
 
 begin
   inherited;
   FOldPasswordHash := Session.Config.Authenticator.Password;
+  //Old password is required only when user request to change-it
+  //If the request is made after login with password expires the old password
+  //was already requested to the user
+  FShowOldPassword := not Session.Config.Authenticator.MustChangePassword;
 
   Modal := True;
-  Title := GetDefaultDisplayLabel;
-  Width := 316;
-  Height := 162;
+  Title := Config.GetString('DisplayLabel', GetDefaultDisplayLabel);
+  Width := Config.GetInteger('FormPanel/Width', 420);
+  Height := Config.GetInteger('FormPanel/Height', 200);
   Maximized := Session.IsMobileBrowser;
   Border := not Maximized;
   Closable := True;
   Resizable := False;
+  LEditWidth := Config.GetInteger('FormPanel/EditWidth', 220);
 
   FStatusBar := TKExtStatusBar.Create(Self);
   FStatusBar.DefaultText := '';
@@ -154,7 +186,7 @@ begin
 
   FFormPanel := TExtFormFormPanel.CreateAndAddTo(Items);
   FFormPanel.Region := rgCenter;
-  FFormPanel.LabelWidth := 150;
+  FFormPanel.LabelWidth := Config.GetInteger('FormPanel/LabelWidth', 150);
   FFormPanel.LabelAlign := laRight;
   FFormPanel.Border := False;
   FFormPanel.BodyStyle := SetPaddings(5, 5);
@@ -166,14 +198,19 @@ begin
   FConfirmButton.SetIconAndScale('password', 'medium');
   FConfirmButton.Text := _('Change password');
 
-  FOldPassword := TExtFormTextField.CreateAndAddTo(FFormPanel.Items);
-  FOldPassword.Name := 'OldPassword';
-  //FOldPassword.Value := ...
-  FOldPassword.FieldLabel := _('Old Password');
-  FOldPassword.InputType := itPassword;
-  FOldPassword.AllowBlank := False;
-  FOldPassword.Width := 136;
-  FOldPassword.EnableKeyEvents := True;
+  if FShowOldPassword then
+  begin
+    FOldPassword := TExtFormTextField.CreateAndAddTo(FFormPanel.Items);
+    FOldPassword.Name := 'OldPassword';
+    //FOldPassword.Value := FOldPasswordHash;
+    FOldPassword.FieldLabel := _('Old Password');
+    FOldPassword.InputType := itPassword;
+    FOldPassword.AllowBlank := False;
+    FOldPassword.Width := LEditWidth;
+    FOldPassword.EnableKeyEvents := True;
+  end
+  else
+    FOldPassword := nil;
 
   FNewPassword := TExtFormTextField.CreateAndAddTo(FFormPanel.Items);
   FNewPassword.Name := 'NewPassword';
@@ -181,7 +218,7 @@ begin
   FNewPassword.FieldLabel := _('New Password');
   FNewPassword.InputType := itPassword;
   FNewPassword.AllowBlank := False;
-  FNewPassword.Width := 136;
+  FNewPassword.Width := LEditWidth;
   FNewPassword.EnableKeyEvents := True;
 
   FConfirmNewPassword := TExtFormTextField.CreateAndAddTo(FFormPanel.Items);
@@ -190,23 +227,52 @@ begin
   FConfirmNewPassword.FieldLabel := _('Confirm New Password');
   FConfirmNewPassword.InputType := itPassword;
   FConfirmNewPassword.AllowBlank := False;
-  FConfirmNewPassword.Width := 136;
+  FConfirmNewPassword.Width := LEditWidth;
   FConfirmNewPassword.EnableKeyEvents := True;
 
-  FOldPassword.On('keyup', JSFunction(GetEnableButtonJS));
+  LPasswordRules := TKConfig.Instance.Config.GetString('Auth/ValidatePassword/Message');
+  if LPasswordRules <> '' then
+  begin
+    FPasswordRules := TExtFormLabel.CreateAndAddTo(FFormPanel.Items);
+    FPasswordRules.Text := LPasswordRules;
+    FPasswordRules.Width := CharsToPixels(Length(FPasswordRules.Text));
+    Height := Height + 30;
+  end;
+
+  if FShowOldPassword then
+    FOldPassword.On('keyup', JSFunction(GetEnableButtonJS));
   FNewPassword.On('keyup', JSFunction(GetEnableButtonJS));
   FConfirmNewPassword.On('keyup', JSFunction(GetEnableButtonJS));
-  FOldPassword.On('specialkey', JSFunction('field, e', GetSubmitJS));
+
+  if FShowOldPassword then
+    FOldPassword.On('keydown', JSFunction(GetCheckCapsLockJS));
+  FNewPassword.On('keydown', JSFunction(GetCheckCapsLockJS));
+  FConfirmNewPassword.On('keydown', JSFunction(GetCheckCapsLockJS));
+
+  if FShowOldPassword then
+    FOldPassword.On('specialkey', JSFunction('field, e', GetSubmitJS));
   FNewPassword.On('specialkey', JSFunction('field, e', GetSubmitJS));
   FConfirmNewPassword.On('specialkey', JSFunction('field, e', GetSubmitJS));
 
-  FConfirmButton.Handler := Ajax(DoChangePassword, ['Dummy', FStatusBar.ShowBusy,
-    'OldPassword', FOldPassword.GetValue, 'NewPassword', FNewPassword.GetValue,
-    'ConfirmNewPassword', FConfirmNewPassword.GetValue]);
+  if FShowOldPassword then
+  begin
+    FConfirmButton.Handler := Ajax(DoChangePassword, ['Dummy', FStatusBar.ShowBusy,
+      'OldPassword', FOldPassword.GetValue, 'NewPassword', FNewPassword.GetValue,
+      'ConfirmNewPassword', FConfirmNewPassword.GetValue]);
+  end
+  else
+  begin
+    FConfirmButton.Handler := Ajax(DoChangePassword, ['Dummy', FStatusBar.ShowBusy,
+      'NewPassword', FNewPassword.GetValue,
+      'ConfirmNewPassword', FConfirmNewPassword.GetValue]);
+  end;
 
   FConfirmButton.Disabled := True;
 
-  FOldPassword.Focus(False, 500);
+  if FShowOldPassword then
+    FOldPassword.Focus(False, 500)
+  else
+    FNewPassword.Focus(False, 500);
 end;
 
 initialization

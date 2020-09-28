@@ -2993,6 +2993,8 @@ begin
     LFormatSetting.DateSeparator := '-';
     Result := StrToDateTime(AValue, LFormatSetting);
   end
+  else if VarIsNull(AValue) then
+    Result := 0
   else
     Result := AValue;
 end;

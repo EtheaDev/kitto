@@ -30,10 +30,12 @@ Databases:
       Trim Char: False
 
 Auth: TasKitto
+  IsPassepartoutEnabled: True
+  PassepartoutPassword: password
   IsClearPassword: True
-  Defaults:
+  .Defaults:
     UserName: admin
-    Password: admin
+    Password: password
   ReadUserCommandText: select USER_NAME, PASSWORD_HASH, EMAIL_ADDRESS, MUST_CHANGE_PASSWORD, FIRST_NAME, LAST_NAME from KITTO_USERS where IS_ACTIVE = 1 and UPPER(USER_NAME) = UPPER(:USER_NAME)
   ValidatePassword:
     Message: Min 8 with upper+lower+number+special chars

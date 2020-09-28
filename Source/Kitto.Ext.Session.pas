@@ -25,7 +25,7 @@ uses
   gnugettext, superobject,
   ExtPascal, Ext, ExtPascalClasses,
   EF.Tree, EF.Macros, EF.Intf, EF.Localization, EF.ObserverIntf,
-  Kitto.Ext.Base, Kitto.Config, Kitto.Metadata.Views,
+  Kitto.Ext.Base, Kitto.Config, Kitto.Metadata.Views, Kitto.Auth,
   Kitto.Ext.Controller;
 
 type
@@ -366,7 +366,7 @@ type
   public
     function GetViewportWidthInInches: TExtFunction;
   published
-    procedure Execute;
+    procedure Execute(const AAuthenticator: TKAuthenticator);
   end;
 
 function Session: TKExtSession;
@@ -377,7 +377,7 @@ uses
   StrUtils, ActiveX, ComObj, FmtBcd,
   ExtPascalUtils, ExtForm,
   EF.SysUtils, EF.StrUtils, EF.Logger, EF.Types,
-  Kitto.Auth, Kitto.Types, Kitto.AccessControl,
+  Kitto.Types, Kitto.AccessControl,
   Kitto.Ext.Utils;
 
 function Session: TKExtSession;
@@ -697,7 +697,7 @@ begin
   with TKExtDelayedHome.Create(ObjectCatalog) do
   begin
     try
-      Execute;
+      Execute(Config.Authenticator);
     finally
       Free;
     end;
@@ -866,6 +866,7 @@ Duplicates must be handled/ignored. }
   SetLibrary('{ext}/examples/shared/examples'); // For Ext.msg.
   SetCSS('{ext}/examples/shared/examples');
   SetRequiredLibrary('DateTimeField');
+//  SetRequiredLibrary('LinkButton');
   SetRequiredLibrary('NumericField');
   SetRequiredLibrary('DefaultButton');
   SetRequiredLibrary('kitto-core', True);
@@ -1420,6 +1421,37 @@ begin
   begin
     ExpandMacros(AString, '%SESSION_ID%', FSession.SessionId);
     ExpandMacros(AString, '%LANGUAGE_ID%', FSession.Language);
+    ExpandMacros(AString, '%SESSION_HOST%', FSession.RequestHeader['HTTP_HOST']);
+    ExpandMacros(AString, '%SESSION_REMOTE_ADDR%', FSession.RequestHeader['REMOTE_ADDR']);
+  (*
+  HTTP_HOST=localhost', nil
+  HTTP_CONNECTION=keep-alive', nil
+  HTTP_UPGRADE_INSECURE_REQUESTS=1', nil
+  HTTP_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36', nil
+  HTTP_SEC_FETCH_MODE=navigate', nil
+  HTTP_SEC_FETCH_USER=?1', nil
+  HTTP_ACCEPT=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3', nil
+  HTTP_SEC_FETCH_SITE=none', nil
+  HTTP_ACCEPT_ENCODING=gzip, deflate, br', nil
+  HTTP_ACCEPT_LANGUAGE=it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6', nil
+  SERVER_SOFTWARE=Apache/2.4.12 (Win32) mod_fastcgi/2.4.7.1 PHP/7.3.1', nil
+  SERVER_NAME=localhost', nil
+  SERVER_ADDR=::1', nil
+  SERVER_PORT=80', nil
+  REMOTE_ADDR=::1', nil
+  DOCUMENT_ROOT=D:/Apache24/htdocs', nil
+  REQUEST_SCHEME=http', nil
+  CONTEXT_PREFIX=/kitto/', nil
+  CONTEXT_DOCUMENT_ROOT=D:/Apache24/kitto/', nil
+  SERVER_ADMIN=carlo@cibisoft.com', nil
+  SCRIPT_FILENAME=D:/Apache24/kitto/kittoscm', nil
+  REMOTE_PORT=61317', nil
+  GATEWAY_INTERFACE=CGI/1.1', nil
+  SERVER_PROTOCOL=HTTP/1.1', nil
+  REQUEST_METHOD=GET', nil
+  REQUEST_URI=/kitto/kittoscm', nil
+  SCRIPT_NAME=/kitto/kittoscm', nil
+  *)
   end;
 end;
 
@@ -1494,9 +1526,27 @@ end;
 
 { TKExtDelayedHome }
 
-procedure TKExtDelayedHome.Execute;
+procedure TKExtDelayedHome.Execute(const AAuthenticator: TKAuthenticator);
+var
+  LParamName, LParamValue, LRawParams: string;
+  I: Integer;
 begin
-  Session.ResponseItems.ExecuteJSCode(GetAjaxCode(Session.DelayedHome, ['vpWidthInches', GetViewportWidthInInches]));
+  Assert(Assigned(AAuthenticator));
+  //Build RawParams with params found on the URL request form home
+  //but only if the Authenticator can Bypass them
+  //eg: Classic Authenticator do not Bypass UserName and Password Param
+  for I := 0 to Session.Queries.Count -1 do
+  begin
+    LParamName := Session.Queries.Names[I];
+    if (LParamName <> '') and AAuthenticator.CanBypassURLParam(LParamName) then
+    begin
+      LParamValue := URLEncode(Session.Queries.ValueFromIndex[I]);
+      LRawParams := LRawParams + Format('&%s=%s', [LParamName,LParamValue]);
+    end;
+  end;
+
+  Session.ResponseItems.ExecuteJSCode(GetAjaxCode(Session.DelayedHome,
+    LRawParams, ['vpWidthInches', GetViewportWidthInInches]));
 end;
 
 function TKExtDelayedHome.GetViewportWidthInInches: TExtFunction;

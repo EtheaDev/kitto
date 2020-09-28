@@ -70,6 +70,8 @@ var
   LDummyHeight: Integer;
   LFormPanel: TKExtResetPasswordFormPanel;
   LFormPanelBodyStyle: string;
+  LBorderPanelConfigNode: TEFNode;
+  LBorderPanel: TKExtBorderPanelController;
 begin
   inherited;
   Frame := False;
@@ -81,7 +83,22 @@ begin
   PaddingString := Config.GetString('Padding', '0px');
   RenderTo := Config.GetString('ContainerElementId');
 
-  LFormPanel := TKExtResetPasswordFormPanel.CreateAndAddTo(Items);
+  //If BorderPanel configuration Node exists, use a BorderPanelController
+  LBorderPanelConfigNode := Config.FindNode('BorderPanel');
+  if Assigned(LBorderPanelConfigNode) then
+  begin
+    LBorderPanel := TKExtBorderPanelController.CreateAndAddTo(Items);
+    LBorderPanel.Config.Assign(LBorderPanelConfigNode);
+    //FBorderPanel.Border := False;
+    LBorderPanel.Frame := False;
+    LBorderPanel.View := View;
+    LBorderPanel.Display;
+    LFormPanel := TKExtResetPasswordFormPanel.CreateAndAddTo(LBorderPanel.Items);
+    LFormPanel.Region := rgCenter;
+  end
+  else
+    LFormPanel := TKExtResetPasswordFormPanel.CreateAndAddTo(Items);
+
   LFormPanel.LabelWidth := Config.GetInteger('FormPanel/LabelWidth', 150);
   LFormPanelBodyStyle := Config.GetString('FormPanel/BodyStyle');
   if LFormPanelBodyStyle <> '' then
@@ -102,15 +119,15 @@ end;
 function TKExtResetPasswordFormPanel.GetEnableButtonJS: string;
 begin
   Result := Format(
-    '%0:s.setDisabled((%1:s.getValue() == "") || !Ext.form.VTypes.email(%1:s.getValue()));',
-    [FSendButton.JSName, FEmailAddress.JSName]);
+    '%0:s.setDisabled((%1:s.getValue() == "") || !Ext.form.VTypes.email(%1:s.getValue()) || (%2:s.getValue() == "") );',
+    [FSendButton.JSName, FEmailAddress.JSName, FUserName.JSName]);
 end;
 
 function TKExtResetPasswordFormPanel.GetSubmitJS: string;
 begin
   Result := Format(
     // For some reason != does not survive rendering.
-    'if (e.getKey() == 13 && !(%s.getValue() == "")) %s.handler.call(%s.scope, %s);',
+    'if (e.getKey() == 13 && !(%s.getValue() == "") && !(%s.getValue() == "")) %s.handler.call(%s.scope, %s);',
     [FUserName.JSName, FEmailAddress.JSName, FSendButton.JSName, FSendButton.JSName, FSendButton.JSName]);
 end;
 
@@ -118,6 +135,19 @@ procedure TKExtResetPasswordFormPanel.Display(const AEditWidth: Integer; const A
   var ACurrentHeight: Integer);
 const
   CONTROL_HEIGHT = 30;
+
+  function AddFormTextField(const AName, ALabel: string): TExtFormTextField;
+  begin
+    Result := TExtFormTextField.CreateAndAddTo(Items);
+    Result.Name := AName;
+    Result.FieldLabel := AConfig.GetString('FormPanel/'+AName, ALabel);
+    Result.AllowBlank := False;
+    Result.EnableKeyEvents := True;
+    Result.SelectOnFocus := True;
+    Result.Width := AEditWidth;
+    Inc(ACurrentHeight, CONTROL_HEIGHT);
+  end;
+
 begin
   FStatusBar := TKExtStatusBar.Create(Self);
   FStatusBar.DefaultText := '';
@@ -131,24 +161,8 @@ begin
   with TExtBoxComponent.CreateAndAddTo(Items) do
     Height := 10;
 
-  FUserName := TExtFormTextField.CreateAndAddTo(Items);
-  FUserName.Name := 'UserName';
-  FUserName.FieldLabel := _('User Name');
-  FUserName.AllowBlank := False;
-  FUserName.EnableKeyEvents := True;
-  FUserName.SelectOnFocus := True;
-  FUserName.Width := AEditWidth;
-  Inc(ACurrentHeight, CONTROL_HEIGHT);
-
-  FEmailAddress := TExtFormTextField.CreateAndAddTo(Items);
-  FEmailAddress.Name := 'EmailAddress';
-  FEmailAddress.FieldLabel := _('Email address');
-  FEmailAddress.AllowBlank := False;
-  FEmailAddress.EnableKeyEvents := True;
-  FEmailAddress.SelectOnFocus := True;
-  FEmailAddress.Width := AEditWidth;
-  Inc(ACurrentHeight, CONTROL_HEIGHT);
-
+  FUserName := AddFormTextField('UserName', _('User Name'));
+  FEmailAddress := AddFormTextField('EmailAddress', _('Email address'));
   FUserName.On('specialkey', JSFunction('field, e', GetSubmitJS));
   FEmailAddress.On('specialkey', JSFunction('field, e', GetSubmitJS));
 
@@ -159,7 +173,7 @@ begin
   On('beforedestroy', JSFunction(Format('Ext.TaskMgr.stop(%s.enableTask);', [JSName])));
 
   FSendButton.Handler := Ajax(DoSend, ['Dummy', FStatusBar.ShowBusy, 'UserName', FUserName.GetValue, 'EmailAddress', FEmailAddress.GetValue]);
-  FSendButton.Disabled := (FEmailAddress.Value = '');
+  FSendButton.Disabled := (FEmailAddress.Value = '') or (FUserName.Value = '');
   FUserName.Focus(False, 750);
 end;
 
@@ -183,8 +197,7 @@ begin
     LParams.SetString('EmailAddress', Session.Query['EmailAddress']);
     try
       Session.Config.Authenticator.ResetPassword(LParams);
-      //Session.ResponseItems.ExecuteJSCode(Format('Ext.TaskMgr.stop(%s.enableTask);', [JSName]));
-      Session.Alert(_('A new temporary password was generated and sent to the specified e-mail address.'));
+      Session.ShowMessage(emtInfo, _('Reset Password'), _('A new temporary password was generated and sent to the specified e-mail address.'));
       Assert(Assigned(FAfterSend));
       FAfterSend();
     except

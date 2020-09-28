@@ -728,6 +728,7 @@ var
   LCaptionField: string;
   LSearchTerm: string;
   LOrderBy: string;
+  LLookupSearchModel, LSearchOperator, LSearchValue, LSearchClause: string;
 begin
   Assert(Assigned(AViewField));
   Assert(Assigned(ADBQuery));
@@ -773,7 +774,24 @@ begin
   begin
     LSearchTerm := LLookupModel.CaptionField.DBColumnNameOrExpression;
     ExpandQualification(LSearchTerm, '');
-    LQueryText := AddToSQLWhereClause(LQueryText, '(' + LSearchTerm + ' like ''%' + ASearchString + '%'')');
+    //At model level you can specify a model for the lookup search:
+    //for example: LookupSearchModel: {Value}%
+    //to search only values from first.
+    //Default is %{Value}%
+    LLookupSearchModel := LLookupModel.GetString('LookupSearchModel','%{Value}%');
+    if pos('%', LLookupSearchModel) > 0 then
+    begin
+      LSearchOperator := 'like';
+      LSearchValue := StringReplace(LLookupSearchModel,'{Value}', ASearchString, [rfIgnoreCase]);
+    end
+    else
+    begin
+      LSearchOperator := '=';
+      LSearchValue := ASearchString;
+    end;
+    LSearchClause := Format('(%s %s ''%s'')',
+      [LSearchTerm, LSearchOperator, LSearchValue]);
+    LQueryText := AddToSQLWhereClause(LQueryText, LSearchClause);
   end;
 
   LOrderBy := LLookupModel.CaptionField.DBColumnNameOrExpression;
@@ -991,8 +1009,8 @@ begin
     else
       Result := AViewField.QualifiedDBNameOrExpression
   else begin
-    Result := AViewField.DBNameOrExpression;
-    ExpandQualification(Result, AViewField.DBName);
+    Result := '{Q}' +  AViewField.DBNameOrExpression;
+    ExpandQualification(Result, AViewField.Table.Model.DBTableName);
   end;
   if AIsDescending then
     Result := Result + ' desc';

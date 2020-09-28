@@ -222,6 +222,7 @@ type
     FCurrentValue: string;
     const VALUE_FIELD = 0;
     const DISPLAY_FIELD = 1;
+    function GetCurrentValueExpresion: string;
   public
     function GetExpression: string;
     procedure SetConfig(const AConfig: TEFNode); override;
@@ -290,6 +291,32 @@ type
     FConfig: TEFNode;
     FViewTable: TKViewTable;
     procedure FieldChecked(This: TExtFormCheckBox; Checked: boolean);
+  public
+    procedure SetConfig(const AConfig: TEFNode);
+    function AsExtObject: TExtObject;
+    function GetExpression: string;
+    procedure SetViewTable(const AViewTable: TKViewTable);
+    function ExpandValues(const AString: string): string;
+    function GetId: string;
+    procedure Invalidate;
+  end;
+
+   /// <summary>
+  ///  <para>
+  ///   Numeric search. Displays an edit for a free search criteria numeric input.
+  ///  </para>
+  ///  <para>
+  ///   AutoSearchAfterChars determines the number of characters that can
+  ///   be entered before the search automatically fires. Default is 0
+  ///   characters (no auto search).
+  ///  </para>
+  /// </summary>
+  TKNumericSearchFilter = class(TKExtFormNumberField, IKExtFilter)
+  strict private
+    FCurrentValue: string;
+    FConfig: TEFNode;
+    FViewTable: TKViewTable;
+    procedure FieldChange(This: TExtFormField; NewValue, OldValue: string);
   public
     procedure SetConfig(const AConfig: TEFNode);
     function AsExtObject: TExtObject;
@@ -752,6 +779,39 @@ begin
   Result := ReplaceText(AString, '{' + GetId + '}', FCurrentValue);
 end;
 
+function TKDynaListFilter.GetCurrentValueExpresion: string;
+var
+  LDBQuery: TEFDBQuery;
+  LQueryExpression: string;
+begin
+  inherited;
+
+  LDBQuery := Session.Config.DBConnections[GetDatabaseName(FConfig, Self, FViewTable.DatabaseName)].CreateDBQuery;
+  try
+    LQueryExpression :=  FConfig.GetExpandedString('DefaultValueExpression');
+    if LQueryExpression <> '' then
+    begin
+      LDBQuery.CommandText := LQueryExpression;
+      LDBQuery.Open;
+      try
+        Assert(LDBQuery.DataSet.FieldCount = 1);
+        Assert(LDBQuery.DataSet.RecordCount <= 1);
+        if LDBQuery.DataSet.RecordCount = 1 then
+          Result := LDBQuery.DataSet.Fields[0].AsString
+        else
+          Result := '';
+      finally
+        LDBQuery.Close;
+      end;
+    end
+    else
+      Result := '';
+  finally
+    FreeAndNil(LDBQuery);
+  end;
+
+end;
+
 function TKDynaListFilter.GetExpression: string;
 begin
   if FCurrentValue <> '' then
@@ -765,12 +825,38 @@ var
   LStart: Integer;
   LLimit: Integer;
   LPageRecordCount: Integer;
+begin
+  inherited;
+
+  LStart := Session.QueryAsInteger['start'];
+  LLimit := Session.QueryAsInteger['limit'];
+  LPageRecordCount := Min(LLimit, FServerStore.RecordCount - LStart);
+
+  ExtSession.ResponseItems.AddJSON('{Total: ' + IntToStr(FServerStore.RecordCount)
+    + ', Root: ' + FServerStore.GetAsJSON(False, LStart, LPageRecordCount) + '}');
+end;
+
+procedure TKDynaListFilter.SetConfig(const AConfig: TEFNode);
+var
+  I : Integer;
   LDBQuery: TEFDBQuery;
   LCommandText: string;
   LQuery: string;
   LQueryExpression: string;
 begin
   inherited;
+  //PageSize := 10;
+  //Resizable := True;
+  //MinHeight := LinesToPixels(5);
+  if FConfig.GetBoolean('Sys/IsReadOnly') then
+    Disabled := True
+  else
+  begin
+    On('change', Ajax(ValueChanged, ['Value', GetEncodedValue()]));
+    On('select', Ajax(ValueChanged, ['Value', GetEncodedValue()]));
+    On('blur', JSFunction(Format('fireChangeIfEmpty(%s);', [JSName])));
+  end;
+
 
   Assert(Assigned(FServerStore));
 
@@ -794,31 +880,27 @@ begin
     FreeAndNil(LDBQuery);
   end;
 
-  LStart := Session.QueryAsInteger['start'];
-  LLimit := Session.QueryAsInteger['limit'];
-  LPageRecordCount := Min(LLimit, FServerStore.RecordCount - LStart);
-
-  ExtSession.ResponseItems.AddJSON('{Total: ' + IntToStr(FServerStore.RecordCount)
-    + ', Root: ' + FServerStore.GetAsJSON(False, LStart, LPageRecordCount) + '}');
-end;
-
-procedure TKDynaListFilter.SetConfig(const AConfig: TEFNode);
-begin
-  inherited;
-  //PageSize := 10;
-  //Resizable := True;
-  //MinHeight := LinesToPixels(5);
-  if FConfig.GetBoolean('Sys/IsReadOnly') then
-    Disabled := True
-  else
-  begin
-    On('change', Ajax(ValueChanged, ['Value', GetEncodedValue()]));
-    On('select', Ajax(ValueChanged, ['Value', GetEncodedValue()]));
-    On('blur', JSFunction(Format('fireChangeIfEmpty(%s);', [JSName])));
-  end;
   FCurrentValue := AConfig.GetExpandedString('DefaultValue');
+  if FCurrentValue = '' then
+    FCurrentValue := GetCurrentValueExpresion;
+
   if FCurrentValue <> '' then
+  begin
     SetRawValue(FCurrentValue);
+    for I := 0 to FServerStore.RecordCount-1 do
+    begin
+      if FServerStore.Records[i].Fields[0].AsString = FCurrentValue then
+      begin
+        SetValue(FServerStore.Records[i].Fields[1].AsString);
+        break;
+      end;
+    end;
+
+
+  end;
+  
+  if FConfig.GetBoolean('IsRequired') then
+    AllowBlank := False;
 end;
 
 { TKFreeSearchFilter }
@@ -851,6 +933,8 @@ begin
     Disabled := True
   else
     OnChange := FieldChange;
+  if FConfig.GetBoolean('IsRequired') then
+    AllowBlank := False;
 end;
 
 procedure TKFreeSearchFilter.SetViewTable(const AViewTable: TKViewTable);
@@ -1455,6 +1539,78 @@ begin
   FViewTable := AViewTable;
 end;
 
+{ TKNumericSearchFilter }
+
+function TKNumericSearchFilter.AsExtObject: TExtObject;
+begin
+  Result := Self;
+end;
+
+function TKNumericSearchFilter.ExpandValues(const AString: string): string;
+begin
+  Result := AString;
+end;
+
+procedure TKNumericSearchFilter.FieldChange(This: TExtFormField; NewValue,
+  OldValue: string);
+begin
+  if FCurrentValue <> NewValue then
+  begin
+    FCurrentValue := NewValue;
+    NotifyObservers('FilterChanged');
+  end;
+end;
+
+function TKNumericSearchFilter.GetExpression: string;
+begin
+  if FCurrentValue <> '' then
+    Result := ReplaceText(FConfig.GetExpandedString('ExpressionTemplate'), '{value}', ReplaceStr(FCurrentValue, '''', ''''''))
+  else
+    Result := '';
+end;
+
+function TKNumericSearchFilter.GetId: string;
+begin
+  Assert(Assigned(FConfig));
+
+  Result := FConfig.GetExpandedString('Id');
+end;
+
+procedure TKNumericSearchFilter.Invalidate;
+begin
+  SetValue('');
+end;
+
+procedure TKNumericSearchFilter.SetConfig(const AConfig: TEFNode);
+var
+  LAutoSearchAfterChars: Integer;
+begin
+  Assert(Assigned(AConfig));
+  FConfig := AConfig;
+
+  LAutoSearchAfterChars := AConfig.GetInteger('AutoSearchAfterChars', 0);
+  if LAutoSearchAfterChars <> 0 then
+  begin
+    // Auto-fire change event when at least MinChars characters are typed.
+    EnableKeyEvents := True;
+    On('keyup', JSFunction(Format('fireChangeAfterNChars(%s, %d);', [JSName, LAutoSearchAfterChars])));
+  end;
+  FieldLabel := _(AConfig.AsString);
+  Width := CharsToPixels(AConfig.GetInteger('Width', DEFAULT_FILTER_WIDTH));
+  FCurrentValue := AConfig.GetExpandedString('DefaultValue');
+  if FCurrentValue <> '' then
+    SetValue(FCurrentValue);
+  if FConfig.GetBoolean('Sys/IsReadOnly') then
+    Disabled := True
+  else
+    OnChange := FieldChange;
+end;
+
+procedure TKNumericSearchFilter.SetViewTable(const AViewTable: TKViewTable);
+begin
+  FViewTable := AViewTable;
+end;
+
 initialization
   TKExtFilterRegistry.Instance.RegisterClass('List', TKListFilter);
   TKExtFilterRegistry.Instance.RegisterClass('DynaList', TKDynaListFilter);
@@ -1466,6 +1622,7 @@ initialization
   TKExtFilterRegistry.Instance.RegisterClass('ApplyButton', TKFilterApplyButton);
   TKExtFilterRegistry.Instance.RegisterClass('Spacer', TKFilterSpacer);
   TKExtFilterRegistry.Instance.RegisterClass('Lookup', TKLookupFilter);
+  TKExtFilterRegistry.Instance.RegisterClass('NumericSearch', TKNumericSearchFilter);
 
 finalization
   TKExtFilterRegistry.Instance.UnregisterClass('List');
@@ -1478,5 +1635,6 @@ finalization
   TKExtFilterRegistry.Instance.UnregisterClass('ApplyButton');
   TKExtFilterRegistry.Instance.UnregisterClass('Spacer');
   TKExtFilterRegistry.Instance.UnregisterClass('Lookup');
+  TKExtFilterRegistry.Instance.UnregisterClass('NumericSearch');
 
 end.

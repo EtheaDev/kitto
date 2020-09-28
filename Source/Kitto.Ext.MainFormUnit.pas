@@ -344,7 +344,7 @@ end;
 procedure TKExtMainForm.FormShow(Sender: TObject);
 begin
   ShowTabGUI(TAB_LOG);
-  Caption := TKConfig.AppHomePath;
+  Caption := TKConfig.AppHomePath {$IFDEF DEBUG}+' - Debug'{$ENDIF};
   DoLog(Format(_('Build date: %s'), [DateTimeToStr(GetFileDateTime(ParamStr(0)))]));
   FillConfigFileNameCombo;
   if HasConfigFileName then
@@ -420,9 +420,20 @@ begin
       end
       else
       begin
-        //Use first Config file found
-        ConfigFileNameComboBox.ItemIndex := 0;
-        ConfigFileNameComboBoxChange(ConfigFileNameComboBox);
+        //Read config file
+        LDefaultConfig := TKConfig.BaseConfigFileName;
+        LConfigIndex := ConfigFileNameComboBox.Items.IndexOf(LDefaultConfig);
+        if LConfigIndex <> -1 then
+        begin
+          ConfigFileNameComboBox.ItemIndex := LConfigIndex;
+          ConfigFileNameComboBoxChange(ConfigFileNameComboBox);
+        end
+        else
+        begin
+          //Use first Config file found
+          ConfigFileNameComboBox.ItemIndex := 0;
+          ConfigFileNameComboBoxChange(ConfigFileNameComboBox);
+        end;
       end;
     end;
   end;

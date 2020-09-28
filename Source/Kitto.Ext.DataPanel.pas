@@ -26,7 +26,8 @@ uses
   superobject,
   EF.Classes, EF.ObserverIntf, EF.Tree,
   Kitto.Metadata.Views, Kitto.Metadata.DataView, Kitto.Store, Kitto.Types,
-  Kitto.Ext.Base, Kitto.Ext.Controller, Kitto.Ext.BorderPanel, Kitto.Ext.Editors;
+  Kitto.Ext.Base, Kitto.Ext.Controller, Kitto.Ext.BorderPanel, Kitto.Ext.Editors,
+  Kitto.Ext.Graphics;
 
 type
   TKExtGetServerRecordEvent = reference to function: TKViewTableRecord;
@@ -85,6 +86,7 @@ type
     function FindValueByName(const AValues: ISuperObject; const AName: string): TSuperAvlEntry;
     function GetFieldFilterFunc: TKFieldFilterFunc;
     function GetEditItems: TKEditItemList;
+    procedure CloseEditHostWindow(P: TExtPanel);
   strict protected
     FButtonsRequiringSelection: TList<TExtObject>;
     property EditItems: TKEditItemList read GetEditItems;
@@ -192,7 +194,7 @@ begin
     LController := TKExtControllerFactory.Instance.CreateController(
       Session.ObjectCatalog, View, nil, nil, ActionObserver);
     if LController.Config.GetBoolean('RequireSelection', True) then
-      FServerRecord := ServerStore.GetRecord(Session.GetQueries, Session.Config.JSFormatSettings, 0)
+      FServerRecord := ServerStore.FindRecord(Session.GetQueries, Session.Config.JSFormatSettings, 0)
     else
       FServerRecord := nil;
     InitController(LController);
@@ -285,7 +287,7 @@ begin
     on E: EKValidationError do
     begin
       LRecord.RestorePreviousState;
-      ExtMessageBox.Alert(_(Session.Config.AppTitle), E.Message);
+      ExtMessageBox.Alert(_('Error'), E.Message);
       Exit;
     end;
   end;
@@ -388,8 +390,8 @@ begin
   Assert((AEditMode = emNewrecord) or Assigned(ARecord));
   Assert(ViewTable <> nil);
 
-  if Assigned(FEditHostWindow) then
-    FEditHostWindow.Free(True);
+//  if Assigned(FEditHostWindow) then //Don't need anymore after use of CloseEditHostWindow
+//    FEditHostWindow.Free(True);
   FEditHostWindow := TKExtModalWindow.Create(Self);
 
   //FEditHostWindow.ResizeHandles := 'n s';
@@ -410,6 +412,7 @@ begin
     FEditHostWindow.SetSizeFromTree(ViewTable, 'Controller/PopupWindow/'));
   LFormController.Display;
   FEditHostWindow.Show;
+  FEditHostWindow.OnClose := CloseEditHostWindow;
 end;
 
 function TKExtDataPanelController.InitEditController(const AContainer: TExtContainer;
@@ -525,10 +528,15 @@ begin
   else
     LConfirmationJS := GetConfirmCall(LConfirmationMessage, Result.ExecuteButtonAction);
 
-  if LConfirmationMessage <> '' then
-    Result.Handler := JSFunction(LConfirmationJS)
-  else if LRequireSelection then
-    Result.On('click', GetSelectCall(TKExtDataActionButton(Result).ExecuteButtonAction))
+  if LConfirmationJS <> '' then
+  begin
+    if LConfirmationMessage <> '' then
+      Result.Handler := JSFunction(LConfirmationJS)
+    else if LRequireSelection then
+      Result.On('click', GetSelectCall(TKExtDataActionButton(Result).ExecuteButtonAction))
+    else
+      Result.On('click', Ajax(Result.ExecuteButtonAction, []));
+  end
   else
     Result.On('click', Ajax(Result.ExecuteButtonAction, []));
 end;
@@ -1050,6 +1058,12 @@ begin
   Session.Config.CheckAccessGranted(ViewTable.GetACURI, ACM_READ);
 end;
 
+procedure TKExtDataPanelController.CloseEditHostWindow(P: TExtPanel);
+begin
+  FEditHostWindow.Free(True);
+  FEditHostWindow := nil;
+end;
+
 procedure TKExtDataPanelController.SetFieldValue(const AField: TKViewTableField;
   const AValue: TSuperAvlEntry);
 var
@@ -1162,7 +1176,17 @@ begin
     except
       on E: EKValidationError do
       begin
-        ExtMessageBox.Alert(_(Session.Config.AppTitle), E.Message);
+        if E.AdditionalInfo <> '' then
+          ExtMessageBox.Alert(E.AdditionalInfo, E.Message) //EKValidationError exception with Additional Info as Title of error window
+        else
+          ExtMessageBox.Alert(_('Error'), E.Message);  //Simple EKValidationError exception
+        Result := E.Message;
+        ARecord.Assign(LOldRecord);
+        Exit;
+      end;
+      on E: Exception do
+      begin
+        ExtMessageBox.Alert(_('Error'), E.Message); //Simple generic exception
         Result := E.Message;
         ARecord.Assign(LOldRecord);
         Exit;
@@ -1174,8 +1198,12 @@ begin
 end;
 
 procedure TKExtDataPanelController.ViewRecord;
+var
+  LRecord: TKViewTableRecord;
 begin
-  ShowEditWindow(GetCurrentViewRecord, emViewCurrentRecord);
+  LRecord := GetCurrentViewRecord;
+  ShowEditWindow(LRecord, emViewCurrentRecord);
+  LRecord.ApplyAfterShowEditWindowRules;
 end;
 
 procedure TKExtDataPanelController.UpdateObserver(const ASubject: IEFSubject; const AContext: string);

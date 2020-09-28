@@ -72,8 +72,8 @@ var
   LEngine: TPerlRegEx;
 begin
   LEngine := GetRegExEngine;
-  LEngine.RegEx := APattern;
-  LEngine.Subject := AString;
+  LEngine.RegEx := UTF8Encode(APattern);
+  LEngine.Subject := UTF8Encode(AString);
   Result := LEngine.Match;
 end;
 

@@ -83,6 +83,7 @@ type
     function HandleUrlPath : Boolean; virtual;
     procedure InitDefaultValues; virtual;
     procedure OnError(const Msg, Method, Params : string); virtual;
+    procedure OnRedirectError(const AURLToRedirect: string); virtual;
     procedure OnNotFoundError; virtual;
     procedure SendResponse(const Msg : AnsiString); virtual; abstract;
     procedure SetCookie(const Name, Value : string; Expires : TDateTime = 0; const Domain : string = '';
@@ -196,7 +197,7 @@ type
 implementation
 
 uses
-  StrUtils, HTTPApp, ExtPascal;
+  StrUtils, HTTPApp, ExtPascal, gnugettext;
 
 const
   CBrowserNames: array[TBrowser] of string = ('Unknown', 'MSIE', 'Firefox', 'Chrome', 'Safari', 'Opera', 'Konqueror', 'Safari');
@@ -607,6 +608,7 @@ begin
         if CanHandleUrlPath and not HandleUrlPath and not TryToServeFile then
           OnNotFoundError;
     except
+      on E: ERedirectError do OnRedirectError(E.Message);
       on E: Exception do OnError(E.Message, PathInfo, string(HTTPDecode(ARequest)));
     end;
   if CanCallAfterHandleRequest then AfterHandleRequest;
@@ -622,19 +624,28 @@ var
   LPos: Integer;
 begin
   HandlerObj := GetUrlHandlerObject;
-  if not Assigned(HandlerObj) then
-    raise Exception.CreateFmt('Handler object for method %s not found in session.', [PathInfo]);
-
-  LPathInfo := PathInfo;
-  LPos := Pos('/', LPathInfo);
-  if LPos > 0 then
-    Delete(LPathInfo, 1, LPos);
-  PageMethod.Code := HandlerObj.MethodAddress(LPathInfo);
-  Result := PageMethod.Code <> nil;
-  if Result then begin
-    PageMethod.Data := HandlerObj;
-    MethodCall(PageMethod); // Call published method
+  if Assigned(HandlerObj) then
+  begin
+    LPathInfo := PathInfo;
+    LPos := Pos('/', LPathInfo);
+    if LPos > 0 then
+      Delete(LPathInfo, 1, LPos);
+    PageMethod.Code := HandlerObj.MethodAddress(LPathInfo);
+    Result := PageMethod.Code <> nil;
+    if Result then
+    begin
+      PageMethod.Data := HandlerObj;
+      MethodCall(PageMethod); // Call published method
+    end;
   end
+  else
+  begin
+{$IFDEF DEBUG}
+    raise Exception.CreateFmt(dgettext('Kitto','Handler object for method %s not found in session.'), [PathInfo]);
+{$ELSE}
+    Result := False;
+{$ENDIF}
+  end;
 end;
 
 procedure TCustomWebSession.InitDefaultValues; begin end;
@@ -659,17 +670,29 @@ begin
   if Result <> '' then
     Result := MethodURI(Result)
   else
-    raise Exception.Create('MethodURI: Method is not published');
+    raise Exception.Create(dgettext('Kitto','MethodURI: Method is not published'));
 end;
 
 procedure TCustomWebSession.OnError(const Msg, Method, Params : string);
+var
+  LMsg: string;
 begin
-  Alert(Msg + '\non Method: ' + Method + '\nParams: ' + Params);
+  LMsg := Format(dgettext('Kitto','%s\non Method: %s\nParams: %s'),
+    [Msg, Method, Params]);
+  Alert(LMsg);
 end;
 
 procedure TCustomWebSession.OnNotFoundError;
+var
+  LMsg: string;
 begin
-  Response := Format('alert("Method: ''%s'' not found");', [PathInfo]);
+  LMsg := Format(dgettext('Kitto','Method: ''%s'' not found'), [PathInfo]);
+  Response := Format('alert("%s");', [LMsg]);
+end;
+
+procedure TCustomWebSession.OnRedirectError(const AURLToRedirect: string);
+begin
+  Alert(dgettext('Kitto','Redirect to: ')+ AURLToRedirect);
 end;
 
 {
@@ -766,7 +789,7 @@ begin
   with Application do
     if CheckPassword(Password) then begin
       Logout;
-      SendResponse('SHUTDOWN: Service is temporarily shutdown for maintenance. Please, try again after a few moments.');
+      SendResponse(dgettext('Kitto','SHUTDOWN: Service is temporarily shutdown for maintenance. Please, try again after a few moments.'));
       Terminate;
     end;
 end;
@@ -827,11 +850,11 @@ var
 begin
   if FileUploaded = '' then Exit;
   if MaxUploadSize = 0 then begin
-    UploadResponse(False, 'File upload disabled.');
+    UploadResponse(False, dgettext('Kitto','File upload disabled.'));
     Exit;
   end
   else if FUploadedFileTooBig then begin
-    UploadResponse(False, Format('File too big. Maximum allowed size is %s.',
+    UploadResponse(False, Format(dgettext('Kitto','File too big. Maximum allowed size is %s.'),
       [FormatByteSize(MaxUploadSize)]));
     Exit;
   end;

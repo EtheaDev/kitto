@@ -5,6 +5,7 @@ unit UseKitto;
 interface
 
 uses
+  Classes,
   DBXFirebird,
   EF.DB.ADO,
   EF.DB.DBX,
@@ -26,5 +27,11 @@ uses
   ;
 
 implementation
+
+initialization
+{$WARN SYMBOL_PLATFORM OFF}
+  // check memory leaks at the end of the app
+  ReportMemoryLeaksOnShutdown := DebugHook <> 0;
+{$WARN SYMBOL_PLATFORM ON}
 
 end.

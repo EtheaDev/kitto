@@ -59,11 +59,15 @@ unit ExtPascal;
 interface
 
 uses
-  Generics.Collections, SysUtils,
+  Generics.Collections, SysUtils, gnugettext,
   {$IFNDEF WebServer}FCGIApp{$ELSE}IdExtHTTPServer{$ENDIF},
   Classes, ExtPascalClasses, ExtPascalUtils;
 
 type
+  ERedirectError = class(Exception);
+
+  TExtMessageType = (emtInfo, emtWarning, emtError);
+
   TArrayOfString  = array of string;
   TArrayOfInteger = array of Integer;
   TExtObjectList  = class;
@@ -431,11 +435,14 @@ type
     function GetStyleTag: string;
     function GetSequence: string;
     function GetResponseItems: TExtResponseItems;
+    function GetMessageJSCode(const AMessageType: TExtMessageType;
+      const ATitle, AMessage, AAction: string): string;
   protected
     function BeforeHandleRequest : boolean; override;
     procedure AfterHandleRequest; override;
     function GarbageFixName(const Name: string): string; override;
     procedure OnError(const AMessage, AMethodName, AParams : string); override;
+    procedure OnRedirectError(const AURLToRedirect: string); override;
     function GetNextJSName(const AObjectType: string): string;
     function GetUrlHandlerObject: TObject; override;
     function JSConcat(PrevCommand, NextCommand : string) : string;
@@ -460,9 +467,13 @@ type
     procedure SetLibrary(pLibrary : string = ''; CSS : boolean = false; HasDebug : boolean = false; DisableExistenceCheck : boolean = false);
     procedure SetCSS(pCSS : string; Check : boolean = true);
     procedure SetIconCls(Cls : array of string);
+    procedure ShowMessage(const AMessageType: TExtMessageType;
+      const ATitle, AMessage: string; const AAction: string = ''); overload;
+    procedure ShowMessage(const AMessageType: TExtMessageType;
+      const ATitle, AMessage: string; const AAction: TExtFunction); overload;
     procedure ErrorMessage(const AMessage: string; const AAction: string = ''); overload;
     procedure ErrorMessage(const AMessage: string; const AAction: TExtFunction); overload;
-    procedure Alert(const Msg : string); override;
+    procedure Alert(const AMsg : string); override;
     procedure Refresh; override;
 
     property ResponseItems: TExtResponseItems read GetResponseItems;
@@ -755,8 +766,7 @@ Shows an error message in browser session using Ext JS style.
 }
 procedure TExtSession.ErrorMessage(const AMessage: string; const AAction: string);
 begin
-  ResponseItems.ExecuteJSCode('Ext.Msg.show({title:"Error",msg:' + StrToJS(AMessage, True) +
-    ',icon:Ext.Msg.ERROR,buttons:Ext.Msg.OK' + IfThen(AAction = '', '', ',fn:function(){' + AAction + '}') + '});');
+  ShowMessage(emtError, dgettext('Kitto','Error'), AMessage, AAction);
 end;
 
 {
@@ -768,6 +778,43 @@ Shows an error message in browser session using Ext JS style.
 procedure TExtSession.ErrorMessage(const AMessage: string; const AAction: TExtFunction);
 begin
   ErrorMessage(AMessage, AAction.ExtractJSCommand);
+end;
+
+function TExtSession.GetMessageJSCode(const AMessageType: TExtMessageType;
+  const ATitle, AMessage, AAction: string): string;
+var
+  LJSCode: string;
+begin
+  LJSCode := 'Ext.Msg.show({title:"%s",msg:' + StrToJS(AMessage, True) +
+    ',icon:Ext.Msg.%s,'+
+    'maxWidth: getMaxMsgWidth(),'+
+    'minWidth: getMinMsgWidth(),'+
+    'buttons:Ext.Msg.OK' +
+    IfThen(AAction = '', '', ',fn:function(){' + AAction + '}') + '});';
+  case AMessageType of
+    emtInfo: Result := Format(LJSCode, [ATitle,'INFO']);
+    emtWarning: Result := Format(LJSCode, [ATitle,'WARNING']);
+    emtError: Result := Format(LJSCode, [ATitle,'ERROR']);
+  end;
+end;
+
+{
+Shows a message of type AMessageType in browser session using Ext JS style.
+@param Msg Message text, can to use HTML to formating text.
+@param Action Optional action that will be executed after user to click Ok button. Could be JavaScript or ExtPascal commands
+@example <code>ErrorMessage('User not found.');</code>
+@example <code>ErrorMessage('Context not found.<br/>This Window will be reloaded to fix this issue.', 'window.location.reload()');</code>
+}
+procedure TExtSession.ShowMessage(const AMessageType: TExtMessageType;
+  const ATitle, AMessage: string; const AAction: string = '');
+begin
+  ResponseItems.ExecuteJSCode(GetMessageJSCode(AMessageType, ATitle, AMessage, AAction));
+end;
+
+procedure TExtSession.ShowMessage(const AMessageType: TExtMessageType;
+  const ATitle, AMessage: string; const AAction: TExtFunction);
+begin
+  ShowMessage(AMessageType, ATitle, AMessage, AAction.ExtractJSCommand);
 end;
 
 function TExtSession.GarbageFixName(const Name: string): string;
@@ -786,9 +833,16 @@ begin
   {$ENDIF}
 end;
 
-procedure TExtSession.Alert(const Msg : string);
+procedure TExtSession.OnRedirectError(const AURLToRedirect: string);
 begin
-  ErrorMessage(Msg)
+  inherited;
+  ResponseItems.Clear;
+  ResponseItems.ExecuteJSCode(Format('window.location.href=''%s''', [AURLToRedirect]));
+end;
+
+procedure TExtSession.Alert(const AMsg : string);
+begin
+  ErrorMessage(AMsg);
 end;
 
 {
@@ -1002,12 +1056,12 @@ begin
   IsAjax := (RequestHeader['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest') or IsUpload;
   if IsAjax then begin
     if SessionCookie = '' then begin
-      ErrorMessage('This web application requires Cookies enabled to AJAX works.');
+      ErrorMessage(dgettext('Kitto','This web application requires Cookies enabled to AJAX works.'));
       Result := false;
     end
     else
       if NewThread or RequiresReload then begin
-        ErrorMessage('Session expired or lost.<br/>A new session will be created now.', 'window.location.reload()');
+        ErrorMessage(dgettext('Kitto','Session expired or lost.<br/>A new session will be created now.'), 'window.location.reload()');
         RequiresReload := true;
         Result := false;
       end
@@ -1081,7 +1135,7 @@ begin
   begin
     LObject := ObjectCatalog.FindExtObject(Query['Obj']) as TExtObject;
     if not Assigned(LObject) then
-      OnError('Object not found in session list. It could be timed out, refresh page and try again', 'HandleEvent', '')
+      OnError(dgettext('Kitto','Object not found in session list. It could be timed out, refresh page and try again'), 'HandleEvent', '')
     else
       LObject.HandleEvent(Query['Evt']);
   end;
@@ -2459,6 +2513,8 @@ begin
       Result := '" + encodeURIComponent(' + Param + ') + "'
     else
       Result := '" + encodeURIComponent(' + Copy(Param, I + 1, Length(Param)) + ') + "'
+  else if Result <> '' then
+    Result := 'encodeURIComponent('+Param+')'
   else
     Result := Param;
 end;
@@ -2478,7 +2534,7 @@ begin
           {$IFDEF UNICODE}
           vtUnicodeString : Result := Result + SurroundAjaxParam(string(VUnicodeString));
           {$ENDIF}
-          vtObject     : Result := Result + '"+' + TExtObject(VObject).ExtractJSCommand + '+"';
+          vtObject     : Result := Result + '"+' + SurroundAjaxParam(TExtObject(VObject).ExtractJSCommand) + '+"';
           vtInteger    : Result := Result + IntToStr(VInteger);
           vtBoolean    : Result := Result + IfThen(VBoolean, 'true', 'false');
           vtExtended   : Result := Result + FloatToStr(VExtended^);

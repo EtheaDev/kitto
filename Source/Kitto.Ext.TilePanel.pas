@@ -27,8 +27,8 @@ uses
   Kitto.Ext.Base, Kitto.Ext.Controller, Kitto.Ext.Session, Kitto.Ext.TabPanel;
 
 const
-  DEFAULT_TILE_HEIGHT = 50;
-  DEFAULT_TILE_WIDTH = 100;
+  DEFAULT_TILE_HEIGHT = '50';
+  DEFAULT_TILE_WIDTH = '100';
 
 type
   // A tile page to be added to a container.
@@ -42,8 +42,8 @@ type
     FRootNode: TKTreeViewNode;
     procedure AddBreak;
     procedure AddTitle(const ADisplayLabel: string);
-    function GetTileHeight: Integer;
-    function GetTileWidth: Integer;
+    function GetTileHeight: string;
+    function GetTileWidth: string;
     function GetShowImage: Boolean;
     function GetImagePosition: string;
     procedure BuildTileBoxHtml(const ARootNode: TKTreeViewNode = nil);
@@ -139,6 +139,7 @@ procedure TKExtTilePanel.DoDisplay;
 var
   LTitle: string;
 begin
+  Style := 'background-image: url(''/KittoSCM/SCMLogo.png'')';
   LTitle := _(Config.GetExpandedString('Title', View.DisplayLabel));
   if LTitle <> '' then
     Title := LTitle
@@ -212,6 +213,15 @@ begin
     Result[3] := '#2B0E88';
     Result[4] := '#20096A';
   end
+  else if SameText(AColorSetName, 'Green') then
+  begin
+    SetLength(Result, 5);
+    Result[0] := '#97C93C';
+    Result[1] := '#93DB70';
+    Result[2] := '#00CD00';
+    Result[3] := '#008000';
+    Result[4] := '#003300';
+  end
   else
   begin
     SetLength(Result, 1);
@@ -237,14 +247,18 @@ begin
     FColorIndex := Low(FColors);
 end;
 
-function TKExtTilePanel.GetTileHeight: Integer;
+function TKExtTilePanel.GetTileHeight: string;
 begin
-  Result := Config.GetInteger('TileHeight', DEFAULT_TILE_HEIGHT);
+  Result := Config.GetString('TileHeight', DEFAULT_TILE_HEIGHT);
+  if Result[length(Result)] in ['0'..'9'] then
+    Result := Result+'px';
 end;
 
-function TKExtTilePanel.GetTileWidth: Integer;
+function TKExtTilePanel.GetTileWidth: string;
 begin
-  Result := Config.GetInteger('TileWidth', DEFAULT_TILE_WIDTH);
+  Result := Config.GetString('TileWidth', DEFAULT_TILE_WIDTH);
+  if Result[length(Result)] in ['0'..'9'] then
+    Result := Result+'px';
 end;
 
 procedure TKExtTilePanel.AddTiles(const ANode: TKTreeViewNode; const ADisplayLabel: string);
@@ -407,14 +421,16 @@ begin
   //Build background css style
   LCustomStyle := 'background-repeat: no-repeat;';
   AddAttributeToStyle(LCustomStyle, 'BackgroundColor', 'background-color: %s;', LBackGroundColor);
-  AddAttributeToStyle(LCustomStyle, 'Width', 'width:%spx;', IntToStr(GetTileWidth));
-  AddAttributeToStyle(LCustomStyle, 'Height', 'height:%spx;', IntToStr(GetTileHeight));
+  AddAttributeToStyle(LCustomStyle, 'Width', 'width:%s;', GetTileWidth);
+  AddAttributeToStyle(LCustomStyle, 'Height', 'height:%s;', GetTileHeight);
 
   LShowImage := GetShowImage or (LImageName <> '');
   if LShowImage then
   begin
     if (LImageName = '') and Assigned(LView) then
-      LImageName := LView.ImageName;
+    begin
+      LImageName := CallViewControllerStringMethod(LView, 'GetDefaultImageName', LView.ImageName);
+    end;
     if LImageName <> '' then
     begin
       AddAttributeToStyle(LCustomStyle, 'ImagePosition', 'background-position: %s;', GetImagePosition);
@@ -458,7 +474,8 @@ begin
   if Assigned(FRootNode) then
   begin
     AddBackTile;
-    AddBreak;
+    if FRootNode.GetBoolean('Back/AddBreak',True) then
+      AddBreak;
   end;
 
   LTreeViewRenderer := TKExtTreeViewRenderer.Create;

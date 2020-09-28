@@ -126,7 +126,7 @@ implementation
 uses
   Math, Variants,
   EF.StrUtils, EF.DB, EF.SysUtils,
-  Kitto.Metadata.Models, Kitto.Config, Kitto.Utils;
+  Kitto.Metadata.Models, Kitto.Config, Kitto.Utils, EF.Macros;
 
 const
   ADO_EXCEL_2000 = 'Excel 8.0';
@@ -412,6 +412,7 @@ var
 begin
   //Opens the Ado table using a range defined inside the excel file
   LAdoTable := OpenExcelRange(AExcelFileName, AExcelRangeName);
+  TEFMacroExpansionEngine.Instance.DisableForCurrentThread;
   try
     LFirstAccepted := False;
     LZeroValueForced := False;
@@ -472,11 +473,13 @@ begin
     end;
   finally
     CloseExcelRange(LAdoTable);
+    TEFMacroExpansionEngine.Instance.EnableForCurrentThread;
   end;
 
   if LZeroValueForced then
   begin
     LAdoTable := OpenExcelRange(AExcelFileName, AExcelRangeName);
+    TEFMacroExpansionEngine.Instance.DisableForCurrentThread;
     Try
       //Reassign only blank values with NULL
       LAdoTable.First;
@@ -505,6 +508,7 @@ begin
     finally
       LAdoTable.Close;
       LAdoTable.Free;
+      TEFMacroExpansionEngine.Instance.EnableForCurrentThread;
     end;
   end;
 end;

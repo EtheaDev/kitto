@@ -52,6 +52,9 @@ Source: "..\Home\Resources\*"; DestDir: "{app}\Home\Resources"; Flags: ignorever
 ;Custom Config for deployment: comparetimestamp so don't replace if file was changed directly on web-server
 Source: "Config.yaml"; DestDir: "{app}\Home\Metadata"; Flags: ignoreversion comparetimestamp uninsneveruninstall; Permissions: users-modify
 
+;Custom dll for access to firebird
+Source: "dbxfb.dll"; DestDir: "{app}\Home"; Flags: ignoreversion comparetimestamp uninsneveruninstall;
+
 Source: "..\..\..\Home\Resources\*"; DestDir: "{app}\Externals\Kitto\Home\Resources"; Flags: ignoreversion recursesubdirs createallsubdirs 
 Source: "..\..\..\Home\Locale\*"; DestDir: "{app}\Externals\Kitto\Home\Locale"; Flags: ignoreversion recursesubdirs createallsubdirs 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

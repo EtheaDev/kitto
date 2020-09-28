@@ -33,6 +33,8 @@ type
   TKExtDataPanelLeafController = class abstract(TKExtDataPanelController)
   strict private
     FRefreshButton: TKExtButton;
+    FHelpButton: TKExtButton;
+    FHelpHRef: string;
   strict protected
     function IsClientStoreAutoLoadEnabled: Boolean; virtual;
     procedure AddTopToolbarButtons; override;
@@ -45,6 +47,7 @@ type
   published
     procedure LoadData; override;
     procedure DoDisplay; override;
+    procedure DoHelpContext;
   end;
 
 implementation
@@ -85,6 +88,19 @@ begin
     Session.Queries.Values['action'] := '';
     ExecuteNamedAction(LActionCommand);
   end;
+end;
+
+procedure TKExtDataPanelLeafController.DoHelpContext;
+var
+  LHRef: string;
+  LJSCode: string;
+begin
+  if View.PersistentName <> '' then
+    LHRef := Format(FHelpHRef, [View.PersistentName])
+  else if Assigned(View.MainTable) then
+    LHRef := Format(FHelpHRef, [View.MainTable.ModelName]);
+  LJSCode := Format('window.open(''%s'', "_blank");', [LHRef]);
+  Session.ResponseItems.ExecuteJSCode(LJSCode);
 end;
 
 procedure TKExtDataPanelLeafController.ExecuteNamedAction(const AActionName: string);
@@ -143,6 +159,9 @@ begin
 end;
 
 procedure TKExtDataPanelLeafController.AddTopToolbarButtons;
+var
+  LShowHelpLink: Boolean;
+  LHelpHrefStyle, LHelpShortText, LHelpLongText: string;
 begin
   inherited;
   TExtToolbarSpacer.CreateAndAddTo(TopToolbar.Items);
@@ -152,6 +171,21 @@ begin
     FRefreshButton.On('click', Ajax(GetParentDataPanel.LoadData));
     if ViewTable.GetBoolean('Controller/PreventRefreshing') then
       FRefreshButton.Hidden := True;
+  end;
+
+  FHelpButton := nil;
+  if View.MainTable = ViewTable then
+  begin
+    Session.Config.GetHelpSupport(LShowHelpLink,
+      FHelpHRef, LHelpHrefStyle, LHelpShortText, LHelpLongText);
+    LHelpLongText := Format(LHelpLongText, [View.DisplayLabel]);
+    if LShowHelpLink then
+    begin
+      FHelpButton := TKExtButton.CreateAndAddTo(TopToolbar.Items);
+      FHelpButton.SetIconAndScale('help');
+      FHelpButton.Tooltip := LHelpLongText;
+      FHelpButton.Handler := Ajax(DoHelpContext);
+    end;
   end;
 end;
 

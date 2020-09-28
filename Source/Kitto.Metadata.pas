@@ -635,7 +635,7 @@ begin
     begin
       LObjectName := ANode.AsExpandedString;
       if LObjectName <> '' then
-        Result := ObjectByName(LObjectName)
+        Result := FindObject(LObjectName)
       else if ANode.ChildCount > 0 then
       begin
         Result := GetObjectClassType.Create;

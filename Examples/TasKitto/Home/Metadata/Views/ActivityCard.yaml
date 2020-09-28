@@ -1,0 +1,64 @@
+﻿Type: Data
+DisplayLabel: Activity Cards
+Controller: List
+  Filters:
+    DisplayLabel: Search panel
+    LabelWidth: 90
+    Connector: and
+    Items:
+      FreeSearch: Description
+        ExpressionTemplate: (UPPER(Activity.Description) like UPPER('%{value}%'))
+      DynaList: Activity Type
+        CommandText: |
+          select first 1 '%' TYPE_ID, '(All)' TYPE_NAME from kitto_users
+            union all
+          select TYPE_ID, TYPE_NAME from ACTIVITY_TYPE 
+            order by 2
+        ExpressionTemplate: Activity.TYPE_ID like '{value}'
+      ColumnBreak:
+        LabelWidth: 50
+      DateSearch: From
+        ExpressionTemplate: ACTIVITY_DATE >= '{value}'
+      DateSearch: To
+        ExpressionTemplate: ACTIVITY_DATE <= '{value}'
+      ColumnBreak:
+        LabelWidth: 80
+      List: Period
+        Items:
+          Today: Today
+            Expression: (ACTIVITY_DATE > %DB.CURRENT_DATE% - 1)
+          LastWeek: Last Week
+            Expression: (ACTIVITY_DATE <= %DB.CURRENT_DATE%) and (ACTIVITY_DATE >= %DB.CURRENT_DATE% - 7)
+          CurrMonth: Current Month
+            Expression: |
+              EXTRACT(month FROM ACTIVITY_DATE) = EXTRACT(month FROM %DB.CURRENT_DATE%) 
+              and EXTRACT(year FROM ACTIVITY_DATE) = EXTRACT(year FROM %DB.CURRENT_DATE%)                
+          CurrYear: Current Year
+            Expression: EXTRACT(year FROM ACTIVITY_DATE) = EXTRACT(year FROM %DB.CURRENT_DATE%)
+          All: Whole Archive
+            Expression: 1=1
+            IsDefault: True
+      FreeSearch: Last N Days
+        ExpressionTemplate: (ACTIVITY_DATE >= %DB.CURRENT_DATE% - {value})
+      ColumnBreak:
+      Spacer:
+        Width: 1
+      ColumnBreak:
+      ApplyButton: Apply search
+        ImageName: Find
+  CenterController: TemplateDataPanel
+    TemplateFileName: ActivityCard.html
+    TemplateView:
+      Id: images-view
+      SelectorClass: div.thumb-wrap
+      OverClass: x-view-over
+
+MainTable:
+  Model: ACTIVITY
+  IsLarge: True
+  Controller:
+    FormController:
+      CloneButton:
+    PopupWindow:
+      Width: 600
+      Height: 400

@@ -153,7 +153,6 @@ type
   strict private
     FTempFileNames: TStrings;
     FStream: TStream;
-    function GetClientFileName: string;
     function GetContentType: string;
     function GetFileName: string;
     procedure DoDownloadStream(const AStream: TStream;
@@ -162,6 +161,7 @@ type
   strict protected
     FFileName: string;
     function GetPersistentFileName: string;
+
     procedure ExecuteTool; override;
     function GetFileExtension: string;
     function GetDefaultFileExtension: string; virtual;
@@ -169,6 +169,7 @@ type
     procedure Cleanup;
     procedure DoAfterExecuteTool; override;
   protected
+    function GetClientFileName: string; virtual;
     /// <summary>
     ///  Override this method to provide a default file name if it's
     ///  not specified in the config. If you are using streams, don't override

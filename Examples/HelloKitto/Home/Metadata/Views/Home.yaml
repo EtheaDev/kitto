@@ -1,9 +1,6 @@
 ﻿DisplayLabel: _(%Config:AppTitle%)
 # Valid top-level controllers are Window and Viewport
 Controller: Viewport
-  Width: 1000
-  Height: 600
-
   SubView:
     Controller: BorderPanel
 

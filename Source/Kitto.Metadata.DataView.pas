@@ -102,6 +102,7 @@ type
     function GetDBNameOrExpression: string;
     function GetFieldType: TFieldType;
     function GetIsPicture: Boolean;
+    function GetIsAutoAddField: Boolean;
     const URL_PREFIX = '_URL_';
   strict protected
     function GetChildClass(const AName: string): TEFNodeClass; override;
@@ -153,6 +154,12 @@ type
     ///  model field is a reference field.
     /// </summary>
     property IsReference: Boolean read GetIsReference;
+
+    /// <summary>
+    ///  Returns True if the field is a auto-add field, that is if into
+    ///  field name there is a dot that separate Master Table e Referenced Table.
+    /// </summary>
+    property IsAutoAddField: Boolean read GetIsAutoAddField;
 
     /// <summary>
     ///  Optional filter to use when creating select lists. Only applies to
@@ -511,6 +518,7 @@ type
 
     procedure ApplyNewRecordRules;
     procedure ApplyEditRecordRules;
+    procedure ApplyAfterShowEditWindowRules;
     procedure ApplyDuplicateRecordRules;
     procedure ApplyBeforeRules;
     procedure ApplyAfterRules;
@@ -755,6 +763,11 @@ type
   end;
 
   TKFileReferenceDataType = class(TEFStringDataType)
+  public
+    class function GetTypeName: string; override;
+  end;
+
+  TKHTMLMemoDataType = class(TEFMemoDataType)
   public
     class function GetTypeName: string; override;
   end;
@@ -1145,7 +1158,8 @@ var
         for J := 0 to LAutoAddFields.ChildCount - 1 do
         begin
           LAutoAddField := LAutoAddFields.Children[J];
-          LViewField := TKViewField.Create(LModelField.FieldName + '.' + LAutoAddField.Name, LAutoAddField.AsExpandedString);
+          LViewField := TKViewField.Create(LModelField.FieldName + AUTO_ADD_FIELD_SEPARATOR +
+            LAutoAddField.Name, LAutoAddField.AsExpandedString);
           for K := 0 to LAutoAddField.ChildCount - 1 do
             LViewField.AddChild(TEFNode.Clone(LAutoAddField.Children[K]));
           LFields.AddChild(LViewField);
@@ -1482,7 +1496,7 @@ begin
   for I := 0 to ModelField.Rules.RuleCount - 1 do
   begin
     LRule := ModelField.Rules[I];
-    if not Rules.HasRule(LRule) then
+    if not Rules.HasRule(LRule) and not IsAutoAddField then
     begin
       LRuleImpl := TKRuleImplFactory.Instance.CreateObject(LRule.Name);
       try
@@ -1676,7 +1690,8 @@ end;
 
 function TKViewField.HasRules: Boolean;
 begin
-  Result := (Rules.RuleCount > 0) or (ModelField.Rules.RuleCount > 0);
+  Result := (Rules.RuleCount > 0) or ((ModelField.Rules.RuleCount > 0) and
+    not IsAutoAddField);
 end;
 
 function TKViewField.FindNode(const APath: string;
@@ -1754,7 +1769,7 @@ begin
   LNode := FindNode('CanInsert');
   if LNode = nil then
   begin
-    if pos('.',Name) > 0 then
+    if IsAutoAddField then
       Result := False
     else
       Result := ModelField.CanInsert;
@@ -1770,7 +1785,7 @@ begin
   LNode := FindNode('CanUpdate');
   if LNode = nil then
   begin
-    if pos('.',Name) > 0 then
+    if IsAutoAddField then
       Result := False
     else
       Result := ModelField.CanUpdate;
@@ -2095,6 +2110,11 @@ begin
   Result := GetInteger('Size');
   if Result = 0 then
     Result := ModelField.Size;
+end;
+
+function TKViewField.GetIsAutoAddField: Boolean;
+begin
+  Result := pos(AUTO_ADD_FIELD_SEPARATOR, Name) > 0;
 end;
 
 function TKViewField.GetIsBlob: Boolean;
@@ -2554,6 +2574,15 @@ begin
     end);
 end;
 
+procedure TKViewTableRecord.ApplyAfterShowEditWindowRules;
+begin
+  ViewTable.ApplyRules(
+    procedure (ARuleImpl: TKRuleImpl)
+    begin
+      ARuleImpl.AfterShowEditWindow(Self);
+    end);
+end;
+
 procedure TKViewTableRecord.ApplyDuplicateRecordRules;
 begin
   ViewTable.ApplyRules(
@@ -2696,9 +2725,15 @@ begin
                 LDerivedField.SetToNull;
             end;
           end;
+          LField.ViewField.ApplyRules(
+            procedure (ARuleImpl: TKRuleImpl)
+            begin
+              ARuleImpl.AfterRefreshReferenceField(LField);
+            end);
         finally
           FreeAndNil(LStore);
         end;
+
       finally
         FReferenceViewFieldBeingChanged := nil;
       end;
@@ -2868,18 +2903,14 @@ begin
   Assert(Length(LMasterFieldNames) > 0);
   LDetailFieldNames := Records.Store.ViewTable.ModelDetailReference.ReferenceField.GetFieldNames;
   Assert(Length(LDetailFieldNames) = Length(LMasterFieldNames));
-  //Store.DisableChangeNotifications;
-  try
-    for I := 0 to High(LDetailFieldNames) do
-    begin
-      // ...alias them...
-      LMasterFieldNames[I] := Records.Store.ViewTable.MasterTable.ApplyFieldAliasedName(LMasterFieldNames[I]);
-      LDetailFieldNames[I] := Records.Store.ViewTable.ApplyFieldAliasedName(LDetailFieldNames[I]);
-      // ... and copy values.
-      GetNode(LDetailFieldNames[I]).AssignValue(AMasterRecord.GetNode(LMasterFieldNames[I]));
-    end;
-  finally
-    //Store.EnableChangeNotifications;
+
+  for I := 0 to High(LDetailFieldNames) do
+  begin
+    // ...alias them...
+    LMasterFieldNames[I] := Records.Store.ViewTable.MasterTable.ApplyFieldAliasedName(LMasterFieldNames[I]);
+    LDetailFieldNames[I] := Records.Store.ViewTable.ApplyFieldAliasedName(LDetailFieldNames[I]);
+    // ... and copy values.
+    GetNode(LDetailFieldNames[I]).AssignValue(AMasterRecord.GetNode(LMasterFieldNames[I]));
   end;
 end;
 
@@ -3034,9 +3065,17 @@ begin
   Result := Self;
 end;
 
+{ TKHTMLMemoDataType }
+
+class function TKHTMLMemoDataType.GetTypeName: string;
+begin
+  Result := 'HTMLMemo';
+end;
+
 initialization
   TKViewRegistry.Instance.RegisterClass(TKMetadata.SYS_PREFIX + 'Data', TKDataView);
   TEFDataTypeRegistry.Instance.RegisterClass(TKFileReferenceDataType.GetTypeName, TKFileReferenceDataType);
+  TEFDataTypeRegistry.Instance.RegisterClass(TKHTMLMemoDataType.GetTypeName, TKHTMLMemoDataType);
 
 finalization
   // For some reason, the unit defining TKViewRegistry is finalized before this one.
@@ -3044,5 +3083,6 @@ finalization
   if TKViewRegistry.HasInstance then
     TKViewRegistry.Instance.UnregisterClass(TKMetadata.SYS_PREFIX + 'Data');
   TEFDataTypeRegistry.Instance.UnregisterClass(TKFileReferenceDataType.GetTypeName);
+  TEFDataTypeRegistry.Instance.UnregisterClass(TKHTMLMemoDataType.GetTypeName);
 
 end.

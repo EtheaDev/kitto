@@ -48,6 +48,8 @@ begin
   Resizable := ResizeHandles <> '';
   Maximizable := View.GetBoolean('Controller/Maximizable', Resizable);
   Draggable := View.GetBoolean('Controller/Movable', True);
+  Closable := View.GetBoolean('Controller/Closable', False);
+  Modal := View.GetBoolean('Controller/Modal', False);
   inherited;
 end;
 

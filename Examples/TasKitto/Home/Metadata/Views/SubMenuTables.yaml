@@ -1,0 +1,10 @@
+DisplayLabel: Prova
+View: Employees
+View: Build AutoList
+  Model: OPERATOR_ROLE
+  DisplayLabel: Operator roles
+View:
+  Type: Data
+  Controller: List
+  MainTable:
+    Model: ACTIVITY_TYPE

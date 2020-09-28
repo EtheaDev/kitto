@@ -202,7 +202,11 @@ begin
   if SameText(AContext, '{ConfigChanged}') then
     Configure(TEFLogger(ASubject.AsObject).FConfig, TEFLogger(ASubject.AsObject).FMacroExpansionEngine)
   else
-    DoLog(AContext);
+  begin
+    //prevent logging of password
+    if pos('PASSWORD', UpperCase(AContext)) = 0 then
+      DoLog(AContext);
+  end;
 end;
 
 end.

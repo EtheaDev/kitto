@@ -29,6 +29,40 @@ uses
   EF.Intf, EF.Classes, EF.Tree;
 
 type
+  ///	<summary>
+  ///	  Base class for all EFDB exceptions.
+  ///	</summary>
+  EEFDBError = class(Exception)
+  private
+    FSQLError: string;
+    FSQLExpression: string;
+    FGUIDError: string;
+  public
+    ///	<summary>
+    ///	  Creates the exception with an additional SQL Expression
+    ///   Opening a Query
+    ///	</summary>
+    constructor CreateForQuery(
+      const ASQLError, ASQLExpression: string);
+
+    ///	<summary>
+    ///	  An EF exception may optionally have additional SQL Expression over
+    ///	  what's displayed in the Message. The value of this property is set
+    ///	  upon creation through the CreateOpeningQuery constructor.
+    ///	</summary>
+    property SQLExpression: string read FSQLExpression;
+    ///	<summary>
+    ///	  An EF exception may optionally have additional SQL Error message over
+    ///	  what's displayed in the Message. The value of this property is set
+    ///	  upon creation through the CreateOpeningQuery constructor.
+    ///	</summary>
+    property SQLError: string read FSQLError;
+    ///	<summary>
+    ///	  An EF exception had an additional GUID Identifier
+    ///	</summary>
+    property GUIDError: string read FGUIDError;
+  end;
+
   TEFDBSchemaInfo = class;
 
   ///	<summary>
@@ -1299,6 +1333,26 @@ begin
     Result := Format('to_date(''%s'', ''yyyymmdd'')', [SysUtils.FormatDateTime('yyyymmdd', ADateTimeValue)])
   else
     Result := Format('to_date(''%s'', ''yyyy/mm/dd hh24:mi:ss'')', [SysUtils.FormatDateTime('yyyymmdd hh:mm:ss', ADateTimeValue)]);
+end;
+
+{ EEFDBError }
+
+constructor EEFDBError.CreateForQuery(
+  const ASQLError, ASQLExpression: string);
+var
+  LMessage: string;
+  LErrorMsg: string;
+begin
+  LMessage := _('Error %s using query: %s');
+  FGUIDError := CreateGuidStr;
+  LErrorMsg := Format(LMessage, [FGUIDError+sLineBreak+ASQLError+sLineBreak, ASQLExpression]);
+  TEFLogger.Instance.Log(LErrorMsg, TEFLogger.LOG_LOW);
+  {$IFNDEF DEBUG}
+  LErrorMsg := Format(LMessage, [ASQLError, FGUIDError]);
+  {$ENDIF}
+  FSQLError := ASQLError;
+  FSQLExpression := ASQLExpression;
+  inherited Create(LErrorMsg);
 end;
 
 end.

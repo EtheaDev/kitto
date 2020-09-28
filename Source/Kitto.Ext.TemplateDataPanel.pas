@@ -86,7 +86,7 @@ end;
 function TKExtTemplateDataPanel.GetSelectConfirmCall(const AMessage: string; const AMethod: TExtProcedure): string;
 begin
   Result := Format('selectDataViewConfirmCall("%s", "%s", %s, "%s", {methodURL: "%s", dataView: %s, fieldNames: "%s"});',
-    [_(Session.Config.AppTitle), AMessage, FDataView.JSName, ViewTable.Model.CaptionField.FieldName, MethodURI(AMethod),
+    [_('Confirm operation'), AMessage, FDataView.JSName, ViewTable.Model.CaptionField.FieldName, MethodURI(AMethod),
     FDataView.JSName, Join(ViewTable.GetKeyFieldAliasedNames, ',')]);
 end;
 

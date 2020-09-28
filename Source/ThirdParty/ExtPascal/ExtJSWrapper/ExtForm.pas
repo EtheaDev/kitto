@@ -522,14 +522,14 @@ type
     procedure SetFCreateLinkText(Value: string);
     procedure SetFDefaultLinkValue(Value: string);
     procedure SetFDefaultValue(Value: string);
-    procedure SetFEnableAlignments(Value: Boolean);
-    procedure SetFEnableColors(Value: Boolean);
-    procedure SetFEnableFont(Value: Boolean);
-    procedure SetFEnableFontSize(Value: Boolean);
-    procedure SetFEnableFormat(Value: Boolean);
-    procedure SetFEnableLinks(Value: Boolean);
-    procedure SetFEnableLists(Value: Boolean);
-    procedure SetFEnableSourceEdit(Value: Boolean);
+    procedure SetEnableAlignments(const AValue: Boolean);
+    procedure SetEnableColors(const AValue: Boolean);
+    procedure SetEnableFont(const AValue: Boolean);
+    procedure SetEnableFontSize(const AValue: Boolean);
+    procedure SetEnableFormat(const AValue: Boolean);
+    procedure SetEnableLinks(const AValue: Boolean);
+    procedure SetEnableLists(const AValue: Boolean);
+    procedure SetEnableSourceEdit(const AValue: Boolean);
     procedure SetFFontFamilies(Value: TExtObjectList);
     procedure SetFButtonTips(Value: TExtObject);
     procedure SetFOnActivate(Value: TExtFormHtmlEditorOnActivate);
@@ -561,17 +561,14 @@ type
     property DefaultLinkValue: string read FDefaultLinkValue
       write SetFDefaultLinkValue;
     property DefaultValue: string read FDefaultValue write SetFDefaultValue;
-    property EnableAlignments: Boolean read FEnableAlignments
-      write SetFEnableAlignments;
-    property EnableColors: Boolean read FEnableColors write SetFEnableColors;
-    property EnableFont: Boolean read FEnableFont write SetFEnableFont;
-    property EnableFontSize: Boolean read FEnableFontSize
-      write SetFEnableFontSize;
-    property EnableFormat: Boolean read FEnableFormat write SetFEnableFormat;
-    property EnableLinks: Boolean read FEnableLinks write SetFEnableLinks;
-    property EnableLists: Boolean read FEnableLists write SetFEnableLists;
-    property EnableSourceEdit: Boolean read FEnableSourceEdit
-      write SetFEnableSourceEdit;
+    property EnableAlignments: Boolean read FEnableAlignments write SetEnableAlignments;
+    property EnableColors: Boolean read FEnableColors write SetEnableColors;
+    property EnableFont: Boolean read FEnableFont write SetEnableFont;
+    property EnableFontSize: Boolean read FEnableFontSize write SetEnableFontSize;
+    property EnableFormat: Boolean read FEnableFormat write SetEnableFormat;
+    property EnableLinks: Boolean read FEnableLinks write SetEnableLinks;
+    property EnableLists: Boolean read FEnableLists write SetEnableLists;
+    property EnableSourceEdit: Boolean read FEnableSourceEdit write SetEnableSourceEdit;
     property FontFamilies: TExtObjectList read FFontFamilies
       write SetFFontFamilies;
     property ButtonTips: TExtObject read FButtonTips write SetFButtonTips;
@@ -2591,52 +2588,52 @@ begin
   JSCode('defaultValue:' + VarToJSON([Value]));
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableAlignments(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableAlignments(const AValue: Boolean);
 begin
-  FEnableAlignments := Value;
-  JSCode('enableAlignments:' + VarToJSON([Value]));
+  FEnableAlignments := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableAlignments', 'setEnableAlignments', [AValue]);
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableColors(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableColors(const AValue: Boolean);
 begin
-  FEnableColors := Value;
-  JSCode('enableColors:' + VarToJSON([Value]));
+  FEnableColors := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableColors', 'setEnableColors', [AValue]);
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableFont(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableFont(const AValue: Boolean);
 begin
-  FEnableFont := Value;
-  JSCode('enableFont:' + VarToJSON([Value]));
+  FEnableFont := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableFont', 'setEnableFont', [AValue]);
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableFontSize(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableFontSize(const AValue: Boolean);
 begin
-  FEnableFontSize := Value;
-  JSCode('enableFontSize:' + VarToJSON([Value]));
+  FEnableFontSize := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableFontSize', 'setEnableFontSize', [AValue]);
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableFormat(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableFormat(const AValue: Boolean);
 begin
-  FEnableFormat := Value;
-  JSCode('enableFormat:' + VarToJSON([Value]));
+  FEnableFormat := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableFormat', 'setEnableFormat', [AValue]);
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableLinks(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableLinks(const AValue: Boolean);
 begin
-  FEnableLinks := Value;
-  JSCode('enableLinks:' + VarToJSON([Value]));
+  FEnableLinks := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableLinks', 'setEnableLinks', [AValue]);
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableLists(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableLists(const AValue: Boolean);
 begin
-  FEnableLists := Value;
-  JSCode('enableLists:' + VarToJSON([Value]));
+  FEnableLists := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableLists', 'setEnableLists', [AValue]);
 end;
 
-procedure TExtFormHtmlEditor.SetFEnableSourceEdit(Value: Boolean);
+procedure TExtFormHtmlEditor.SetEnableSourceEdit(const AValue: Boolean);
 begin
-  FEnableSourceEdit := Value;
-  JSCode('enableSourceEdit:' + VarToJSON([Value]));
+  FEnableSourceEdit := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'enableSourceEdit', 'setEnableSourceEdit', [AValue]);
 end;
 
 procedure TExtFormHtmlEditor.SetFFontFamilies(Value: TExtObjectList);

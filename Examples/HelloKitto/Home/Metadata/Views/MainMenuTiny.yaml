@@ -13,3 +13,6 @@ Folder: _(Lookup tables)
   View:
     Controller: ChangePassword
     ImageName: Login
+  View:
+    Controller: Logout
+    ImageName: Logout

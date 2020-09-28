@@ -1958,6 +1958,7 @@ type
     function Render(Container: TExtElement; Position: Integer): TExtFunction; overload;
     function SetDisabled(const AValue: Boolean): TExtFunction;
     function SetVisible(const AValue: Boolean): TExtFunction;
+    function SetWidth(const AValue: Integer): TExtFunction;
     function Show: TExtFunction;
     function Update(HtmlOrData: string; LoadScripts: Boolean = false;
       Callback: TExtFunction = nil): TExtFunction;
@@ -2427,8 +2428,8 @@ type
     procedure SetRegion(const AValue: TExtBoxComponentRegion);
     procedure SetFTabTip(Value: string);
     procedure SetWidth(const AValue: Integer);
-    procedure SetFX(Value: Integer);
-    procedure SetFY(Value: Integer);
+    procedure SetFX(AValue: Integer);
+    procedure SetFY(AValue: Integer);
     procedure SetFOnMove(Value: TExtBoxComponentOnMove);
     procedure SetFOnResize(Value: TExtBoxComponentOnResize);
     procedure SetHeightString(const AValue: string);
@@ -10119,6 +10120,12 @@ begin
   Result := Self;
 end;
 
+function TExtComponent.SetWidth(const AValue: Integer): TExtFunction;
+begin
+  ExtSession.ResponseItems.CallMethod(Self, 'setWidth', [AValue]);
+  Result := Self;
+end;
+
 function TExtComponent.Show: TExtFunction;
 begin
   ExtSession.ResponseItems.CallMethod(Self, 'show', []);
@@ -11076,16 +11083,16 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'width', 'setWidth', [AValue]);
 end;
 
-procedure TExtBoxComponent.SetFX(Value: Integer);
+procedure TExtBoxComponent.SetFX(AValue: Integer);
 begin
-  FX := Value;
-  JSCode('x:' + VarToJSON([Value]));
+  FX := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'x', [AValue]);
 end;
 
-procedure TExtBoxComponent.SetFY(Value: Integer);
+procedure TExtBoxComponent.SetFY(AValue: Integer);
 begin
-  FY := Value;
-  JSCode('y:' + VarToJSON([Value]));
+  FY := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'y', [AValue]);
 end;
 
 procedure TExtBoxComponent.SetFOnMove(Value: TExtBoxComponentOnMove);

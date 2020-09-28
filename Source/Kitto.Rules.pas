@@ -169,6 +169,37 @@ type
     procedure EditRecord(const ARecord: TKRecord); virtual;
 
     /// <summary>
+    ///  Called after creating Windows for editing a record in the user interface.
+    ///  Descendants may set computed values.
+    /// </summary>
+    /// <param name="ARecord">
+    ///  The record being edited. It is usually an
+    ///  instance of TKViewTableRecord.
+    /// </param>
+    procedure AfterShowEditWindow(const ARecord: TKRecord); virtual;
+
+    /// <summary>
+    ///  <para>
+    ///   Called when duplicating a record.
+    ///   Descendants should read the values in ARecord and call RaiseError
+    ///   (which will raise an exception with the default or a custom
+    ///   message) in order to stop the duplicate operation and display an error
+    ///   to the user.
+    ///  </para>
+    ///  <para>
+    ///   Descendants may also change values.
+    ///  </para>
+    /// </summary>
+    /// <param name="ARecord">
+    ///  The duplicate record being created. It is usually an instance of
+    ///  TKViewTableRecord.
+    /// </param>
+    /// <remarks>
+    ///  If an exception is raised, any change is lost.
+    /// </remarks>
+    procedure DuplicateRecord(const ARecord: TKRecord); virtual;
+
+    /// <summary>
     ///  <para>
     ///   Server side validation before writing a new record to the database.
     ///   Descendants should read the values in ARecord and call RaiseError
@@ -187,27 +218,6 @@ type
     /// <remarks>
     ///  If an exception is raised, any change is lost.
     /// </remarks>
-    procedure DuplicateRecord(const ARecord: TKRecord); virtual;
-
-    /// <summary>
-    ///  <para>
-    ///   Called when creating a cloned a record in the user interface.
-    ///   Descendants should read the values in ARecord and call RaiseError
-    ///   (which will raise an exception with the default or a custom
-    ///   message) in order to stop the clone operation and display an error
-    ///   to the user.
-    ///  </para>
-    ///  <para>
-    ///   Descendants may also change values.
-    ///  </para>
-    /// </summary>
-    /// <param name="ARecord">
-    ///  The record being created. It is usually an instance of
-    ///  TKViewTableRecord.
-    /// </param>
-    /// <remarks>
-    ///  If an exception is raised, any change is lost.
-    /// </remarks>    ///
     procedure BeforeAdd(const ARecord: TKRecord); virtual;
 
     /// <summary>
@@ -326,6 +336,9 @@ type
     ///  a reference.
     /// </summary>
     function GetReferencedModelInstanceValue(const AReferenceName, AFieldName: string; const ARecord: TKRecord): Variant;
+
+    procedure AfterRefreshReferenceField(const AField: TKField); virtual;
+
   end;
   TKRuleImplClass = class of TKRuleImpl;
 
@@ -396,6 +409,10 @@ procedure TKRuleImpl.AfterFieldChange(const AField: TKField; const AOldValue, AN
 begin
 end;
 
+procedure TKRuleImpl.AfterRefreshReferenceField(const AField: TKField);
+begin
+end;
+
 procedure TKRuleImpl.AfterUpdate(const ARecord: TKRecord);
 begin
   AfterAddOrUpdate(ARecord);
@@ -456,6 +473,10 @@ begin
 end;
 
 procedure TKRuleImpl.EditRecord(const ARecord: TKRecord);
+begin
+end;
+
+procedure TKRuleImpl.AfterShowEditWindow(const ARecord: TKRecord);
 begin
 end;
 

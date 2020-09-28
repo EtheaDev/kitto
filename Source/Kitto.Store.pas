@@ -26,6 +26,9 @@ uses
   EF.Tree, EF.DB, EF.Types,
   Kitto.Metadata.Models;
 
+const
+  AUTO_ADD_FIELD_SEPARATOR = '.';
+
 type
   TKKey = class;
 
@@ -90,6 +93,7 @@ type
       const AEmptyNulls: Boolean = False): string; virtual;
     property FieldName: string read GetFieldName;
     function IsCompositeField: Boolean;
+    function IsAutoAddField: Boolean;
     function IsPartOfCompositeField: Boolean;
 
     procedure SetTransientProperty(const APropertyName: string; const AValue: Variant);
@@ -730,7 +734,7 @@ begin
       Records.Clear;
     if not ADBQuery.IsOpen then
       ADBQuery.Open;
-    TEFMacroExpansionEngine.Instance.Disable;
+      TEFMacroExpansionEngine.Instance.DisableForCurrentThread;
     try
       while not ADBQuery.DataSet.Eof do
       begin
@@ -741,7 +745,7 @@ begin
         ADBQuery.DataSet.Next;
       end;
     finally
-      TEFMacroExpansionEngine.Instance.Enable;
+        TEFMacroExpansionEngine.Instance.EnableForCurrentThread;
     end;
   finally
     EnableChangeNotifications;
@@ -1546,6 +1550,11 @@ end;
 function TKField.GetXMLTagName: string;
 begin
   Result := FieldName;
+end;
+
+function TKField.IsAutoAddField: Boolean;
+begin
+  Result := FieldName.Contains(AUTO_ADD_FIELD_SEPARATOR);
 end;
 
 function TKField.IsCompositeField: Boolean;
