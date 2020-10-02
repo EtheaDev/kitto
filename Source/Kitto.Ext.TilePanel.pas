@@ -248,16 +248,22 @@ begin
 end;
 
 function TKExtTilePanel.GetTileHeight: string;
+var
+  LChar: Char;
 begin
   Result := Config.GetString('TileHeight', DEFAULT_TILE_HEIGHT);
-  if Result[length(Result)] in ['0'..'9'] then
+  LChar := Result[length(Result)];
+  if CharInSet(LChar, ['0'..'9']) then
     Result := Result+'px';
 end;
 
 function TKExtTilePanel.GetTileWidth: string;
+var
+  LChar: Char;
 begin
   Result := Config.GetString('TileWidth', DEFAULT_TILE_WIDTH);
-  if Result[length(Result)] in ['0'..'9'] then
+  LChar := Result[length(Result)];
+  if CharInSet(LChar, ['0'..'9']) then
     Result := Result+'px';
 end;
 

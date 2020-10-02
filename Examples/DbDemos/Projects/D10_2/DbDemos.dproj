@@ -41,7 +41,6 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <Custom_Styles>&quot;Aqua Light Slate|VCLSTYLE|$(PUBLIC)\Documents\Embarcadero\Studio\19.0\Styles\AquaLightSlate.vsf&quot;</Custom_Styles>
         <DCC_DUPLICATE_CTOR_DTOR>false</DCC_DUPLICATE_CTOR_DTOR>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Locale>1040</VerInfo_Locale>
@@ -68,7 +67,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <Icon_MainIcon>..\..\..\..\..\..\Kitto2\kitto\Examples\DbDemos\Projects\DbDemos_icon.ico</Icon_MainIcon>
+        <Icon_MainIcon>..\DbDemos_icon.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

@@ -504,9 +504,9 @@ function TKDBAuthenticator.IsValidUserName(const AUserName: string): Boolean;
 var
   LQuery: TEFDBQuery;
 begin
-  Result := False;
   LQuery := TKConfig.Instance.DBConnections[GetDatabaseName].CreateDBQuery;
   try
+    {$if compilerversion < 32}Result := False;{$endif}
     LQuery.CommandText := GetReadUserCommandText(AUserName);
     if LQuery.Params.Count <> 1 then
       raise EKError.CreateFmt(_('Wrong authentication query text: %s'), [LQuery.CommandText]);

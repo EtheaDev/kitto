@@ -235,7 +235,7 @@ var
   LLocalStorageAskUserDefault: Boolean;
   LLocalStorageAutoLogin: Boolean;
   LLocalStorageOptions: TEFNode;
-  LInputStyle, LResetPasswordStyle, LRegisterNewUserStyle, LRegisterNewUserLinkText, LResetPasswordNodeLinkText, LPrivacyPolicyStyle, LPrivacyPolicyStyleLinkText, LPrivacyPolicyNodeLinkText, LButtonStyle: string;
+  LInputStyle, LResetPasswordStyle, LRegisterNewUserStyle, LRegisterNewUserLinkText, LResetPasswordNodeLinkText, LPrivacyPolicyStyle, LPrivacyPolicyNodeLinkText, LButtonStyle: string;
 
   function ReplaceMacros(const ACode: string): string;
   begin

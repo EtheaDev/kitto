@@ -767,6 +767,7 @@ begin
   LUseOutputTempFile := Assigned(AOutput) and AWait;
   LOutputTempFileHandle := 0;
   try
+    {$if compilerversion < 32}Result := 0;{$endif}
     AProcessHandle := 0;
     StrPCopy(LApplicationName, AFileName);
     if ACurrentDirectory <> '' then

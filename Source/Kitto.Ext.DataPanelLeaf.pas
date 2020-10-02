@@ -125,7 +125,7 @@ var
 begin
   inherited;
   LParentDataPanel := GetParentDataPanel;
-  if Assigned(LParentDataPanel) then
+  if Assigned(LParentDataPanel) and (LParentDataPanel <> Self) then
     LParentDataPanel.InitActionController(AAction, AController);
 end;
 

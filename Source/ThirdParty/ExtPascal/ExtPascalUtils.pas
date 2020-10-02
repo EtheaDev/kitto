@@ -180,7 +180,9 @@ function FormatByteSize(const AByteSize: Longint): string;
 function RemoveLastJSTerminator(const AJSCode: string): string;
 
 function Join(const AStrings: TStringDynArray; const ASeparator: string): string; overload;
+{$IF CompilerVersion < 33}
 function Join(const AStrings: TArray<string>; const ASeparator: string): string;  overload;
+{$ENDIF}
 
 implementation
 
@@ -990,6 +992,7 @@ begin
   end;
 end;
 
+{$IF CompilerVersion < 33}
 function Join(const AStrings: TArray<string>; const ASeparator: string): string;
 var
   LString: string;
@@ -1003,5 +1006,6 @@ begin
       Result := Result + ASeparator + LString;
   end;
 end;
+{$ENDIF}
 
 end.

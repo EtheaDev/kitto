@@ -479,9 +479,4 @@ begin
     FOnLog(AString);
 end;
 
-{$IF RTLVersion >= 23.0}
-initialization
-  TStyleManager.TrySetStyle('Aqua Light Slate');
-{$IFEND}
-
 end.

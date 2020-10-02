@@ -1312,7 +1312,7 @@ var
 begin
   LFieldName := AFieldName;
   if LFieldName.Contains(TKConfig.Instance.MultiFieldSeparator) then
-    LFieldName := LFieldName.Split([TKConfig.Instance.MultiFieldSeparator], None)[0];
+    LFieldName := LFieldName.Split([TKConfig.Instance.MultiFieldSeparator], TStringSplitOptions.None)[0];
   // We can safely assume that all fields in a composite field share the same parent field.
   LModelField := Model.FindField(LFieldName);
   if Assigned(LModelField) and Assigned(LModelField.ParentField) then
@@ -2680,7 +2680,7 @@ begin
   // Forward the changed value to the multi-valued field constituent parts.
   if LField.IsCompositeField then
   begin
-    LFieldNames := LField.FieldName.Split([TKConfig.Instance.MultiFieldSeparator], None);
+    LFieldNames := LField.FieldName.Split([TKConfig.Instance.MultiFieldSeparator], TStringSplitOptions.None);
     // Test for null and '' as well, since compound fields are always treated as
     // strings and never set to null.
     if VarIsNull(ANewValue) or (ANewValue = '') then
@@ -2690,7 +2690,7 @@ begin
     end
     else
     begin
-      LFieldValues := string(ANewValue).Split([TKConfig.Instance.MultiFieldSeparator], None);
+      LFieldValues := string(ANewValue).Split([TKConfig.Instance.MultiFieldSeparator], TStringSplitOptions.None);
       Assert(Length(LFieldNames) = Length(LFieldValues));
       for I := Low(LFieldNames) to High(LFieldNames) do
         FieldByName(LFieldNames[I]).Value := LFieldValues[I];

@@ -5,6 +5,9 @@ interface
 uses
   SysUtils, Classes, IniFiles, ExtPascalUtils;
 
+{$WARN IMPLICIT_STRING_CAST OFF}
+{$WARN IMPLICIT_STRING_CAST_LOSS OFF}
+
 type
   TCustomWebApplication = class;
 
@@ -197,7 +200,14 @@ type
 implementation
 
 uses
-  StrUtils, HTTPApp, ExtPascal, gnugettext;
+  StrUtils,
+  {$IF CompilerVersion > 27}
+  NetEncoding,
+  {$ELSE}
+  HTTPApp,
+  {$ENDIF}
+  ExtPascal,
+  gnugettext;
 
 const
   CBrowserNames: array[TBrowser] of string = ('Unknown', 'MSIE', 'Firefox', 'Chrome', 'Safari', 'Opera', 'Konqueror', 'Safari');
@@ -609,7 +619,11 @@ begin
           OnNotFoundError;
     except
       on E: ERedirectError do OnRedirectError(E.Message);
+      {$IF CompilerVersion > 27}
+      on E: Exception do OnError(E.Message, PathInfo, string(TNetEncoding.URL.Decode(ARequest)));
+      {$ELSE}
       on E: Exception do OnError(E.Message, PathInfo, string(HTTPDecode(ARequest)));
+      {$ENDIF}
     end;
   if CanCallAfterHandleRequest then AfterHandleRequest;
 end;
