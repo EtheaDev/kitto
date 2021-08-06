@@ -78,7 +78,7 @@ begin
   {$ELSE}
   LEngine.RegEx := UTF8Encode(APattern);
   LEngine.Subject := UTF8Encode(AString);
-  {$ENDIF}
+  {$IFEND}
   Result := LEngine.Match;
 end;
 

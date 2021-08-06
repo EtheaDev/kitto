@@ -1,5 +1,5 @@
 {-------------------------------------------------------------------------------
-   Copyright 2012 Ethea S.r.l.
+   Copyright 2012-2021 Ethea S.r.l.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -145,8 +145,10 @@ type
     ///	</summary>
     property Config: TEFComponentConfig read GetConfig;
 
-    ///	<summary>Invalidates the internal config object so that it is
-    ///	re-created at next access.</summary>
+    ///	<summary>
+    ///   Invalidates the internal config object so that it is
+    ///	  re-created at next access.
+    /// </summary>
     procedure InvalidateConfig;
   end;
   TEFComponentClass = class of TEFComponent;
