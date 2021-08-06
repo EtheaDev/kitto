@@ -14,4 +14,12 @@ Start [here](https://github.com/EtheaDev/kitto/wiki/Kitto-at-a-glance) for furth
 
 Visit [this site](https://ethea.it/Kitto-Demo/) for online demos.
 
+## Delphi versions ##
+
+Kitto supports Delphi versions from XE3 to 10.4
+
+![Delphi 10.4 Sydney Support](https://github.com/EtheaDev/kitto/wiki/images/SupportingDelphi.jpg)
+
+Related links: https://www.embarcadero.com/ - https://learndelphi.org/
+
 Happy Kittoing!
