@@ -76,6 +76,7 @@ type
     function SupportsXML: Boolean; virtual;
     function IsBlob(const ASize: Integer): Boolean; virtual;
     function IsText: Boolean; virtual;
+    function IsBoolean: Boolean; virtual;
     function NodeToJSONValue(const AForDisplay: Boolean; const ANode: TEFNode;
       const AJSFormatSettings: TFormatSettings; const AQuote: Boolean = True;
       const AEmptyNulls: Boolean = False): string;
@@ -218,11 +219,13 @@ type
       const AValue: string; const AUseJSDateFormat: Boolean;
       const AJSFormatSettings: TFormatSettings); override;
   public
+    class function NeedsQuotes: Boolean; override;
     class function GetFieldType: TFieldType; override;
     function GetDefaultDisplayWidth(const ASize: Integer): Integer; override;
     function InternalFormatNodeValue(const AForDisplay: Boolean;
       const ANode: TEFNode; const AFormatSettings: TFormatSettings): string; override;
     function GetJSTypeName: string; override;
+    function IsBoolean: Boolean; override;
   end;
 
   TEFNumericDataTypeBase = class(TEFDataType)
@@ -2806,6 +2809,11 @@ begin
   Result := False;
 end;
 
+function TEFDataType.IsBoolean: Boolean;
+begin
+  Result := False;
+end;
+
 function TEFDataType.IsText: Boolean;
 begin
   Result := False;
@@ -2850,7 +2858,10 @@ begin
   begin
     AParam.Clear;
     if AParam.DataType = ftUnknown then
+    begin
       AParam.DataType := GetFieldType;
+      AParam.Value := NULL;
+    end;
   end
   else
     InternalNodeToParam(ANode, AParam);
@@ -3435,6 +3446,16 @@ procedure TEFBooleanDataType.InternalYamlValueToNode(const AYamlValue: string;
   const ANode: TEFNode; const AFormatSettings: TFormatSettings);
 begin
   ANode.AsBoolean := StrToBool(AYamlValue);
+end;
+
+function TEFBooleanDataType.IsBoolean: Boolean;
+begin
+  Result := True;
+end;
+
+class function TEFBooleanDataType.NeedsQuotes: Boolean;
+begin
+  Result := False;
 end;
 
 { TEFCurrencyDataType }

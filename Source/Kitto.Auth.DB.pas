@@ -26,7 +26,7 @@ interface
 
 uses
   EF.DB, EF.Tree,
-  Kitto.Auth;
+  Kitto.Auth, RegularExpressions, Vcl.Graphics;
 
 const
   DEFAULT_READUSERCOMMANDTEXT =
@@ -37,6 +37,12 @@ const
     'update KITTO_USERS set PASSWORD_HASH = :PASSWORD_HASH, MUST_CHANGE_PASSWORD = 1 where IS_ACTIVE = 1 and EMAIL_ADDRESS = :EMAIL_ADDRESS AND USER_NAME = :USER_NAME';
   DEFAULT_REGISTERNEWUSERCOMMANDTEXT =
     'insert into KITTO_USERS (USER_NAME, PASSWORD_HASH, IS_ACTIVE, MUST_CHANGE_PASSWORD, EMAIL_ADDRESS) VALUES (:USER_NAME, :PASSWORD_HASH, 1, 1, :EMAIL_ADDRESS)';
+  DEFAULT_BCRYPT_READUSERCOMMANDTEXT =
+    'select USER_NAME, PASSWORD_HASH, PASSWORD_B_HASH, EMAIL_ADDRESS, MUST_CHANGE_PASSWORD from KITTO_USERS where IS_ACTIVE = 1 and USER_NAME = :USER_NAME';
+  DEFAULT_BCRYPT_SETPASSWORDCOMMANDTEXT =
+    'update KITTO_USERS set PASSWORD_B_HASH = :PASSWORD_HASH, PASSWORD_HASH = null, MUST_CHANGE_PASSWORD = 0 where IS_ACTIVE = 1 and USER_NAME = :USER_NAME';
+  DEFAULT_BCRYPT_RESETPASSWORDCOMMANDTEXT =
+    'update KITTO_USERS set PASSWORD_B_HASH = :PASSWORD_HASH, PASSWORD_HASH = null, MUST_CHANGE_PASSWORD = 1 where IS_ACTIVE = 1 and EMAIL_ADDRESS = :EMAIL_ADDRESS AND USER_NAME = :USER_NAME';
 
 type
   /// <summary>User data read from the database. Used internally as a helper
@@ -239,13 +245,6 @@ type
     function IsPassepartoutAuthentication(
       const ASuppliedPassword: string): Boolean; virtual;
 
-    /// <summary>Returns True if ASuppliedPasswordHash matches
-    /// AStoredPasswordHash. By default this means that they are the same
-    /// value. A descendant might use different matching rules or disable
-    /// matching altogether by overriding this method.</summary>
-    function IsPasswordMatching(const ASuppliedPasswordHash: string;
-      const AStoredPasswordHash: string): Boolean; virtual;
-
     /// <summary>Returns True if AUserName is a valid user name. It is
     /// implemented using GetReadUserSQL to perform a query against the
     /// database to see if authentication data is available for this
@@ -256,7 +255,8 @@ type
     ///   <para>Reads data from the current record of the specified DB query
     ///   and stores it into AUser.</para>
     ///   <para>Override this method if your table of users has a non-default
-    ///   structure.</para>
+    ///   structure or if you want to customize secret code generation
+    ///   (for PIN-OTP authentication).</para>
     ///   <para>This method is usually overridden together with GetReadUserSQL,
     ///   and possibly also CreateUser.</para>
     /// </summary>
@@ -291,7 +291,94 @@ type
     ///  back to the initiator of the password reset flow.
     /// </param>
     procedure AfterResetPassword(const ADBConnection: TEFDBConnection; const AParams: TEFNode); virtual;
+
+    /// <summary>
+    ///  Called by QRGenerate after generating QR code for OTP authentication.
+    ///  Override this method if you need to use this QR for any purpose, such
+    ///  as sending it via email to a user. The default implementation does nothing.
+    /// </summary>
+    /// <param name="AParams">
+    ///  Contains all the params passed to QRGenerate. This method is not supposed
+    ///  to modify the params but can add custom ones if needed. They will be passed
+    ///  back to the initiator of the QR generation flow.
+    /// </param>
+    procedure AfterQRGeneration(const AQRCode: TBitmap; const AParams: TEFNode); virtual;
+
   public
+    /// <summary>Returns True if ASuppliedPasswordHash matches
+    /// AStoredPasswordHash. By default this means that they are the same
+    /// value. A descendant might use different matching rules or disable
+    /// matching altogether by overriding this method.</summary>
+    function IsPasswordMatching(const ASuppliedPasswordHash: string;
+      const AStoredPasswordHash: string): Boolean; override;
+
+    procedure ResetPassword(const AParams: TEFNode); override;
+    procedure QRGenerate(const AParams: TEFNode); override;
+  end;
+
+  /// <summary>Same Authenticator as TKDBAuthenticator, it only manages hashed passwords
+  ///  using BCrypt algorithm (in BCrypt unit).
+  ///  It requires a field on the custom user table
+  ///  named PASSWORD_HASH at least 60-CHARACTER LONG.
+  ///  It shifts automatically from TKDBAuthenticator's hash method
+  ///  to BCrypt (after the first successful login), without the need to do
+  ///  a password reset.</summary>
+  TKDBCryptAuthenticator = class(TKDBAuthenticator)
+
+  strict private
+    FBCryptCost: integer;
+    function GetRandomSpecialChar: char;
+    function GetBCryptedString(const AValue: string): string;
+  protected
+    /// <summary>Generates and returns a random password compatible with special rules defined in SetPassword.</summary>
+    function GenerateRandomPassword: string; override;
+
+    /// <summary>
+    ///   <para>Reads data from the current record of the specified DB query
+    ///   and stores it into AUser.</para>
+    ///   <para>This method is usually overridden together with GetReadUserSQL,
+    ///   and possibly also CreateUser.</para>
+    /// </summary>
+    procedure ReadUserFromRecord(const AUser: TKAuthUser;
+      const ADBQuery: TEFDBQuery; const AAuthData: TEFNode); override;
+
+    /// <summary>Extracts from AAuthData the supplied password, in order to use
+    /// it in an authentication attempt.</summary>
+    function GetSuppliedPasswordHash(const AAuthData: TEFNode; const AHashNeeded: Boolean): string; override;
+
+    procedure SetPassword(const AValue: string); override;
+    /// <summary>Raise an exception in auto-login fails.</summary>
+    function InternalAuthenticate(const AAuthData: TEFNode): Boolean; override;
+
+    /// <summary>Returns the SQL statement to be used to read the user data
+    /// from the database. Override this method to change the name or the
+    /// structure of the predefined table of users.</summary>
+    function GetReadUserCommandText(const AUserName: string): string; override;
+
+    /// <summary>Returns the SQL statement to be used to update the password
+    /// (or password hash) in a user's record in the database. Override this
+    /// method to change the name or the structure of the predefined table of
+    /// users.</summary>
+    /// <remarks>The statement should have two params named PASSWORD_HASH and
+    /// USER_NAME that will be filled in with the data used to locate the
+    /// record and update the password.</remarks>
+    function GetSetPasswordCommandText: string;
+
+    /// <summary>Returns the SQL statement to be used to reset the password
+    /// (or password hash) in a user's record in the database. Override this
+    /// method to change the name or the structure of the predefined table of
+    /// users.</summary>
+    /// <remarks>The statement should have two params named PASSWORD_HASH and
+    /// EMAIL_ADDRESS that will be filled in with the data used to locate the
+    /// record and update the password.</remarks>
+    function GetResetPasswordCommandText: string;
+
+    property BCryptCost: integer read FBCryptCost;
+
+  public
+    procedure AfterConstruction; override;
+    function IsPasswordMatching(const ASuppliedPasswordHash: string;
+      const AStoredPasswordHash: string): Boolean; override;
     procedure ResetPassword(const AParams: TEFNode); override;
   end;
 
@@ -300,9 +387,15 @@ implementation
 uses
   SysUtils, Classes, Variants, DB,
   EF.Localization,  EF.Types, EF.StrUtils,
-  Kitto.Types, Kitto.Config, Kitto.DatabaseRouter;
+  Kitto.Types, Kitto.Config, Kitto.DatabaseRouter,
+  BCrypt, Base32U, GoogleOTP, DelphiZXingQRCode;
 
 { TKDBAuthenticator }
+
+procedure TKDBAuthenticator.AfterQRGeneration(const AQRCode: TBitmap;
+  const AParams: TEFNode);
+begin
+end;
 
 procedure TKDBAuthenticator.AfterResetPassword(const ADBConnection: TEFDBConnection; const AParams: TEFNode);
 begin
@@ -452,9 +545,14 @@ procedure TKDBAuthenticator.GetSuppliedAuthData(
   out AIsPassepartoutAuthentication: Boolean);
 var
   LSuppliedPassword: string;
+  LLoginTypeNode: TEFNode;
 begin
+  LLoginTypeNode := Config.FindNode('LoginType');
   ASuppliedUserName := GetSuppliedUserName(AAuthData);
-  ASuppliedPasswordHash := GetSuppliedPasswordHash(AAuthData, AHashNeeded);
+  if (Assigned(LLoginTypeNode)) and (AnsiUpperCase(LLoginTypeNode.AsString) = 'PIN') then
+    ASuppliedPasswordHash := GetSuppliedPasswordHash(AAuthData, False)
+  else
+    ASuppliedPasswordHash := GetSuppliedPasswordHash(AAuthData, AHashNeeded);
   LSuppliedPassword := GetSuppliedPasswordHash(AAuthData, False);
   AIsPassepartoutAuthentication := IsPassepartoutAuthentication(LSuppliedPassword);
 end;
@@ -465,6 +563,8 @@ var
   LSuppliedPasswordHash: string;
   LIsPassepartoutAuthentication: Boolean;
   LUser: TKAuthUser;
+  LLoginTypeNode: TEFNode;
+  LTokenValue: integer;
 begin
   GetSuppliedAuthData(AAuthData, not IsClearPassword,
     LSuppliedUserName, LSuppliedPasswordHash, LIsPassepartoutAuthentication);
@@ -475,9 +575,21 @@ begin
     try
       if Assigned(LUser) then
       begin
-        Result := IsPasswordMatching(LSuppliedPasswordHash, LUser.PasswordHash) or LIsPassepartoutAuthentication;
+        LLoginTypeNode := Config.FindNode('LoginType');
         if LIsPassepartoutAuthentication then
+        begin
           AAuthData.SetBoolean('IsPassepartoutAuthentication', True);
+          Result := True;
+        end
+        else if (Assigned(LLoginTypeNode)) and (AnsiUpperCase(LLoginTypeNode.AsString) = 'PIN') then
+        begin
+          if not TryStrToInt(LSuppliedPasswordHash,LTokenValue) then
+            Result := False
+          else
+            Result := ValidateTOPT(AAuthData.GetString('SecretCode'),LTokenValue);
+        end
+        else
+          Result := IsPasswordMatching(LSuppliedPasswordHash, LUser.PasswordHash);
       end
       else
         Result := False;
@@ -506,7 +618,7 @@ var
 begin
   LQuery := TKConfig.Instance.DBConnections[GetDatabaseName].CreateDBQuery;
   try
-    {$if compilerversion < 32}Result := False;{$endif}
+    {$if compilerversion < 32}Result := False;{$ifend}
     LQuery.CommandText := GetReadUserCommandText(AUserName);
     if LQuery.Params.Count <> 1 then
       raise EKError.CreateFmt(_('Wrong authentication query text: %s'), [LQuery.CommandText]);
@@ -539,6 +651,9 @@ begin
   // Plus, known fields go under known names (see InternalDefineAuthData).
   AAuthData.SetString('UserName', AUser.Name);
   AAuthData.SetString('Password', AUser.PasswordHash);
+
+  // SecretCode (for PIN authentications) is filled with base32 encoded UserName.
+  AAuthData.SetString('SecretCode',Base32.EncodeWithoutPadding(AnsiUpperCase(AUser.Name)));
 end;
 
 procedure TKDBAuthenticator.ResetPassword(const AParams: TEFNode);
@@ -591,6 +706,79 @@ begin
   end;
 end;
 
+procedure TKDBAuthenticator.QRGenerate(const AParams: TEFNode);
+var
+  LUserName: string;
+  LEmailAddress: string;
+  LQuery: TEFDBQuery;
+  LSecretCode, LQRString: string;
+  LQRCode: TDelphiZXingQRCode;
+  LQRCodeBitmap: TBitmap;
+  LRow, LColumn: Integer;
+  LSCaleFactor, LRowScale, LColumnScale: Integer;
+begin
+  Assert(Assigned(AParams));
+
+  LUserName := AParams.GetString('UserName');
+  if LUserName = '' then
+    raise Exception.Create(_('UserName not specified.'));
+
+  LEmailAddress := AParams.GetString('EmailAddress');
+  if LEmailAddress = '' then
+    raise Exception.Create(_('E-mail address not specified.'));
+
+  LQuery := TKConfig.Instance.DBConnections[GetDatabaseName].CreateDBQuery;
+  try
+    LQuery.CommandText := GetReadUserCommandText(LUserName);
+    if LQuery.Params.Count <> 1 then
+      raise EKError.CreateFmt(_('Wrong authentication query text: %s'), [LQuery.CommandText]);
+    LQuery.Params[0].AsString := LUserName;
+    LQuery.Open;
+    try
+      if LQuery.DataSet.IsEmpty then
+        raise EKError.Create(_('Error: user name and email address not found.'));
+    finally
+      LQuery.Close;
+    end;
+  finally
+    FreeAndNil(LQuery);
+  end;
+  // Using Base32 encoded username as shared secret
+  LSecretCode := Base32.EncodeWithoutPadding(AnsiUpperCase(LUserName));
+  LQRString := 'otpauth://totp/'+TKConfig.Instance.Config.GetString('AppTitle')+'?secret='+LSecretCode;
+  LQRCode := TDelphiZXingQRCode.Create;
+  LQRCodeBitmap := TBitmap.Create;
+  try
+    LQRCode.Data := LQRString;
+    LQRCode.Encoding := TQRCodeEncoding(3);
+    LQRCode.QuietZone := StrToIntDef('4', 4);
+    LScaleFactor := 10;
+    LQRCodeBitmap.SetSize(LQRCode.Rows*LScaleFactor, LQRCode.Columns*LScaleFactor);
+    for LRow := 0 to LQRCode.Rows - 1 do
+    begin
+      for LColumn := 0 to LQRCode.Columns - 1 do
+      begin
+        if (LQRCode.IsBlack[LRow, LColumn]) then
+        begin
+          for LColumnScale := 0 to LScaleFactor do
+            for LRowScale := 0 to LScaleFactor do
+              LQRCodeBitmap.Canvas.Pixels[LColumn*LScaleFactor-LColumnScale, LRow*LScaleFactor-LRowScale] := clBlack;
+        end
+        else
+        begin
+          for LColumnScale := 0 to LScaleFactor do
+            for LRowScale := 0 to LScaleFactor do
+              LQRCodeBitmap.Canvas.Pixels[LColumn*LScaleFactor-LColumnScale, LRow*LScaleFactor-LRowScale] := clWhite;
+        end;
+      end;
+    end;
+    AfterQRGeneration(LQRCodeBitmap,AParams);
+  finally
+    LQRCode.Free;
+    LQRCodeBitmap.FreeImage;
+  end;
+end;
+
 procedure TKDBAuthenticator.SetPassword(const AValue: string);
 var
   LPasswordHash: string;
@@ -629,11 +817,289 @@ begin
   Result := Config.GetString('SetPasswordCommandText', DEFAULT_SETPASSWORDCOMMANDTEXT);
 end;
 
+{ TKDBCryptAuthenticator }
+
+function TKDBCryptAuthenticator.GetRandomSpecialChar: char;
+var
+  LSpecialChars: string;
+begin
+  LSpecialChars := '\<>!£$%&/()=?^*°[]{}-+@#€';
+  Result := LSpecialChars[Random(LSpecialChars.Length)+1];
+end;
+
+function TKDBCryptAuthenticator.GetBCryptedString(const AValue: string): string;
+var
+  LBCryptCostValue: integer;
+begin
+  // if BCryptCost is defined and <> 0 it means it has been invoked a password rehash: use BCryptCost value
+  if ((BCryptCost <> 0)) then
+    LBCryptCostValue := BCryptCost
+  // if BCryptCost isn't defined (or = 0), it searches on the Config.yaml for a valid value
+  else if Assigned(Config.FindNode('BCryptCostValue')) then
+    LBCryptCostValue := StrToInt(Config.GetString('BCryptCostValue'))
+  // if none of the above, it selects the default value 13
+  else
+    LBCryptCostValue := 13;
+
+  // BCrypt works with values in range 4..31, if LBCryptCostValue is not in that range it's replaced by the default value 13
+  if ((LBCryptCostValue <= 4) or (LBCryptCostValue >= 31)) then
+    LBCryptCostValue := 13;
+  // Stores actual BCryptCost and hashed password
+  FBCryptCost := LBCryptCostValue;
+  Result := TBCrypt.HashPassword(AValue,LBCryptCostValue);
+end;
+
+procedure TKDBCryptAuthenticator.AfterConstruction;
+begin
+  inherited;
+  IsBCrypted := True;
+end;
+
+function TKDBCryptAuthenticator.GenerateRandomPassword: string;
+var
+  LValidatePasswordNode: TEFNode;
+  LRegEx: string;
+  LRegularExpression : TRegEx;
+  LMatch: TMatch;
+begin
+  LValidatePasswordNode := Config.FindNode('ValidatePassword');
+  LRegEx := LValidatePasswordNode.GetExpandedString('RegEx','^[ -~]{8,63}$');
+  LRegularExpression.Create(LRegEx);
+  Result := GetRandomStringEx(8)+GetRandomSpecialChar;
+  LMatch := LRegularExpression.Match(Result);
+  while (not LMatch.Success) do
+  begin
+    Result := GetRandomStringEx(8)+GetRandomSpecialChar;
+    LMatch := LRegularExpression.Match(Result);
+  end;
+end;
+
+function TKDBCryptAuthenticator.GetSuppliedPasswordHash(const AAuthData: TEFNode; const AHashNeeded: Boolean): string;
+begin
+  Result := AAuthData.GetString('Password');
+  TKConfig.Instance.MacroExpansionEngine.Expand(Result);
+  // No need to check AHashNeeded because hashing is done in IsPasswordMatching
+end;
+
+procedure TKDBCryptAuthenticator.SetPassword(const AValue: string);
+var
+  LValidatePasswordNode: TEFNode;
+  LRegEx: string;
+  LErrorMsg: string;
+  LRegularExpression : TRegEx;
+  LMatch: TMatch;
+  LPasswordHash: string;
+  LCommand: TEFDBCommand;
+  LCommandText: string;
+begin
+  // Example of enforcement of password strength rules.
+  LValidatePasswordNode := Config.FindNode('ValidatePassword');
+  Assert(Assigned(LValidatePasswordNode));
+  LErrorMsg := LValidatePasswordNode.GetExpandedString('Message','Minimun 8 characters');
+  LRegEx := LValidatePasswordNode.GetExpandedString('RegEx','^[ -~]{8,63}$');
+  LRegularExpression.Create(LRegEx);
+  LMatch := LRegularExpression.Match(AValue);
+  if not LMatch.Success then
+    raise Exception.Create(LErrorMsg);
+
+  if IsClearPassword then
+    LPasswordHash := AValue
+  else
+    LPasswordHash := GetBCryptedString(AValue);
+
+  LCommandText := GetSetPasswordCommandText;
+  LCommand := TKConfig.Instance.DBConnections[GetDatabaseName].CreateDBCommand;
+  try
+    LCommand.CommandText := LCommandText;
+    LCommand.Params.ParamByName('USER_NAME').AsString := UserName;
+    LCommand.Params.ParamByName('PASSWORD_HASH').AsString := LPasswordHash;
+    LCommand.Connection.StartTransaction;
+    try
+      if LCommand.Execute <> 1 then
+        raise EKError.Create(_('Error changing password.'));
+      LCommand.Connection.CommitTransaction;
+      AuthData.SetString('Password', LPasswordHash);
+    except
+      LCommand.Connection.RollbackTransaction;
+      raise;
+    end;
+  finally
+    FreeAndNil(LCommand);
+  end;
+end;
+
+function TKDBCryptAuthenticator.InternalAuthenticate(
+  const AAuthData: TEFNode): Boolean;
+var
+  LSuppliedUserName: string;
+  LSuppliedPasswordHash: string;
+  LIsPassepartoutAuthentication: Boolean;
+  LUser: TKAuthUser;
+  LLoginTypeNode: TEFNode;
+  LTokenValue: Integer;
+begin
+  GetSuppliedAuthData(AAuthData, not IsClearPassword,
+    LSuppliedUserName, LSuppliedPasswordHash, LIsPassepartoutAuthentication);
+
+  if LSuppliedUserName <> '' then
+  begin
+    LUser := CreateAndReadUser(LSuppliedUserName, AAuthData);
+    try
+      if Assigned(LUser) then
+      begin
+        LLoginTypeNode := Config.FindNode('LoginType');
+        if LIsPassepartoutAuthentication then // this clause goes first not to trigger "Invalid base-64 hash string" BCrypt error
+        begin
+          AAuthData.SetBoolean('IsPassepartoutAuthentication', True);
+          Result := True;
+        end
+        else if (Assigned(LLoginTypeNode)) and (AnsiUpperCase(LLoginTypeNode.AsString) = 'PIN') then
+        begin
+          if not TryStrToInt(LSuppliedPasswordHash,LTokenValue) then
+            Result := False
+          else
+            Result := ValidateTOPT(AAuthData.GetString('SecretCode'),LTokenValue);
+        end
+        else if (AAuthData.GetString('Password') <> '') then
+          Result := IsPasswordMatching(LSuppliedPasswordHash, AAuthData.GetString('Password'))
+        else if IsClearPassword then
+        begin
+          if (inherited IsPasswordMatching(LSuppliedPasswordHash, LUser.PasswordHash)) then
+          begin
+            SetPassword(LSuppliedPasswordHash);
+            Result := True;
+          end
+          else
+            Result := False;
+        end
+        else
+        begin
+          if (inherited IsPasswordMatching(GetStringHash(LSuppliedPasswordHash), LUser.PasswordHash)) then
+          begin
+            SetPassword(LSuppliedPasswordHash);
+            Result := True;
+          end
+          else
+            Result := False;
+        end;
+
+
+      end
+      else
+        Result := False;
+    finally
+      FreeAndNil(LUser);
+    end;
+  end
+  else
+    Result := False;
+end;
+
+function TKDBCryptAuthenticator.IsPasswordMatching(const ASuppliedPasswordHash,
+  AStoredPasswordHash: string): Boolean;
+var
+  LIsRehashNeeded: Boolean;
+  LBCryptCostValue: string;
+begin
+  if IsClearPassword then
+    Result := ASuppliedPasswordHash = AStoredPasswordHash
+  else
+  begin
+    Result := TBCrypt.CheckPassword(ASuppliedPasswordHash,AStoredPasswordHash,LIsRehashNeeded);
+    if Result and LIsRehashNeeded then
+    begin
+      // Increasing password's cost value (see BCrypt doc.) and rehashing when hash's strength is under a certain threshold
+      LBCryptCostValue := StringReplace(AStoredPasswordHash.Substring(3,3), '$', '', [rfReplaceAll]);
+      FBCryptCost := StrToInt(LBCryptCostValue)+1;
+      SetPassword(ASuppliedPasswordHash);
+    end;
+  end;
+end;
+
+procedure TKDBCryptAuthenticator.ReadUserFromRecord(const AUser: TKAuthUser;
+  const ADBQuery: TEFDBQuery; const AAuthData: TEFNode);
+begin
+  inherited;
+  AAuthData.SetString('Password', ADBQuery.DataSet.FieldByName('PASSWORD_HASH').AsString);
+  if (AAuthData.GetString('Password') = '') then
+    AAuthData.SetString('Password',AAuthData.GetString('Password'));
+end;
+
+procedure TKDBCryptAuthenticator.ResetPassword(const AParams: TEFNode);
+var
+  LUserName: string;
+  LEmailAddress: string;
+  LPassword: string;
+  LPasswordHash: string;
+  LCommandText: string;
+  LCommand: TEFDBCommand;
+begin
+  Assert(Assigned(AParams));
+
+  LUserName := AParams.GetString('UserName');
+  if LUserName = '' then
+    raise Exception.Create(_('UserName not specified.'));
+
+  LEmailAddress := AParams.GetString('EmailAddress');
+  if LEmailAddress = '' then
+    raise Exception.Create(_('E-mail address not specified.'));
+
+  LPassword := GenerateRandomPassword;
+  AParams.SetString('Password', LPassword);
+
+  BeforeResetPassword(AParams);
+  if IsClearPassword then
+    LPasswordHash := LPassword
+  else
+    LPasswordHash := GetBCryptedString(LPassword);
+
+  LCommandText := GetResetPasswordCommandText;
+  LCommand := TKConfig.Instance.DBConnections[GetDatabaseName].CreateDBCommand;
+  try
+    LCommand.Connection.StartTransaction;
+    try
+      LCommand.CommandText := LCommandText;
+      LCommand.Params.ParamByName('USER_NAME').AsString := LUserName;
+      LCommand.Params.ParamByName('EMAIL_ADDRESS').AsString := LEmailAddress;
+      LCommand.Params.ParamByName('PASSWORD_HASH').AsString := LPasswordHash;
+      if LCommand.Execute <> 1 then
+        raise EKError.Create(_('Error: user name and email address not found.'));
+      AfterResetPassword(LCommand.Connection, AParams);
+      LCommand.Connection.CommitTransaction;
+    except
+      LCommand.Connection.RollbackTransaction;
+      raise;
+    end;
+  finally
+    FreeAndNil(LCommand);
+  end;
+end;
+
+function TKDBCryptAuthenticator.GetReadUserCommandText(const AUserName: string): string;
+begin
+  Result := Config.GetString('ReadUserCommandText',
+    DEFAULT_BCRYPT_READUSERCOMMANDTEXT);
+end;
+
+function TKDBCryptAuthenticator.GetSetPasswordCommandText: string;
+begin
+  Result := Config.GetString('SetPasswordCommandText',
+    DEFAULT_BCRYPT_SETPASSWORDCOMMANDTEXT);
+end;
+
+function TKDBCryptAuthenticator.GetResetPasswordCommandText: string;
+begin
+  Result := Config.GetString('ResetPasswordCommandText',
+    DEFAULT_BCRYPT_RESETPASSWORDCOMMANDTEXT);
+end;
+
 initialization
   TKAuthenticatorRegistry.Instance.RegisterClass('DB', TKDBAuthenticator);
+  TKAuthenticatorRegistry.Instance.RegisterClass('DBCrypt',TKDBCryptAuthenticator);
 
 finalization
   TKAuthenticatorRegistry.Instance.UnregisterClass('DB');
+  TKAuthenticatorRegistry.Instance.UnregisterClass('DBCrypt');
 
 end.
 

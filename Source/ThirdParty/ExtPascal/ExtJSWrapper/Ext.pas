@@ -3883,7 +3883,7 @@ type
     procedure SetFAfterPageText(Value: string);
     procedure SetFBeforePageText(Value: string);
     procedure SetDisplayInfo(const AValue: Boolean);
-    procedure SetFDisplayMsg(Value: string);
+    procedure SetDisplayMsg(AValue: string);
     procedure SetFEmptyMsg(Value: string);
     procedure SetFFirstText(Value: string);
     procedure SetFLastText(Value: string);
@@ -3915,7 +3915,7 @@ type
     property AfterPageText: string read FAfterPageText write SetFAfterPageText;
     property BeforePageText: string read FBeforePageText write SetFBeforePageText;
     property DisplayInfo: Boolean read FDisplayInfo write SetDisplayInfo;
-    property DisplayMsg: string read FDisplayMsg write SetFDisplayMsg;
+    property DisplayMsg: string read FDisplayMsg write SetDisplayMsg;
     property EmptyMsg: string read FEmptyMsg write SetFEmptyMsg;
     property FirstText: string read FFirstText write SetFFirstText;
     property LastText: string read FLastText write SetFLastText;
@@ -14698,10 +14698,10 @@ begin
   ExtSession.ResponseItems.SetConfigItem(Self, 'displayInfo', [AValue]);
 end;
 
-procedure TExtPagingToolbar.SetFDisplayMsg(Value: string);
+procedure TExtPagingToolbar.SetDisplayMsg(AValue: string);
 begin
-  FDisplayMsg := Value;
-  JSCode('displayMsg:' + VarToJSON([Value]));
+  FDisplayMsg := AValue;
+  ExtSession.ResponseItems.SetConfigItem(Self, 'displayMsg', [AValue]);
 end;
 
 procedure TExtPagingToolbar.SetFEmptyMsg(Value: string);

@@ -16,3 +16,5 @@
   LabelWidth: 150
   ExtraHeight: 100
   ResetPassword: True
+  RegisterNewUser: True
+  SendQR: True

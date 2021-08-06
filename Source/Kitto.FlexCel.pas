@@ -151,7 +151,8 @@ implementation
 uses
   Math, Variants,
   EF.StrUtils, EF.DB, EF.SysUtils,
-  Kitto.Metadata.Models, Kitto.Config, EF.Macros, Kitto.Utils;
+  Kitto.Metadata.Models, Kitto.Config, EF.Macros, Kitto.Utils,
+  EF.Types, EF.Localization, DateUtils;
 
 const
   ADO_EXCEL_2000 = 'Excel 8.0';
@@ -174,19 +175,43 @@ const
      EXCEL_NEW_TEMPLATE_EXT);
 
 function GetReportValue(const AField: TKViewTableField): TReportValue;
+var
+  I: integer;
+  LAllowedValues: TEFPairs;
+  LDestValue: string;
 begin
   if AField.ViewField.ActualDataType is TEFMemoDataType then
    exit(AField.AsString)
-  else if AField.ViewField.ActualDataType is TEFStringDataType then
-    exit(AField.AsString)
+  else
+  if AField.ViewField.ActualDataType is TEFStringDataType then
+  begin
+    LDestValue :=   AField.AsString;
+    if Assigned(AField) and Assigned(AField.ModelField) and (Length(AField.ModelField.AllowedValues) > 0) then
+    begin
+      LAllowedValues := AField.ModelField.AllowedValues;
+      for I := Low(LAllowedValues) to High(LAllowedValues) do
+        if LAllowedValues[I].Key = AField.Value then
+          LDestValue := _(LAllowedValues[I].Value);
+      end;
+      exit(LDestValue);
+  end
   else if AField.ViewField.ActualDataType is TEFIntegerDataType then
     exit(AField.AsInteger)
-  else if (AField.ViewField.ActualDataType is TEFDateDataType) then
-    exit(AField.AsDateTime)
-  else if (AField.ViewField.ActualDataType is TEFDateTimeDataType) then
-    exit(AField.AsDateTime)
-  else if (AField.ViewField.ActualDataType is TEFTimeDataType) then
-    exit(AField.AsDateTime)
+  else if (AField.ViewField.ActualDataType is TEFDateDataType) and not AField.IsNull then
+    if  (YearOf(AField.AsDateTime) >= 1900) then              //IR: svuotare le date negative
+      exit(AField.AsDateTime)
+    else
+      AField.SetToNull
+  else if (AField.ViewField.ActualDataType is TEFDateTimeDataType) and not AField.IsNull then
+    if  (YearOf(AField.AsDateTime) >= 1900) then
+      exit(AField.AsDateTime)
+    else
+      AField.SetToNull
+  else if (AField.ViewField.ActualDataType is TEFTimeDataType) and not AField.IsNull then
+    if  (YearOf(AField.AsDateTime) >= 1900) then
+      exit(AField.AsDateTime)
+    else
+      AField.SetToNull
   else if AField.ViewField.ActualDataType is TEFBooleanDataType then
     exit(AField.AsBoolean)
   else if (AField.ViewField.ActualDataType is TEFFloatDataType) or (AField.ViewField.ActualDataType is TEFDecimalDataType) then
@@ -276,7 +301,7 @@ begin
     ftFixedChar, ftString, ftGuid, ftWideString, ftMemo, ftWideMemo: Field.Value := ' ';
     ftLargeint, ftAutoInc, ftInteger, ftSmallint, ftWord,
     ftFloat, ftBCD, ftCurrency, ftFMTBcd: Field.Value := 0;
-    ftDate, ftTime, ftDateTime, ftTimeStamp: Field.Value := 0;
+    ftDate, ftTime, ftDateTime, ftTimeStamp: Field.Value := ' ';
     ftBoolean: Field.Value := False;
   end;
 end;
@@ -418,6 +443,9 @@ var
   FieldSize : integer;
   PosFmt : integer;
   NumColExcel : integer;
+  LDestValue: variant;
+  I: integer;
+  LAllowedValues: TEFPairs;
 begin
   LExcelFile := TXlsFile.Create(1, TExcelFileFormat.v2016, True);
   TEFMacroExpansionEngine.Instance.DisableForCurrentThread;
@@ -452,11 +480,25 @@ begin
             GetFormatFlexCelDataType(LSourceField.ViewField.ActualDataType, FieldSize, FmtFlexCel );
             PosFmt :=  LExcelFile.AddFormat(FmtFlexCel) ;
 
-            //TODO boolean to number
-         //   if (LSourceField.ViewField.ActualDataType is TEFBooleanDataType) then
-           //   LExcelFile.SetCellValue(RowNum, NumColExcel, Ord(LSourceField.AsBoolean), PosFmt)
-            //else
-              LExcelFile.SetCellValue(RowNum, NumColExcel, LSourceField.Value, PosFmt);
+             //TODO boolean to number
+           // else
+           // if (LSourceField.ViewField.ActualDataType is TEFBooleanDataType) then
+           // LExcelFile.SetCellValue(RowNum, NumColExcel, Ord(LSourceField.AsBoolean), PosFmt)
+
+            LDestValue :=   LSourceField.Value;
+            if ((LSourceField.ViewField.ActualDataType is TEFDateDataType) or (LSourceField.ViewField.ActualDataType is TEFDateTimeDataType)) then begin
+              if ( LSourceField.IsNull or (YearOf( LSourceField.Value) < 1900)) then
+                LDestValue := ' '       //forzatura per evitare date negative
+            end
+            else
+              if Assigned(LSourceField.ModelField) and (Length(LSourceField.ModelField.AllowedValues) > 0) then
+              begin
+                LAllowedValues := LSourceField.ModelField.AllowedValues;
+                for I := Low(LAllowedValues) to High(LAllowedValues) do
+                  if LAllowedValues[I].Key = LSourceField.Value then
+                    LDestValue := _(LAllowedValues[I].Value);          //forzatura per gestire AllowedValues
+              end;
+              LExcelFile.SetCellValue(RowNum, NumColExcel, LDestValue, PosFmt);
 
            // if FmtFlexCel = FFmtFCMemo then
            //   LExcelFile.AutofitCol(NumColExcel, False, 1);
@@ -488,6 +530,7 @@ var
   PosFmt : integer;
   NumColExcel : integer;
   J : integer;
+  LDestValue: variant;
 begin
   LExcelFile := TXlsFile.Create(1, TExcelFileFormat.v2016, True);
   Try
@@ -528,7 +571,12 @@ begin
             //  if (SourceField.DataType = ftBoolean) then
            //     LExcelFile.SetCellValue(RowNum, NumColExcel, Ord(LSourceField.AsBoolean), PosFmt)
           //    else
-                LExcelFile.SetCellValue(RowNum, NumColExcel, LSourceField.Value, PosFmt);
+
+                LDestValue :=  LSourceField.Value;
+                if (LSourceField.DataType = ftDate) or (LSourceField.DataType = ftDateTime) then
+                  if YearOf(LSourceField.AsDateTime) < 1900 then
+                    LDestValue := null;
+                 LExcelFile.SetCellValue(RowNum, NumColExcel, LDestValue, PosFmt);
             end;
           end;
         end;

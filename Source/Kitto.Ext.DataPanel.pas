@@ -339,24 +339,23 @@ begin
   if LViewTable = nil then
     LViewTable := View.MainTable;
   Assert(Assigned(LViewTable));
+  ViewTable := LViewTable;
 
   if Config.GetBoolean('Sys/ShowIcon', True) then
-    IconCls := Session.SetViewIconStyle(View, LViewTable.Model.ImageName);
+    IconCls := Session.SetViewIconStyle(View, ViewTable.Model.ImageName);
 
   FServerStore := Config.GetObject('Sys/ServerStore') as TKViewTableStore;
   if FServerStore = nil then
   begin
-    FServerStore := LViewTable.CreateStore;
+    FServerStore := ViewTable.CreateStore;
     FOwnsServerStore := True;
   end
   else
     FOwnsServerStore := False;
   Assert(Assigned(FServerStore));
 
-  ViewTable := LViewTable;
-
   // We do this after setting ViewTable in order to give descendants a chance
-  // to define which view fields are used.
+  // to define which view table fields are used.
   CreateClientReaderFields;
 
   inherited; // Creates subcontrollers.
@@ -370,7 +369,7 @@ var
 begin
   LRecord := GetCurrentViewRecord;
   LRecord.ApplyDuplicateRecordRules;
-  ShowEditWindow(GetCurrentViewRecord, emDupCurrentRecord);
+  ShowEditWindow(LRecord, emDupCurrentRecord);
 end;
 
 procedure TKExtDataPanelController.EditRecord;
@@ -661,6 +660,8 @@ var
   LTotal: Integer;
   LData: string;
   LForEachRecordProc: TProc<TEFNode>;
+  LRecordPageFilter: string;
+  LOrderByClause: string;
 begin
   try
     // Don't refresh if there are pending changes.
@@ -682,7 +683,9 @@ begin
           end
       else
         LForEachRecordProc := nil;
-      LTotal := ViewTable.Model.LoadRecords(ServerStore, GetRecordPageFilter, GetOrderByClause, AStart, ALimit, LForEachRecordProc);
+      LRecordPageFilter := GetRecordPageFilter;
+      LOrderByClause := GetOrderByClause;
+      LTotal := ViewTable.Model.LoadRecords(ServerStore, LRecordPageFilter, LOrderByClause, AStart, ALimit, LForEachRecordProc);
       if AFillResponse then
       begin
         if (AStart <> 0) or (ALimit <> 0) then
@@ -977,6 +980,7 @@ begin
   begin
     Result := TKExtButton.CreateAndAddTo(TopToolbar.Items);
     Result.Tooltip := FViewTable.GetString('Controller/' + AActionName + '/Tooltip', ADefaultTooltip);
+    Result.Text := FViewTable.GetString('Controller/' + AActionName, '');
     Result.SetIconAndScale(AImageName);
     if (AActionName <> '') and not IsActionVisible(AActionName) then
       Result.Hidden := True

@@ -216,7 +216,7 @@ begin
         raise EKError.Create(_('TabPanel''s SubViews node may only contain View or Controller subnodes.'));
     end;
     if Items.Count > 0 then
-      SetActiveTab(0);
+      SetActiveTab(Config.GetInteger('ActiveTabNumber', 0));
   end;
 end;
 

@@ -3,7 +3,7 @@ unit ExtPascalClasses;
 interface
 
 uses
-  SysUtils, Classes, IniFiles, ExtPascalUtils;
+  SysUtils, Classes, IniFiles, EF.StrUtils, ExtPascalUtils;
 
 {$WARN IMPLICIT_STRING_CAST OFF}
 {$WARN IMPLICIT_STRING_CAST_LOSS OFF}
@@ -34,6 +34,7 @@ type
     FNameSpace: string;
     FScriptName : string;
     FSessionGUID: string;
+    FAcceptedWildCards: string;
     function CheckPassword(const RealPassword : string) : Boolean;
     function GetCookie(const Name : string): string;
     function GetQuery(const ParamName : string) : string;
@@ -46,6 +47,8 @@ type
     procedure SetSessionCookie(const AValue: string);
     procedure SetScriptName(const Value: string);
     procedure SetNameSpace(const Value: string);
+    procedure SetAcceptedWildCards(const Value: string);
+    procedure SetMaxUploadSize(const Value: Integer);
   protected
     FApplication : TCustomWebApplication;
     FBrowser : TBrowser;
@@ -73,7 +76,9 @@ type
     procedure DetectBrowser(const UserAgent : string);
     procedure DoLogout; virtual;
     procedure DoSetCookie(const Name, ValueRaw : string); virtual;
-    procedure DownloadBuffer(const FileName: string; const Size: Longint; const Buffer : AnsiString; AContentType : string = '');
+    procedure DownloadBuffer(const FileName: string; const Size: Longint;
+      const Buffer : AnsiString; AContentType : string = '';
+      const AEmbedded: Boolean = False);
     function DownloadContentType(const FileName, Default : string) : string;
     class function GetCurrentWebSession : TCustomWebSession; virtual; abstract;
     function GetDocumentRoot : string; virtual; abstract;
@@ -114,7 +119,8 @@ type
     destructor Destroy; override;
     procedure Alert(const AMessage: string); virtual;
     procedure DownloadFile(const FileName : string; AContentType : string = '');
-    procedure DownloadStream(const Stream : TStream; const FileName : string; AContentType : string = '');
+    procedure DownloadStream(const Stream : TStream; const FileName : string; AContentType : string = '';
+      const AEmbedded: Boolean = False);
     procedure Refresh; virtual;
     function MethodURI(MethodName : string): string; overload;
     function MethodURI(Method : TExtProcedure): string; overload;
@@ -126,7 +132,8 @@ type
     property FileUploaded : string read FFileUploaded; // Last uploaded file name
     property FileUploadedFullName : string read FFileUploadedFullName; // Last uploaded file fullname
     property IsAjax : Boolean read FIsAjax write FIsAjax; // Tests if execution is occurring in an AJAX request
-    property MaxUploadSize : Integer read FMaxUploadSize write FMaxUploadSize; // Max size of upload file. Default is MaxLongint(2GB)
+    property MaxUploadSize : Integer read FMaxUploadSize write SetMaxUploadSize; // Max size of upload file. Default is MaxLongint(2GB)
+    property AcceptedWildCards : string read FAcceptedWildCards write SetAcceptedWildCards; //optional file extensions to check for upload
     property NewThread : Boolean read FNewThread write FNewThread; // True if is the first request of a thread
     property PathInfo: string read FPathInfo; // Path info string for the current request
     property Query[const ParamName : string] : string read GetQuery; // Returns HTTP query info parameters read in the current request as a string
@@ -485,13 +492,16 @@ procedure TCustomWebSession.DoLogout; begin end;
 // send cookie to response
 procedure TCustomWebSession.DoSetCookie(const Name, ValueRaw : string); begin end;
 
-procedure TCustomWebSession.DownloadBuffer(const FileName: string; const Size: Longint; const Buffer : AnsiString; AContentType : string = '');
+procedure TCustomWebSession.DownloadBuffer(const FileName: string; const Size: Longint;
+  const Buffer : AnsiString; AContentType : string = '';
+  const AEmbedded: Boolean = False);
 begin
   if AContentType = '' then
     ContentType := DownloadContentType(FileName, 'application/octet-stream')
   else
     ContentType := AContentType;
-  CustomResponseHeaders['content-disposition'] := Format('attachment;filename="%s"', [ExtractFileName(FileName)]);
+  if not AEmbedded then
+    CustomResponseHeaders['content-disposition'] := Format('attachment;filename="%s"', [ExtractFileName(FileName)]);
   CustomResponseHeaders['Content-Length'] := IntToStr(Size);
   Response := string(Buffer);
   IsDownload := True;
@@ -530,7 +540,8 @@ begin
 end;
 
 procedure TCustomWebSession.DownloadStream(const Stream: TStream;
-  const FileName: string; AContentType: string);
+  const FileName: string; AContentType: string;
+  const AEmbedded: Boolean);
 var
   Buffer : AnsiString;
   Size: Longint;
@@ -540,7 +551,7 @@ begin
     SetLength(Buffer, Size);
     Stream.Position := 0;
     Stream.Read(Buffer[1], Length(Buffer));
-    DownloadBuffer(FileName, Size, Buffer, AContentType);
+    DownloadBuffer(FileName, Size, Buffer, AContentType, AEmbedded);
   end;
 end;
 
@@ -735,6 +746,11 @@ If not specified assumes the current pathname request.
 @param Secure If true the cookie will only be transmitted if the communications channel with the host is a secure one (HTTPS only).
 The default is false.
 }
+procedure TCustomWebSession.SetAcceptedWildCards(const Value: string);
+begin
+  FAcceptedWildCards := Value;
+end;
+
 procedure TCustomWebSession.SetCookie(const Name, Value : string; Expires : TDateTime; const Domain, Path : string; Secure : Boolean);
 var
   ValueRaw : string;
@@ -755,6 +771,11 @@ end;
 procedure TCustomWebSession.SetCustomResponseHeaders(const Name, Value : string);
 begin
   FCustomResponseHeaders.Values[Name] := Value;
+end;
+
+procedure TCustomWebSession.SetMaxUploadSize(const Value: Integer);
+begin
+  FMaxUploadSize := Value;
 end;
 
 procedure TCustomWebSession.SetNameSpace(const Value: string);
@@ -863,13 +884,22 @@ var
   BlockType : TUploadBlockType;
 begin
   if FileUploaded = '' then Exit;
-  if MaxUploadSize = 0 then begin
+  if MaxUploadSize = 0 then
+  begin
     UploadResponse(False, dgettext('Kitto','File upload disabled.'));
     Exit;
   end
-  else if FUploadedFileTooBig then begin
+  else if FUploadedFileTooBig then
+  begin
     UploadResponse(False, Format(dgettext('Kitto','File too big. Maximum allowed size is %s.'),
       [FormatByteSize(MaxUploadSize)]));
+    Exit;
+  end
+  else if not MatchWildCards(FileUploadedFullName, FAcceptedWildCards) then
+  begin
+    UploadResponse(False, Format(dgettext('Kitto',
+      'Error: uploaded file don''t match Wildcard (%s)'),
+      [FAcceptedWildcards]));
     Exit;
   end;
   ForceDirectories(ExtractFilePath(FileUploadedFullName));

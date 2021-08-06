@@ -1,0 +1,7 @@
+﻿DisplayLabel: _(Send QR Code)
+# Empty ACName allows the view to be opened when no user is logged in.
+ACName:
+Controller: SendQR
+  PopupWindow:
+    Width: 400
+    Height: 150

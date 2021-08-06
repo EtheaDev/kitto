@@ -37,6 +37,8 @@ type
     FFormPanel: TExtFormFormPanel;
     FOldPasswordHash: string;
     function GetPasswordHash(const AClearPassword: string): string;
+  strict protected
+    procedure DoDisplay; override;
   protected
     procedure InitDefaults; override;
   public
@@ -57,7 +59,7 @@ uses
   SysUtils, StrUtils, Math,
   ExtPascalUtils, ExtPascal,
   EF.Classes, EF.Localization, EF.Tree, EF.StrUtils,
-  Kitto.Types, Kitto.Config,
+  Kitto.Types, Kitto.Config, Kitto.Auth.DB,
   Kitto.Ext.Controller, Kitto.Ext.Session;
 
 { TKExtChangePasswordWindow }
@@ -67,17 +69,21 @@ begin
   if Session.Config.Authenticator.IsClearPassword then
     Result := AClearPassword
   else
+  begin
     Result := GetStringHash(AClearPassword);
+    if Session.Config.Authenticator.IsBCrypted then
+      Result := AClearPassword;
+  end;
 end;
 
 procedure TKExtChangePasswordWindow.DoChangePassword;
 begin
-  if FShowOldPassword and (GetPasswordHash(Session.Query['OldPassword']) <> FOldPasswordHash) then
+  if FShowOldPassword and (not Session.Config.Authenticator.IsPasswordMatching(GetPasswordHash(Session.Query['OldPassword']),FOldPasswordHash)) then
   begin
     FStatusBar.SetErrorStatus(_('Old Password is wrong.'));
     FOldPassword.Focus(False, 500);
   end
-  else if GetPasswordHash(Session.Query['NewPassword']) = FOldPasswordHash then
+  else if Session.Config.Authenticator.IsPasswordMatching(GetPasswordHash(Session.Query['NewPassword']),FOldPasswordHash) then
   begin
     FStatusBar.SetErrorStatus(_('New Password must be different than old password.'));
     FNewPassword.Focus(False, 500);
@@ -104,6 +110,24 @@ begin
   end;
 end;
 
+procedure TKExtChangePasswordWindow.DoDisplay;
+var
+  LEditWidth: Integer;
+begin
+  Title := Config.GetString('DisplayLabel', GetDefaultDisplayLabel);
+  Width := Config.GetInteger('FormPanel/Width', 420);
+  Height := Config.GetInteger('FormPanel/Height', 200);
+  LEditWidth := Config.GetInteger('FormPanel/EditWidth', 220);
+  if Assigned(FOldPassword) then
+    FOldPassword.Width := LEditWidth;
+  if Assigned(FNewPassword) then
+    FNewPassword.Width := LEditWidth;
+  if Assigned(FConfirmNewPassword) then
+    FConfirmNewPassword.Width := LEditWidth;
+  Self.Closable := Config.GetBoolean('AllowClose', True);
+  inherited;
+end;
+
 class function TKExtChangePasswordWindow.GetDefaultDisplayLabel: string;
 begin
   Result := _('Change Password');
@@ -116,7 +140,6 @@ end;
 
 procedure TKExtChangePasswordWindow.InitDefaults;
 var
-  LEditWidth: Integer;
   LPasswordRules: string;
 
   function ReplaceMacros(const ACode: string): string;
@@ -171,14 +194,10 @@ begin
   FShowOldPassword := not Session.Config.Authenticator.MustChangePassword;
 
   Modal := True;
-  Title := Config.GetString('DisplayLabel', GetDefaultDisplayLabel);
-  Width := Config.GetInteger('FormPanel/Width', 420);
-  Height := Config.GetInteger('FormPanel/Height', 200);
   Maximized := Session.IsMobileBrowser;
   Border := not Maximized;
   Closable := True;
   Resizable := False;
-  LEditWidth := Config.GetInteger('FormPanel/EditWidth', 220);
 
   FStatusBar := TKExtStatusBar.Create(Self);
   FStatusBar.DefaultText := '';
@@ -206,7 +225,6 @@ begin
     FOldPassword.FieldLabel := _('Old Password');
     FOldPassword.InputType := itPassword;
     FOldPassword.AllowBlank := False;
-    FOldPassword.Width := LEditWidth;
     FOldPassword.EnableKeyEvents := True;
   end
   else
@@ -218,7 +236,6 @@ begin
   FNewPassword.FieldLabel := _('New Password');
   FNewPassword.InputType := itPassword;
   FNewPassword.AllowBlank := False;
-  FNewPassword.Width := LEditWidth;
   FNewPassword.EnableKeyEvents := True;
 
   FConfirmNewPassword := TExtFormTextField.CreateAndAddTo(FFormPanel.Items);
@@ -227,7 +244,6 @@ begin
   FConfirmNewPassword.FieldLabel := _('Confirm New Password');
   FConfirmNewPassword.InputType := itPassword;
   FConfirmNewPassword.AllowBlank := False;
-  FConfirmNewPassword.Width := LEditWidth;
   FConfirmNewPassword.EnableKeyEvents := True;
 
   LPasswordRules := TKConfig.Instance.Config.GetString('Auth/ValidatePassword/Message');

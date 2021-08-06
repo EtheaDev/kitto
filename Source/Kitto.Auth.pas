@@ -43,6 +43,7 @@ type
     FAuthData: TEFNode;
     FMacroExpander: TEFMacroExpander;
     FIsAuthenticated: Boolean;
+    FIsBCrypted:Boolean;
     procedure ClearAuthData;
   strict protected
     function GetIsAuthenticated: Boolean; virtual;
@@ -85,14 +86,33 @@ type
     /// authenticator. The default implementation does nothing.</summary>
     /// <remarks>After calling this method, the user stays authenticated and
     /// the session's password is updated (the password used when first
-    /// authenticating is lost). This allows a usr to change his password more
+    /// authenticating is lost). This allows a user to change his password more
     /// than once per session.</remarks>
     procedure SetPassword(const AValue: string); virtual;
+
+    /// <summary>For PIN-based authenticators, this function should return
+    /// the current user's secret code (to generate the 6-digit one time PIN).
+    /// The default implementation returns a blank string.</summary>
+    function GetSecretCode: string; virtual;
 
     /// <summary>Returns True if the authentication data contains a custom field
     /// called MUST_CHANGE_PASSWORD with value 1. Override this method to implement a
     /// custom way of signaling that the user needs to change his password.</summary>
     function GetMustChangePassword: Boolean; virtual;
+
+    /// <summary>Returns True if the authentication data contains a custom field
+    /// called MUST_CONFIRM_ACCESS with value 1. Override this method to implement a
+    /// custom way of signaling that the user needs to confirm the access to the system.</summary>
+    function GetMustConfirmAccess: Boolean; virtual;
+
+    /// <summary>Returns always False
+    /// Override this method if your Auth process required a PIN to Authenticate.</summary>
+    function GetMustInputPIN: Boolean; virtual;
+
+    /// <summary>For PIN-based authenticators, changes the PIN validate status.
+    /// It has to be called with "False" after a successful PIN authentication.
+    /// This default implementation does nothing.</summary>
+    procedure SetMustInputPIN(const Value: Boolean); virtual;
   public
     procedure AfterConstruction; override;
     destructor Destroy; override;
@@ -132,6 +152,11 @@ type
     /// string.</summary>
     property Password: string read GetPassword write SetPassword;
 
+    /// <summary>For PIN-based authenticators, returns the current user's
+    /// secret code (to generate the 6-digit one time PIN).
+    /// The default implementation returns a blank string.</summary>
+    property SecretCode: string read GetSecretCode;
+
     /// <summary>Returns True if the autheticator uses clear passwords, False
     /// if hashing is used. Only meaningful for password-based authenticators.
     /// By default, returns True.</summary>
@@ -147,6 +172,10 @@ type
     /// Querying this property is only meaningful after successful authentication.</summary>
     property MustChangePassword: Boolean read GetMustChangePassword;
 
+    /// <summary>Returns True if the authentication need to confirm
+    /// a pre-requisite to access to system.</summary>
+    property MustConfirmAccess: Boolean read GetMustConfirmAccess;
+
     /// <summary>
     ///  Called (with no authenticated user) when a password reset is initiated.
     ///  Override this method to implement an application-defined scheme, such
@@ -158,9 +187,25 @@ type
     procedure ResetPassword(const AParams: TEFNode); virtual; abstract;
 
     /// <summary>
+    ///  Called (with no authenticated user) when a QR code (for PIN authentication)
+    ///  is requested. Override this method to implement an application-defined
+    ///  scheme, such as generating a QR code containing the secret to share with
+    ///  the third party authenticator app and emailing it to the user.
+    ///  The specified params depend on the calling controller.
+    ///  A standard controller might specify the user name (UserName) and
+    ///  email address (EmailAddress) to which the generated QR code should be sent.
+    /// </summary>
+    procedure QRGenerate(const AParams: TEFNode); virtual; abstract;
+
+    /// <summary>
     ///   Access to the authenticator macro expander, that expands auth data.
     /// </summary>
     property MacroExpander: TEFMacroExpander read FMacroExpander;
+
+    function IsPasswordMatching(const ASuppliedPasswordHash: string;
+      const AStoredPasswordHash: string): Boolean; virtual; abstract;
+
+    property IsBCrypted: Boolean read FIsBCrypted write FIsBCrypted;
   public
     function CanBypassURLParam(const AParamName: string): Boolean; virtual;
   end;
@@ -178,6 +223,7 @@ type
     procedure InternalDefineAuthData(const AAuthData: TEFNode); override;
     function GetUserName: string; override;
     function GetPassword: string; override;
+    function GetSecretCode: string; override;
   public
     function CanBypassURLParam(const AParamName: string): Boolean; override;
   end;
@@ -291,6 +337,7 @@ begin
   DefineAuthData(FAuthData);
   FMacroExpander := TEFTreeMacroExpander.Create(FAuthData, 'Auth');
   FIsAuthenticated := False;
+  IsBCrypted := False;
 end;
 
 destructor TKAuthenticator.Destroy;
@@ -327,9 +374,25 @@ begin
   Result := '';
 end;
 
+function TKAuthenticator.GetSecretCode: string;
+begin
+  Result := '';
+end;
+
+function TKAuthenticator.GetMustInputPIN: Boolean;
+begin
+  Result := False;
+end;
+
+
 function TKAuthenticator.GetMustChangePassword: Boolean;
 begin
   Result := AuthData.GetInteger('MUST_CHANGE_PASSWORD') = 1;
+end;
+
+function TKAuthenticator.GetMustConfirmAccess: Boolean;
+begin
+  Result := AuthData.GetInteger('MUST_CONFIRM_ACCESS') = 1;
 end;
 
 function TKAuthenticator.GetUserName: string;
@@ -351,6 +414,10 @@ procedure TKAuthenticator.Logout;
 begin
   ClearAuthData;
   FIsAuthenticated := False;
+end;
+
+procedure TKAuthenticator.SetMustInputPIN(const Value: Boolean);
+begin
 end;
 
 procedure TKAuthenticator.SetPassword(const AValue: string);
@@ -400,6 +467,11 @@ begin
   Result := AuthData.GetString('Password');
 end;
 
+function TKClassicAuthenticator.GetSecretCode: string;
+begin
+  Result := AuthData.GetString('SecretCode');
+end;
+
 function TKClassicAuthenticator.GetUserName: string;
 begin
   Result := AuthData.GetString('UserName');
@@ -411,6 +483,7 @@ begin
   AAuthData.SetString('UserName', '');
   AAuthData.SetString('Password', '');
   AAuthData.SetString('Language', '');
+  AAuthData.SetString('SecretCode','');
 end;
 
 function TKClassicAuthenticator.CanBypassURLParam(

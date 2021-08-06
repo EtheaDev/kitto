@@ -275,7 +275,7 @@ implementation
 uses
   Types, StrUtils, Masks,
   Ext, ExtForm, ExtUxForm,
-  EF.SysUtils, EF.Tree, EF.RegEx, EF.Localization,
+  EF.StrUtils, EF.SysUtils, EF.Tree, EF.RegEx, EF.Localization,
   Kitto.Ext.Session, Kitto.Ext.Controller, Kitto.Metadata.DataView;
 
 { TKExtURLControllerBase }
@@ -610,35 +610,24 @@ begin
   LUploadButton.Handler := TExtFormBasicForm(LFormPanel.GetForm).Submit(LSubmitAction);
 
   Session.MaxUploadSize := MaxUploadSize;
+  session.AcceptedWildCards := AcceptedWildcards;
   FWindow.Show;
 end;
 
 procedure TKExtUploadFileController.Upload;
 var
-  LFileName, LAcceptedWildcards, LWildcard: string;
-  LWildcards: TStringDynArray;
-  I: Integer;
+  LFileName, LAcceptedWildcards: string;
   LAccepted: Boolean;
 begin
   LFileName := Session.FileUploadedFullName;
   LAcceptedWildcards := AcceptedWildcards;
-  if LAcceptedWildcards <> '' then
-  begin
-    LWildcards := SplitString(LAcceptedWildcards, ' ');
-    LAccepted := False;
-    for I := 0 to High(LWildcards) do
-    begin
-      LWildcard := LWildcards[I];
-      if (LWildcard <> '') and MatchesMask(LFileName, LWildcard) then
-      begin
-        LAccepted := True;
-        Break;
-      end;
-    end;
-    if not LAccepted then
-      raise Exception.Create(Format(_('Error: uploaded file don''t match Wildcard (%s)'),
-        [LAcceptedWildcards]));
-  end;
+  LAccepted := MatchWildCards(LFileName,
+    LAcceptedWildcards);
+
+  if not LAccepted then
+    raise Exception.Create(Format(_('Error: uploaded file don''t match Wildcard (%s)'),
+      [LAcceptedWildcards]));
+
   { TODO : Check the file against limitations such as size}
   if (LFileName <> '') and FileExists(LFileName) then
   begin

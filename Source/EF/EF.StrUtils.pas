@@ -310,10 +310,17 @@ function FormatByteSize(const AByteSize: Longint; const AFormatSettings: TFormat
 ///	</summary>
 procedure ReplaceAllCaseSensitive(var AString: string; const AOldPattern, ANewPattern: string);
 
+/// <summary>
+///	 Check form AFileName is compatible with WildCards
+///	 AAcceptedWildCards is a string with a list of wildcards eg: .xls .xlsx
+///	</summary>
+function MatchWildCards(const AFileName: string;
+  const AAcceptedWildCards: string): Boolean;
+
 implementation
 
 uses
-  Windows, StrUtils, Character,
+  Windows, StrUtils, Masks, Character,
   IdHashMessageDigest, IdHash;
 
 function RightPos(const ASubString, AString: string): Integer;
@@ -1027,6 +1034,29 @@ begin
       Insert(ANewPattern, AString, LPos);
       LPos := Pos(AOldPattern, AString);
     until LPos = 0;
+  end;
+end;
+
+function MatchWildCards(const AFileName: string;
+  const AAcceptedWildCards: string): Boolean;
+var
+  LWildcard: string;
+  LWildcards: TStringDynArray;
+  I: Integer;
+begin
+  Result := AAcceptedWildcards = '';
+  if not Result then
+  begin
+    LWildcards := SplitString(AAcceptedWildcards, ' ');
+    for I := 0 to High(LWildcards) do
+    begin
+      LWildcard := LWildcards[I];
+      if (LWildcard <> '') and MatchesMask(AFileName, LWildcard) then
+      begin
+        Result := True;
+        Break;
+      end;
+    end;
   end;
 end;
 

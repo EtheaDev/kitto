@@ -60,6 +60,8 @@ type
     function GetIsVisible: Boolean;
     function GetModelField: TKModelField;
     function GetDisplayLabel: string;
+    function GetDisplayLabel_Form: string;
+    function GetDisplayLabel_Grid: string;
     function GetDisplayWidth: Integer;
     function GetIsRequired: Boolean;
     function GetIsReadOnly: Boolean;
@@ -260,6 +262,9 @@ type
     property Expression: string read GetExpression;
 
     property DisplayLabel: string read GetDisplayLabel;
+    property DisplayLabel_Grid: string read GetDisplayLabel_Grid;
+    property DisplayLabel_Form: string read GetDisplayLabel_Form;
+
     property Hint: string read GetHint;
     property DisplayWidth: Integer read GetDisplayWidth;
     property DecimalPrecision: Integer read GetDecimalPrecision;
@@ -1086,7 +1091,10 @@ end;
 
 function TKViewTable.GetDisplayLabel: string;
 begin
-  Result := GetString('DisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel2')
+  else
+    Result := GetString('DisplayLabel');
   if Result = '' then
     Result := GetDefaultDisplayLabel;
 end;
@@ -1248,7 +1256,10 @@ end;
 
 function TKViewTable.GetPluralDisplayLabel: string;
 begin
-  Result := GetString('PluralDisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('PluralDisplayLabel2')
+  else
+    Result := GetString('PluralDisplayLabel');
   if Result = '' then
     Result := Model.PluralDisplayLabel;
 end;
@@ -1954,9 +1965,32 @@ end;
 
 function TKViewField.GetDisplayLabel: string;
 begin
-  Result := GetString('DisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel2')
+  else
+    Result := GetString('DisplayLabel');
   if Result = '' then
     Result := ModelField.DisplayLabel;
+end;
+
+function TKViewField.GetDisplayLabel_Form: string;
+begin
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel_Form2')
+  else
+    Result := GetString('DisplayLabel_Form');
+  if Result = '' then
+    Result := ModelField.DisplayLabel_Form;
+end;
+
+function TKViewField.GetDisplayLabel_Grid: string;
+begin
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel_Grid2')
+  else
+    Result := GetString('DisplayLabel_Grid');
+  if Result = '' then
+    Result := ModelField.DisplayLabel_Grid;
 end;
 
 function TKViewField.GetDisplayTemplate: string;
@@ -2895,6 +2929,8 @@ var
   LMasterFieldNames: TStringDynArray;
   LDetailFieldNames: TStringDynArray;
   I: Integer;
+  LFieldRef: String;
+  LFieldValue: String;
 begin
   Assert(Records.Store.ViewTable.IsDetail);
 
@@ -2911,7 +2947,23 @@ begin
     LDetailFieldNames[I] := Records.Store.ViewTable.ApplyFieldAliasedName(LDetailFieldNames[I]);
     // ... and copy values.
     GetNode(LDetailFieldNames[I]).AssignValue(AMasterRecord.GetNode(LMasterFieldNames[I]));
+    if High(LDetailFieldNames) >= 1 then
+    begin
+      if LFieldRef = '' then
+        LFieldRef := LDetailFieldNames[I]
+      else
+        LFieldRef := Concat(LFieldRef,TKConfig.Instance.MultiFieldSeparator,LDetailFieldNames[I]);
+
+      if LFieldValue = '' then
+        LFieldValue := AMasterRecord.GetNode(LMasterFieldNames[I]).AsString
+      else
+        LFieldValue := Concat(LFieldValue,TKConfig.Instance.MultiFieldSeparator,AMasterRecord.GetNode(LMasterFieldNames[I]).AsString);
+    end;
+
   end;
+
+  if LFieldRef <> '' then
+    GetNode(LFieldRef).AsString := LFieldValue;
 end;
 
 function TKViewTableRecord.TranslateFieldName(const AFieldName: string): string;
@@ -2981,7 +3033,7 @@ begin
     begin
       // Use value of DisplayTemplate cached in the header for best speed.
       LDisplayTemplate := HeaderField.ViewFieldDisplayTemplate;
-      if LDisplayTemplate <> '' then
+      if (LDisplayTemplate <> '') and not SameText(Result, 'null') then
       begin
         // Replace other field values, this field's value and add back quotes.
         ReplaceAllCaseSensitive(LDisplayTemplate, '{value}', Result);

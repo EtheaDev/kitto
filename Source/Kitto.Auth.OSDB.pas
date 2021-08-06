@@ -37,11 +37,6 @@ type
   private
     FIsUsingSystemUserName: Boolean;
   protected
-    ///	<summary>Disables password matching if the OS user is
-    ///	recognized.</summary>
-    function IsPasswordMatching(const ASuppliedPasswordHash: string;
-      const AStoredPasswordHash: string): Boolean; override;
-
     ///	<summary>Loads the OS user name into the auth data.</summary>
     procedure InternalBeforeAuthenticate(const AAuthData: TEFNode); override;
 
@@ -57,6 +52,11 @@ type
     ///	recognized as a valid user name and we are using it to perform
     ///	authentication. False otherwise.</summary>
     property IsUsingSystemUserName: Boolean read FIsUsingSystemUserName;
+  public
+    ///	<summary>Disables password matching if the OS user is
+    ///	recognized.</summary>
+    function IsPasswordMatching(const ASuppliedPasswordHash: string;
+      const AStoredPasswordHash: string): Boolean; override;
   end;
 
 implementation

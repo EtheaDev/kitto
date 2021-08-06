@@ -166,7 +166,7 @@ begin
   FLookupController := Session.DisplayNewController(LView, Self, True,
     procedure (AWindow: TKExtControllerHostWindow)
     begin
-      AWindow.Title := Format(_('Choose %s'), [FViewField.DisplayLabel]);
+      AWindow.Title := Format(_('Choose %s'), [FViewField.DisplayLabel_Form]);
     end,
     procedure (AController: IKExtController)
     begin

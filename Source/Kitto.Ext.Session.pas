@@ -632,6 +632,11 @@ begin
     LView := Config.Views.ViewByName('ChangePassword');
     FAutoOpenViewName := '';
   end
+  else if Config.Authenticator.MustConfirmAccess then
+  begin
+    LView := Config.Views.ViewByName('ConfirmAccess');
+    FAutoOpenViewName := 'ConfirmAccess';
+  end
   else
     LView := GetHomeView;
 
@@ -716,7 +721,7 @@ begin
     else
       FViewportWidthInInches := 8;
   end
-  else
+  else if FViewportWidthInInches = 0 then
     FViewportWidthInInches := QueryAsInteger['vpWidthInches'];
 
   FViewportWidth := GetDefaultViewportWidth();

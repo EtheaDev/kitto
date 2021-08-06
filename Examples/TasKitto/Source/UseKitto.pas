@@ -5,10 +5,10 @@ unit UseKitto;
 interface
 
 uses
-  Classes,
   DBXFirebird,
   EF.DB.ADO,
   EF.DB.DBX,
+  EF.DB.FD,
   // Kitto.AccessControl.DB,
   Kitto.Auth.DB,
   // Kitto.Auth.DBServer,
@@ -17,8 +17,8 @@ uses
   EF.Logger.TextFile,
   Kitto.Ext.ADOTools, //For Excel import/export
   Kitto.Ext.DebenuQuickPDFTools, //For PDF Merge
-  Kitto.Ext.FOPTools, //For FOP Engine
   Kitto.Ext.XSLTools, //For XSL Transformation
+  Kitto.Ext.FOPTools, //For FOP Engine
   Kitto.Localization.dxgettext,
   Kitto.Metadata.ModelImplementation,
   Kitto.Metadata.ViewBuilders,

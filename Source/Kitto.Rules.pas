@@ -138,6 +138,12 @@ type
     property Rule: TKRule read FRule write SetRule;
 
     /// <summary>
+    ///  Client-side (Javascript) rules return True. The default implementation
+    ///  returns False, assuming it is a server-side rule.
+    /// </summary>
+    function IsClientSide: Boolean; virtual;
+
+    /// <summary>
     ///  Called when creating a new record before showing it in the
     ///  user interface. Descendants may set computed default values
     ///  (declarative default values are already applied when this method is
@@ -534,6 +540,11 @@ begin
   Result := Format(_('Rule %s failed.'), [GetClassId]);
 end;
 
+function TKRuleImpl.IsClientSide: Boolean;
+begin
+  Result := False;
+end;
+
 procedure TKRuleImpl.NewRecord(const ARecord: TKRecord);
 begin
 end;
@@ -604,7 +615,7 @@ begin
   LTo := (ARecord as TKViewTableRecord).FieldByName(Rule.GetString('To'));
 
   if not IsRange(LFrom.Value, LTo.Value) then
-    RaiseError([LTo.ViewField.DisplayLabel, LFrom.ViewField.DisplayLabel]);
+    RaiseError([LTo.ViewField.DisplayLabel_Form, LFrom.ViewField.DisplayLabel_Form]);
 end;
 
 function TKEnforceRange.InternalGetErrorMessage: string;

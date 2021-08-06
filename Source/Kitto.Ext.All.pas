@@ -33,6 +33,7 @@ uses
   , Kitto.Ext.List
   , Kitto.Ext.ResetPassword
   , Kitto.Ext.Rules
+  , Kitto.Ext.SendQR
   , Kitto.Ext.StandardControllers
   , Kitto.Ext.StatusBar
   , Kitto.Ext.TabPanel

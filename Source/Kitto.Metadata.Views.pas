@@ -460,7 +460,10 @@ end;
 
 function TKView.GetDisplayLabel: string;
 begin
-  Result := GetString('DisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel2')
+  else
+    Result := GetString('DisplayLabel');
 end;
 
 function TKView.GetImageName: string;

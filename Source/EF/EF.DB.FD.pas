@@ -1,5 +1,5 @@
 {-------------------------------------------------------------------------------
-   Copyright 2014 Ethea S.r.l.
+   Copyright 2012-2021 Ethea S.r.l.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,18 +24,28 @@ unit EF.DB.FD;
 interface
 
 uses
-  Classes, DB, Contnrs,
-  FireDAC.Comp.Client,
-  {$IFDEF IBFB_SUPPORT}FireDAC.Phys.IBBase, FireDAC.Phys.FB, FireDAC.Phys.IB,{$ENDIF}
-  {$IFDEF MSSQL_SUPPORT}FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLMeta,{$ENDIF}
-  {$IFDEF SYBASE_SUPPORT}FireDAC.Phys.ASA, FireDAC.Phys.ASAWrapper,{$ENDIF}
-  {$IFDEF ORACLE_SUPPORT}FireDAC.Phys.ORACLE, FireDAC.Phys.ORACLEMeta,{$ENDIF}
-  {$IFDEF PGSQL_SUPPORT}FireDAC.Phys.PG, FireDAC.Phys.PGWrapper,{$ENDIF}
-  {$IFDEF MYSQL_SUPPORT}FireDAC.Phys.MYSQL, FireDAC.Phys.MYSQLWrapper,{$ENDIF}
-  {$IFDEF SQLITE_SUPPORT}FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteWrapper,{$ENDIF}
-  FireDAC.Stan.Def, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Intf, FireDAC.Phys.Intf,
-  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
-  EF.Tree, EF.DB;
+  Classes
+  , DB
+  , FireDAC.Comp.Client
+  {$IFDEF IBFB_SUPPORT}, FireDAC.Phys.IBBase, FireDAC.Phys.FB, FireDAC.Phys.IB{$ENDIF}
+  {$IFDEF MSSQL_SUPPORT}, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLMeta{$ENDIF}
+  {$IFDEF SYBASE_SUPPORT}, FireDAC.Phys.ASA, FireDAC.Phys.ASAWrapper{$ENDIF}
+  {$IFDEF ORACLE_SUPPORT}, FireDAC.Phys.ORACLE, FireDAC.Phys.ORACLEMeta{$ENDIF}
+  {$IFDEF PGSQL_SUPPORT}, FireDAC.Phys.PG, FireDAC.Phys.PGWrapper{$ENDIF}
+  {$IFDEF MYSQL_SUPPORT}, FireDAC.Phys.MYSQL, FireDAC.Phys.MYSQLWrapper{$ENDIF}
+  {$IFDEF SQLITE_SUPPORT}, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteWrapper{$ENDIF}
+  , FireDAC.Stan.Def
+  , FireDAC.Stan.Option
+  , FireDAC.Stan.Param
+  , FireDAC.Stan.Intf
+  , FireDAC.Phys.Intf
+  , FireDAC.Stan.Async
+  , FireDAC.DApt.Intf
+  , FireDAC.DApt
+  , FireDAC.Comp.DataSet
+  , EF.Tree
+  , EF.DB
+  ;
 
 type
   ///	<summary>
@@ -48,7 +58,7 @@ type
     ///	  matches the name of a parameter in the current object to that of the
     ///	  current object's parameter.
     ///	</summary>
-    procedure AssignValuesTo(const ADestination: TFDParams);
+    procedure AssignValuesTo(const ADestination: TFDParams; AUseBooleanFields : boolean);
   end;
 
   ///	<summary>
@@ -87,9 +97,9 @@ type
     procedure InternalOpen; override;
     procedure InternalClose; override;
     function InternalCreateDBInfo: TEFDBInfo; override;
-    property DriverId: string read GetDriverId;
     property Isolation: string read GetIsolation;
   public
+    property DriverId: string read GetDriverId;
     procedure AfterConstruction; override;
     destructor Destroy; override;
   public
@@ -169,6 +179,10 @@ type
     class function InternalGetClassId: string; override;
   end;
 
+
+  function GetUseBooleanFields(ADriverID: string) : boolean;
+
+
 implementation
 
 uses
@@ -176,20 +190,76 @@ uses
   //DBXMetaDataNames,
   EF.StrUtils, EF.Localization, EF.Types;
 
+function GetUseBooleanFields(ADriverID: string) : boolean;
+begin
+  Result := False;
+
+  if SameText(ADriverID, 'MSSQL') then
+  begin
+    Result := True;
+  end
+  else if SameText(ADriverID, 'FB') or
+          SameText(ADriverID, 'IB') then
+  begin
+    Result := False;
+  end
+  else if SameText(ADriverID, 'Ora') then
+    Result := False;
+end;
+
 { TEFDBFDParams }
 
-procedure TEFDBFDParams.AssignValuesTo(const ADestination: TFDParams);
+procedure TEFDBFDParams.AssignValuesTo(const ADestination: TFDParams;
+  AUseBooleanFields : boolean);
 var
   LParamIndex: Integer;
   LDestinationParameter: TFDParam;
+  LSourceParam: TParam;
+
+function ConvertBlobData(const Bytes: TBytes): RawByteString;
+  begin
+    SetLength(Result, Length(Bytes));
+    if length(Result) > 0 then
+      Move(Bytes[0], Result[1], Length(Bytes))
+  end;
+
 begin
   // Causes for errors such as "parameter incomplete or undefined" are
   // column name and type mismatches.
   for LParamIndex := 0 to Count - 1 do
   begin
-    LDestinationParameter := ADestination.FindParam(Items[LParamIndex].Name);
+
+    LSourceParam := Items[LParamIndex];
+    LDestinationParameter := ADestination.FindParam(LSourceParam.Name);
     if Assigned(LDestinationParameter) then
-      LDestinationParameter.Value := Items[LParamIndex].Value;
+    begin
+      case LSourceParam.DataType of
+        ftBoolean:
+          if AUseBooleanFields then
+          LDestinationParameter.Assign(LSourceParam) else
+          LDestinationParameter.AsInteger := ord(LSourceParam.AsBoolean);
+        ftBlob:
+          LDestinationParameter.AsBlob := ConvertBlobData(LSourceParam.AsBlob);
+        ftDateTime:
+          begin
+            LDestinationParameter.DataType := ftTimeStamp;
+            if not LSourceParam.IsNull then
+              LDestinationParameter.Value := LSourceParam.AsDateTime;
+          end;
+        ftCurrency:
+          begin
+            LDestinationParameter.DataType := ftBCD;
+            LDestinationParameter.Value := LSourceParam.AsCurrency;
+          end;
+        ftString:
+          begin
+            LDestinationParameter.DataType := ftWideString;
+            LDestinationParameter.Value := LSourceParam.AsWideString;
+          end;
+        else
+          LDestinationParameter.Assign(Items[LParamIndex]);
+      end;
+    end;
   end;
 end;
 
@@ -232,7 +302,7 @@ begin
     FConnection.Params.Values['Password'] := Config.GetExpandedString('Connection/Password');
     FConnection.Params.Values['Network'] := Config.GetExpandedString('Connection/Network');
     FConnection.Params.Values['Address'] := Config.GetExpandedString('Connection/Address');
-    FConnection.Params.Values['Language'] := Config.GetExpandedString('Connection/Language');    
+    FConnection.Params.Values['Language'] := Config.GetExpandedString('Connection/Language');
     FConnection.Params.Values['ApplicationName'] := Config.GetExpandedString('Connection/ApplicationName');
     FConnection.Params.Values['Database'] := Config.GetExpandedString('Connection/Database');
     FConnection.Params.Values['OSAuthent'] := Config.GetString('Connection/OSAuthent', 'No');
@@ -267,6 +337,13 @@ begin
     FConnection.Params.Values['ApplicationName'] := Config.GetExpandedString('Connection/ApplicationName');
     FConnection.Params.Values['MetaDefSchema'] := Config.GetExpandedString('Connection/MetaDefSchema');
   end;
+
+  //Those parameters speed-up reading
+  FConnection.ResourceOptions.DirectExecute := True;
+  //Esclude use of Macros for SQL-Statements
+  FConnection.ResourceOptions.MacroCreate := False;
+  FConnection.ResourceOptions.MacroExpand := False;
+  FConnection.FetchOptions.Mode := fmAll;
 
   FConnection.Open;
 end;
@@ -488,8 +565,12 @@ begin
 end;
 
 procedure TEFDBFDCommand.UpdateInternalCommandParams;
+var
+  LUseBooleanFields: boolean;
 begin
-  FParams.AssignValuesTo(FCommand.Params);
+  LUseBooleanFields := GetUseBooleanFields(TEFDBFDConnection(Connection).DriverID);
+
+  FParams.AssignValuesTo(FCommand.Params, LUseBooleanFields);
 end;
 
 { TEFDBFDQuery }
@@ -603,8 +684,12 @@ begin
 end;
 
 procedure TEFDBFDQuery.UpdateInternalQueryParams;
+var
+  LUseBooleanFields: boolean;
 begin
-  FParams.AssignValuesTo(FQuery.Params);
+  LUseBooleanFields := GetUseBooleanFields(TEFDBFDConnection(Connection).DriverID);
+
+  FParams.AssignValuesTo(FQuery.Params, LUseBooleanFields);
 end;
 
 { TEFDBFDInfo }

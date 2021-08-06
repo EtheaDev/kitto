@@ -1404,8 +1404,8 @@ begin
   Assert(Assigned(AConfig));
   LText := AConfig.AsExpandedString;
   if LText = '' then
-    LText := _('Apply');
-  Text := LText;
+    LText := 'Apply';
+  Text := _(LText);
   SetIconAndScale(AConfig.GetString('ImageName'), AConfig.GetString('ButtonScale', 'small'));
   Handler := Ajax(ButtonClick);
   // The click event is not always fired when the focus is on a text filter,

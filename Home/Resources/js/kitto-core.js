@@ -296,6 +296,22 @@ function formatWithDisplayTemplate(v, displayTemplate)
     return v;
 }
 
+// Renders an image with his filename.
+// Set path, width, height to define the size of the preview image
+// Note: fileName is always used as the image tooltip (ext:qtip) and alt value.
+function formatWithFileImage(fileName, path, width, height) 
+{
+  if (fileName != "")
+  {
+    var image = path+'/'+fileName;
+    var style = 'width:'+width+'px;height:'+height+'px;display:block;margin-left:auto;margin-right:auto';
+    // TODO: center image vertically?
+    return '<img style="' + style + '" src="' + image + '" alt="' + fileName + '" ext:qtip="' + fileName + '">';
+  }
+  else
+    return "";
+};
+
 // Renders an image with a value.
 // Patterns is an array of arrays of two/three elements: image URL and regexp
 // are mandatory, and the third element, if present, is a custom value template

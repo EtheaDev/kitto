@@ -34,6 +34,7 @@ implementation
 
 uses
   Ext,
+  Kitto.Config,
   EF.Localization,
   Kitto.Ext.Session, Kitto.Metadata.Views;
 
@@ -41,7 +42,10 @@ uses
 
 procedure TKExtWindowController.DoDisplay;
 begin
-  Title := _(View.GetExpandedString('DisplayLabel'));
+  if TKConfig.Instance.UseAltLanguage then
+    Title := _(View.GetExpandedString('DisplayLabel2'))
+  else
+    Title := _(View.GetExpandedString('DisplayLabel'));
   Width := View.GetInteger('Controller/Width', 800);
   Height := View.GetInteger('Controller/Height', 600);
   ResizeHandles := View.GetString('Controller/ResizeHandles');

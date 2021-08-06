@@ -272,6 +272,7 @@ begin
   FEditorGridPanel.ColumnLines := True;
   FEditorGridPanel.TrackMouseOver := True;
   FEditorGridPanel.EnableHdMenu := False;
+
 //  FEditorGridPanel.On('viewready', JSFunction(FSelectionModel.JSName + '.selectFirstRow();'));
 end;
 
@@ -355,6 +356,8 @@ var
       LJSCode: string;
       LColorValueFieldName: string;
       LColorPair: string;
+      LImageWidth, LImageHeight: Integer;
+      LURL: string;
     begin
       Result := False;
 
@@ -367,6 +370,21 @@ var
         Exit;
       end;
 
+      if AViewField.IsPicture then
+      begin
+        LImageWidth := AViewField.GetInteger('IsPicture/GridCell/Width', 50);
+        LImageHeight := AViewField.GetInteger('IsPicture/GridCell/Height', 50);
+        LURL := AViewField.GetExpandedString(
+          'URL',Session.Config.UploadURL);
+        AColumn.RendererExtFunction := AColumn.JSFunction('value',
+          Format('return formatWithFileImage(value, "%s", %d, %d);',
+            [LURL,
+            LImageWidth, LImageHeight]));
+        Result := True;
+        Exit;
+      end;
+
+      //Rendering of Images into GridColumn using formatWithImage Javascript function
       if Assigned(ALayoutNode) then
         LImages := ALayoutNode.FindNode('Images')
       else
@@ -398,10 +416,15 @@ var
       else
         LColors := nil;
       if not Assigned(LColors) then
+      begin
         LColors := AViewField.FindNode('Colors');
+        if Assigned(LColors) and (LColors.ChildCount > 0) then
+          LColorPairs := AViewField.GetColorsAsPairs;
+      end
+      else
+        LColorPairs := ALayoutNode.GetChildrenAsPairs('Colors',True);
       if Assigned(LColors) and (LColors.ChildCount > 0) then
       begin
-        LColorPairs := AViewField.GetColorsAsPairs;
         // Get color list into array of triples (color/regexp/template).
         SetLength(LTriples, Length(LColorPairs));
         for I := 0 to High(LColorPairs) do
@@ -597,9 +620,12 @@ var
     LColumn := CreateColumn;
     LColumn.Sortable := not AViewField.IsBlob;
     if Assigned(ALayoutNode) then
-      LColumn.Header := _(ALayoutNode.GetString('DisplayLabel', AViewField.DisplayLabel))
+      if ALayoutNode.GetBoolean('HideLabel') then
+        LColumn.Header := ''
+       else
+        LColumn.Header := _(ALayoutNode.GetString('DisplayLabel', AViewField.DisplayLabel_Grid))
     else
-      LColumn.Header := _(AViewField.DisplayLabel);
+      LColumn.Header := _(AViewField.DisplayLabel_Grid);
     LColumn.DataIndex := AViewField.AliasedName;
 
     if Assigned(ALayoutNode) then
@@ -703,6 +729,8 @@ begin
       else
       begin
         (FAutoFormController.AsObject as TKExtFormPanelController).ChangeRecord(LRecord);
+        LRecord.ApplyAfterShowEditWindowRules;
+	
       end;
       FAutoFormContainer.Show;
     end
@@ -1017,7 +1045,7 @@ begin
 
   FPagingToolbar := TExtPagingToolbar.Create(Self);
   FPagingToolbar.Store := FEditorGridPanel.Store;
-  FPagingToolbar.DisplayInfo := False;
+  FPagingToolbar.DisplayInfo := True;
   FPagingToolbar.PageSize := FPageRecordCount;
   FPagingToolbar.Cls := 'k-bbar';
   Result := FPagingToolbar;

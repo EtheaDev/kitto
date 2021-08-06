@@ -595,6 +595,7 @@ begin
                         begin
                           FSession.IsUpload := _CurrentFCGIThread.CompleteRequestHeaderInfo(Buffer, I);
                           FSession.MaxUploadSize := _CurrentFCGIThread.FSession.MaxUploadSize;
+                          FSession.AcceptedWildCards := _CurrentFCGIThread.FSession.AcceptedWildCards;
                           if FSession.IsUpload then
                           begin
                             FSession.FFileUploaded := _CurrentFCGIThread.FSession.FFileUploaded;

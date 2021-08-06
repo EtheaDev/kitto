@@ -109,7 +109,7 @@ begin
   AddTileSubPanel;
   inherited;
   if Items.Count > 0 then
-    SetActiveTab(0);
+    SetActiveTab(Config.GetInteger('ActiveTabNumber', 0));
 end;
 
 procedure TKExtTileTabPanel.SetAsViewHost;
@@ -139,7 +139,6 @@ procedure TKExtTilePanel.DoDisplay;
 var
   LTitle: string;
 begin
-  Style := 'background-image: url(''/KittoSCM/SCMLogo.png'')';
   LTitle := _(Config.GetExpandedString('Title', View.DisplayLabel));
   if LTitle <> '' then
     Title := LTitle

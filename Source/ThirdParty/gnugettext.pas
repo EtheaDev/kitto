@@ -2888,7 +2888,6 @@ begin
     a:=b;
     offset:=offset+bufsize;
   end;
-  Result:=0;
 end;
 
 procedure TFileLocator.Analyze;

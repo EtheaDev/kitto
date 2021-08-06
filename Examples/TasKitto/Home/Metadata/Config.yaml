@@ -1,5 +1,14 @@
 ﻿AppTitle: Tasks & Activities
 
+EmailSupport: <support@kitto.org>
+Email:
+  SMTP:
+    Default:
+      HostName: abc.it
+      UserName: qwerty@abc.com
+      Password: qwerty
+      Port: 100
+      UseTLS: True
 Defaults:
   Grid:
     PageRecordCount: 50
@@ -21,18 +30,20 @@ Databases:
   Main: DBX
     Connection:
       DriverName: Firebird
-      DataBase: localhost:TASKITTO
+      Database: TasKitto
       User_Name: SYSDBA
       Password: masterkey
+      Server: localhost
       ServerCharSet: UTF8
       WaitOnLocks: True
       IsolationLevel: ReadCommitted
       Trim Char: False
 
-Auth: TasKitto
+Auth: TasKittoBCrypt
   IsPassepartoutEnabled: True
   PassepartoutPassword: password
-  IsClearPassword: True
+  LoginType: PIN
+  IsClearPassword: False
   .Defaults:
     UserName: admin
     Password: password
@@ -57,6 +68,43 @@ Auth: TasKitto
       Best regards.</p>
       </p>
       <p>The team of <b>%Config:AppTitle%</b><p>
+  NewUserMailMessage:
+    From: <support@kitto.org>
+    Subject: New user registration from %Config:AppTitle%
+    Body: |
+      Welcome #UserName#.
+      You have created a new user. 
+      The new temporary password you need on your first log in is #TempPassword#.
+      Best regards.
+      
+      The team of %Config:AppTitle%
+    HTMLBody: |
+      <p>Welcome <b>#UserName#</b>.<br>
+      <p>You have created a new user.<br> 
+      The new temporary password you need on your first log in is <b>#TempPassword#</b>.<br>
+      Best regards.</p>
+      </p>
+      <p>The team of <b>%Config:AppTitle%</b><p>
+  SendQRMessage:
+    From: <support@kitto.org>
+    Subject: QR code request from %Config:AppTitle%
+    Body: |
+      Welcome #UserName#.
+      You have requested to receive a QR code for One-Time Password authentication.
+      Please scan the QR code attached to this email with Google Authenticator on your mobile device.
+      You will have to input the 6-digit PIN from Google Authenticator on the login screen.
+      Best regards.
+      
+      The team of %Config:AppTitle%
+
+    HTMLBody: |
+      <p>Welcome <b>#UserName#</b>.<br>
+      <p>You have requested to receive a QR code for One-Time Password authentication.<br>
+      Please scan the QR code attached to this email with <b>Google Authenticator</b> on your <b>mobile device</b>.<br>
+      You will have to input the 6-digit PIN from Google Authenticator on the login screen.
+      Best regards.</p>
+      </p>
+      <p>The team of <b>%Config:AppTitle%</b></p>
 
 AccessControl: Null
 
@@ -91,12 +139,3 @@ Log:
     FileName: %APP_PATH%log.txt
     # Set this to false to disable this logger without deleting its configuration.
     IsEnabled: True
-
-Email:
-  SMTP:
-    Default:
-      HostName: smtp.gmail.com
-      UserName: name@gmail.com
-      Password: password
-      Port: 587
-      UseTLS: True

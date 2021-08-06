@@ -18,3 +18,24 @@
   /* .ext-el-mask-msg has 20001 */
   z-index: 20000;
 }
+
+img.kitto-preview-img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+img.kitto-preview-thumbnail {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+iframe.kitto-preview-iframe {
+  width: 100%;
+  height: 100%;
+}

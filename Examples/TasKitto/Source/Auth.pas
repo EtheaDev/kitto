@@ -29,6 +29,7 @@ uses
   , Kitto.Auth.DB
   , Kitto.Config
   , RegularExpressions
+  , Vcl.Graphics
   ;
 
 type
@@ -37,6 +38,7 @@ type
     FAutoLogin: Boolean;
     FRedirectErrorUrl: string;
     procedure SendResetPasswordEmail(const AUserName, AEmailAddress, APassword: string);
+    procedure SendQREmail(const AUserName, AEmailAddress, AQRFileName: string);
     function HasRemoteLoginRequest: Boolean;
   protected
     /// <summary>Generates and returns a random password compatible with special rules defined in SetPassword.</summary>
@@ -51,6 +53,38 @@ type
     /// <summary>Raise an exception in auto-login fails.</summary>
     function InternalAuthenticate(const AAuthData: TEFNode): Boolean; override;
     /// <summary>Form auto-login redirect to another site.</summary>
+
+    procedure AfterQRGeneration(const AQRCode: TBitmap; const AParams: TEFNode); override;
+  public
+    procedure Logout; override;
+  end;
+
+type
+  TTasKittoBCryptAuthenticator = class(TKDBCryptAuthenticator)
+  strict private
+    FAutoLogin: Boolean;
+    FRedirectErrorUrl: string;
+    procedure SendResetPasswordEmail(const AUserName, AEmailAddress, APassword: string);
+    procedure SendQREmail(const AUserName, AEmailAddress, AQRFileName: string);
+    function HasRemoteLoginRequest: Boolean;
+  protected
+    /// <summary>Generates and returns a random password compatible with special rules defined in SetPassword.</summary>
+    function GenerateRandomPassword: string; override;
+    /// <summary>Try to extract suppliedusername and suppliedpassword from url.</summary>
+    procedure GetSuppliedAuthData(const AAuthData: TEFNode; const AHashNeeded: Boolean;
+      out ASuppliedUserName, ASuppliedPasswordHash: string;
+      out AIsPassepartoutAuthentication: Boolean); override;
+    procedure SetPassword(const AValue: string); override;
+    /// <summary>Example of sending email for reset password.</summary>
+    procedure AfterResetPassword(const ADBConnection: TEFDBConnection; const AParams: TEFNode); override;
+
+    procedure ReadUserFromRecord(const AUser: TKAuthUser;
+      const ADBQuery: TEFDBQuery; const AAuthData: TEFNode); override;
+
+    /// <summary>Raise an exception in auto-login fails.</summary>
+    function InternalAuthenticate(const AAuthData: TEFNode): Boolean; override;
+
+    procedure AfterQRGeneration(const AQRCode: TBitmap; const AParams: TEFNode); override;
   public
     procedure Logout; override;
   end;
@@ -60,10 +94,10 @@ implementation
 uses
   SysUtils, EF.Localization, EF.Logger, Kitto.Auth, ExtPascal,
   IdSMTP, IdMessage, IdEmailAddress, Kitto.Ext.Session,
-  IdAttachmentFile, IdExplicitTLSClientServerBase, IdSSLOpenSSL, IdText, EF.StrUtils;
+  IdAttachmentFile, IdExplicitTLSClientServerBase, IdSSLOpenSSL, IdText, EF.StrUtils,
+  Base32U, System.IOUtils;
 
 { TTasKittoAuth }
-
 
 function TTasKittoAuthenticator.GenerateRandomPassword: string;
 begin
@@ -132,6 +166,116 @@ begin
     FAutoLogin := False; //Reset autologin flag
     inherited; //Reload Home
   end;
+end;
+
+procedure TTasKittoAuthenticator.SendQREmail(const AUserName, AEmailAddress,
+  AQRFileName: string);
+var
+  LSMTP: TIdSMTP;
+  LIdSSLIOHandler: TIdSSLIOHandlerSocketOpenSSL;
+  LMessage: TIdMessage;
+  LRecipient: TIdEMailAddressItem;
+  LServerNode: TEFNode;
+  LMessageNode: TEFNode;
+  LBody: string;
+  LHTMLBody: string;
+  LIdText: TIdText;
+  LAttachmentFile: TIdAttachmentFile;
+
+begin
+  inherited;
+  LIdSSLIOHandler := nil;
+  LSMTP := TIdSMTP.Create(nil);
+  try
+    LSMTP.AuthType := satDefault;
+    LServerNode := TKConfig.Instance.Config.FindNode('Email/SMTP/' + Config.GetString('SMTP', 'Default'));
+    LMessageNode := Config.FindNode('SendQRMessage');
+
+    Assert(Assigned(LServerNode));
+    Assert(Assigned(LMessageNode));
+
+    LSMTP.Host := LServerNode.GetExpandedString('HostName');
+    //For this demo, if the SMTP parameters are not configured we just exit.
+    if LSMTP.Host = '' then
+      Exit;
+
+    LSMTP.Username := LServerNode.GetExpandedString('UserName');
+    LSMTP.Password := LServerNode.GetExpandedString('Password');
+    LSMTP.Port := LServerNode.GetInteger('Port');
+    if (LServerNode.GetBoolean('UseTLS')) then
+    begin
+      LIdSSLIOHandler := TIdSSLIOHandlerSocketOpenSSL.Create;
+      LSMTP.IOHandler := LIdSSLIOHandler;
+      LSMTP.UseTLS := utUseRequireTLS;
+    end
+    else
+      LSMTP.UseTLS := utNoTLSSupport;
+
+    LMessage := TIdMessage.Create;
+    try
+      // From
+      LMessage.From.Text := LMessageNode.GetExpandedString('From');
+
+      // To
+      LRecipient := LMessage.Recipients.Add;
+      LRecipient.Text := AEmailAddress;
+
+      // Subject
+      LMessage.Subject := LMessageNode.GetExpandedString('Subject');
+
+      // Body in Text
+      LBody := LMessageNode.GetExpandedString('Body');
+      // Substitute Template #UserName#
+      LBody := StringReplace(LBody, '#UserName#', AUserName, [rfReplaceAll]);
+      // Substitute Template #TempPassword#
+      LBody := StringReplace(LBody, '#TempPassword#', '', [rfReplaceAll]);
+
+      //Body in HTML
+      LHTMLBody := LMessageNode.GetExpandedString('HTMLBody');
+      if LHTMLBody <> '' then
+      begin
+        // Substitute Template #UserName#
+        LHTMLBody := StringReplace(LHTMLBody, '#UserName#', AUserName, [rfReplaceAll]);
+        // Substitute Template #TempPassword#
+        LHTMLBody := StringReplace(LHTMLBody, '#TempPassword#', '', [rfReplaceAll]);
+        // If HTML body is found no plain text is written in email
+        LMessage.ContentType := 'multipart/related; type="text/html"';
+        LIdText := TIdText.Create(LMessage.MessageParts, nil);
+        LIdText.ContentType := 'text/html';
+        LIdText.Charset := 'utf-8';
+        LIdText.Body.Text := LHTMLBody;
+        LAttachmentFile := TIdAttachmentFile.Create(LMessage.MessageParts, AQRFileName);
+        LAttachmentFile.ContentTransfer := 'base64';
+        LAttachmentFile.ContentType := 'image/png';
+        LAttachmentFile.ContentDisposition := 'inline';
+        LAttachmentFile.ContentID := 'QrCode';
+      end
+      else
+      begin
+        // If no HTML body is found email is written in plain text
+        LAttachmentFile := TIdAttachmentFile.Create(LMessage.MessageParts, AQRFileName);
+        LAttachmentFile.ContentTransfer := 'base64';
+        LAttachmentFile.ContentType := 'image/png';
+        LAttachmentFile.ContentDisposition := 'inline';
+        LAttachmentFile.ContentID := 'QrCode';
+        LMessage.Body.Text := LBody;
+      end;
+
+      LSMTP.Connect;
+      try
+        LSMTP.Send(LMessage);
+      finally
+        LSMTP.Disconnect;
+      end;
+    finally
+      FreeAndNil(LMessage);
+    end;
+  finally
+    LSMTP.Free;
+    LIdSSLIOHandler.Free;
+  end;
+  // Removing QR file saved when attachment is uploaded
+  TFile.Delete(AQRFileName);
 end;
 
 procedure TTasKittoAuthenticator.SendResetPasswordEmail(const AUserName, AEmailAddress, APassword: string);
@@ -251,6 +395,19 @@ begin
   end;
 end;
 
+procedure TTasKittoAuthenticator.AfterQRGeneration(const AQRCode: TBitmap;
+  const AParams: TEFNode);
+var
+  LUserName, LEmailAddress, LQRFileName: string;
+begin
+  inherited;
+  LUserName := AParams.GetString('UserName');
+  LEmailAddress := AParams.GetString('EmailAddress');
+  LQRFileName := IncludeTrailingPathDelimiter(TKConfig.Instance.AppHomePath)+'QR_'+LUserName+'.png';
+  AQRCode.SaveToFile(LQRFileName);
+  SendQREmail(LUserName, LEmailAddress, LQRFileName);
+end;
+
 procedure TTasKittoAuthenticator.AfterResetPassword(const ADBConnection: TEFDBConnection; const AParams: TEFNode);
 var
   LUserName, LEmailAddress, LPassword: string;
@@ -284,10 +441,361 @@ begin
   inherited;
 end;
 
+{ TTasKittoBCryptAuthenticator }
+
+function TTasKittoBCryptAuthenticator.GenerateRandomPassword: string;
+begin
+  Result := GetRandomString(8)+'!';
+end;
+
+procedure TTasKittoBCryptAuthenticator.GetSuppliedAuthData(const AAuthData: TEFNode;
+  const AHashNeeded: Boolean; out ASuppliedUserName,
+  ASuppliedPasswordHash: string; out AIsPassepartoutAuthentication: Boolean);
+var
+  LSourceIP, LLanguage: string;
+begin
+  if HasRemoteLoginRequest then
+  begin
+    //Remote login sample: check for LoginUserName and LoginPassword supplied at URL level
+    AIsPassepartoutAuthentication := False;
+    ASuppliedUserName := Session.Query['LoginUserName'];
+    ASuppliedPasswordHash := Session.Query['LoginPassword'];
+    LSourceIP := Session.RequestHeader['HTTP_HOST'];
+    LLanguage := Session.Query['Language'];
+    if LLanguage <> '' then
+      Session.Language := LLanguage;
+    //Supplied Url for error redirect handled by InternalAuthenticate
+    //the error response page: www.ethea.it it's only an example
+    FRedirectErrorUrl := 'http://www.ethea.it';
+    //Notify with logger the remote login event
+    TEFLogger.Instance.Log(Format('Remote Login: UserName: %s', [ASuppliedUserName]),
+      TEFLogger.Instance.LOG_LOW);
+  end
+  else
+    inherited;
+end;
+
+function TTasKittoBCryptAuthenticator.HasRemoteLoginRequest: Boolean;
+begin
+  Result := (Session.Query['LoginUserName']<>'') and (Session.Query['LoginPassword']<>'');
+end;
+
+function TTasKittoBCryptAuthenticator.InternalAuthenticate(
+  const AAuthData: TEFNode): Boolean;
+begin
+  Result := inherited InternalAuthenticate(AAuthData);
+  if not Result and HasRemoteLoginRequest then
+  begin
+    //If autologin fails then raise a special ERedirectError to redirect ULR
+    //provided at AAuthData by GetSuppliedAuthData
+    FAutoLogin := False; //Reset autologin
+    raise ERedirectError.Create(FRedirectErrorUrl);
+  end
+  else
+    FAutoLogin := HasRemoteLoginRequest;
+end;
+
+procedure TTasKittoBCryptAuthenticator.Logout;
+begin
+  if IsAuthenticated and FAutoLogin then
+  begin
+    inherited; //ClearAuthData
+    FAutoLogin := False; //Reset autologin flag
+    raise ERedirectError.Create('http://www.google.it'); //Redirect to logout site
+  end
+  else
+  begin
+    FAutoLogin := False; //Reset autologin flag
+    inherited; //Reload Home
+  end;
+end;
+
+procedure TTasKittoBCryptAuthenticator.ReadUserFromRecord(
+  const AUser: TKAuthUser; const ADBQuery: TEFDBQuery;
+  const AAuthData: TEFNode);
+begin
+  inherited;
+end;
+
+procedure TTasKittoBCryptAuthenticator.AfterQRGeneration(const AQRCode: TBitmap;
+  const AParams: TEFNode);
+var
+  LUserName, LEmailAddress, LQRFileName: string;
+begin
+  inherited;
+  LUserName := AParams.GetString('UserName');
+  LEmailAddress := AParams.GetString('EmailAddress');
+  LQRFileName := IncludeTrailingPathDelimiter(TKConfig.Instance.AppHomePath)+'QR_'+LUserName+'.png';
+  AQRCode.SaveToFile(LQRFileName);
+  SendQREmail(LUserName, LEmailAddress, LQRFileName);
+end;
+
+procedure TTasKittoBCryptAuthenticator.SendQREmail(const AUserName,
+  AEmailAddress, AQRFileName: string);
+var
+  LSMTP: TIdSMTP;
+  LIdSSLIOHandler: TIdSSLIOHandlerSocketOpenSSL;
+  LMessage: TIdMessage;
+  LRecipient: TIdEMailAddressItem;
+  LServerNode: TEFNode;
+  LMessageNode: TEFNode;
+  LBody: string;
+  LHTMLBody: string;
+  LIdText: TIdText;
+  LAttachmentFile: TIdAttachmentFile;
+
+begin
+  inherited;
+  LIdSSLIOHandler := nil;
+  LSMTP := TIdSMTP.Create(nil);
+  try
+    LSMTP.AuthType := satDefault;
+    LServerNode := TKConfig.Instance.Config.FindNode('Email/SMTP/' + Config.GetString('SMTP', 'Default'));
+    LMessageNode := Config.FindNode('SendQRMessage');
+
+    Assert(Assigned(LServerNode));
+    Assert(Assigned(LMessageNode));
+
+    LSMTP.Host := LServerNode.GetExpandedString('HostName');
+    //For this demo, if the SMTP parameters are not configured we just exit.
+    if LSMTP.Host = '' then
+      Exit;
+
+    LSMTP.Username := LServerNode.GetExpandedString('UserName');
+    LSMTP.Password := LServerNode.GetExpandedString('Password');
+    LSMTP.Port := LServerNode.GetInteger('Port');
+    if (LServerNode.GetBoolean('UseTLS')) then
+    begin
+      LIdSSLIOHandler := TIdSSLIOHandlerSocketOpenSSL.Create;
+      LSMTP.IOHandler := LIdSSLIOHandler;
+      LSMTP.UseTLS := utUseRequireTLS;
+    end
+    else
+      LSMTP.UseTLS := utNoTLSSupport;
+
+    LMessage := TIdMessage.Create;
+    try
+      // From
+      LMessage.From.Text := LMessageNode.GetExpandedString('From');
+
+      // To
+      LRecipient := LMessage.Recipients.Add;
+      LRecipient.Text := AEmailAddress;
+
+      // Subject
+      LMessage.Subject := LMessageNode.GetExpandedString('Subject');
+
+      // Body in Text
+      LBody := LMessageNode.GetExpandedString('Body');
+      // Substitute Template #UserName#
+      LBody := StringReplace(LBody, '#UserName#', AUserName, [rfReplaceAll]);
+      // Substitute Template #TempPassword#
+      LBody := StringReplace(LBody, '#TempPassword#', '', [rfReplaceAll]);
+
+      //Body in HTML
+      LHTMLBody := LMessageNode.GetExpandedString('HTMLBody');
+      if LHTMLBody <> '' then
+      begin
+        // Substitute Template #UserName#
+        LHTMLBody := StringReplace(LHTMLBody, '#UserName#', AUserName, [rfReplaceAll]);
+        // Substitute Template #TempPassword#
+        LHTMLBody := StringReplace(LHTMLBody, '#TempPassword#', '', [rfReplaceAll]);
+        // If HTML body is found no plain text is written in email
+        LMessage.ContentType := 'multipart/related; type="text/html"';
+        LIdText := TIdText.Create(LMessage.MessageParts, nil);
+        LIdText.ContentType := 'text/html';
+        LIdText.Charset := 'utf-8';
+        LIdText.Body.Text := LHTMLBody;
+        LAttachmentFile := TIdAttachmentFile.Create(LMessage.MessageParts, AQRFileName);
+        LAttachmentFile.ContentTransfer := 'base64';
+        LAttachmentFile.ContentType := 'image/png';
+        LAttachmentFile.ContentDisposition := 'inline';
+        LAttachmentFile.ContentID := 'QrCode';
+      end
+      else
+      begin
+        // If no HTML body is found email is written in plain text
+        LAttachmentFile := TIdAttachmentFile.Create(LMessage.MessageParts, AQRFileName);
+        LAttachmentFile.ContentTransfer := 'base64';
+        LAttachmentFile.ContentType := 'image/png';
+        LAttachmentFile.ContentDisposition := 'inline';
+        LAttachmentFile.ContentID := 'QrCode';
+        LMessage.Body.Text := LBody;
+      end;
+
+      LSMTP.Connect;
+      try
+        LSMTP.Send(LMessage);
+      finally
+        LSMTP.Disconnect;
+      end;
+    finally
+      FreeAndNil(LMessage);
+    end;
+  finally
+    LSMTP.Free;
+    LIdSSLIOHandler.Free;
+  end;
+  // Removing QR file saved when attachment is uploaded
+  TFile.Delete(AQRFileName);
+end;
+
+procedure TTasKittoBCryptAuthenticator.SendResetPasswordEmail(const AUserName, AEmailAddress, APassword: string);
+var
+  LSMTP: TIdSMTP;
+  LIdSSLIOHandler: TIdSSLIOHandlerSocketOpenSSL;
+  LMessage: TIdMessage;
+  LRecipient: TIdEMailAddressItem;
+  LServerNode: TEFNode;
+  LMessageNode: TEFNode;
+  LBody: string;
+  LHTMLBody: string;
+
+  procedure AddTextPart(const AContent, AContentType: string; const AParentPart: Integer = -1);
+  begin
+    with TIdText.Create(LMessage.MessageParts, nil) do
+    begin
+      Body.Text := AContent;
+      ContentType := AContentType;
+      ParentPart := AParentPart;
+    end;
+  end;
+
+begin
+  inherited;
+  LIdSSLIOHandler := nil;
+  LSMTP := TIdSMTP.Create(nil);
+  try
+    LSMTP.AuthType := satDefault;
+    LServerNode := TKConfig.Instance.Config.FindNode('Email/SMTP/' + Config.GetString('SMTP', 'Default'));
+    LMessageNode := Config.FindNode('ResetMailMessage');
+
+    Assert(Assigned(LServerNode));
+    Assert(Assigned(LMessageNode));
+
+    LSMTP.Host := LServerNode.GetExpandedString('HostName');
+    //For this demo, if the SMTP parameters are not configured we just log it.
+    if LSMTP.Host = '' then
+    begin
+      TEFLogger.Instance.Log(Format(_('Password generated for user %s: %s'), [AUserName, APassword]));
+      Exit;
+    end;
+
+    LSMTP.Username := LServerNode.GetExpandedString('UserName');
+    LSMTP.Password := LServerNode.GetExpandedString('Password');
+    LSMTP.Port := LServerNode.GetInteger('Port');
+    if (LServerNode.GetBoolean('UseTLS')) then
+    begin
+      LIdSSLIOHandler := TIdSSLIOHandlerSocketOpenSSL.Create;
+      LSMTP.IOHandler := LIdSSLIOHandler;
+      LSMTP.UseTLS := utUseRequireTLS;
+    end
+    else
+      LSMTP.UseTLS := utNoTLSSupport;
+
+    LMessage := TIdMessage.Create;
+    try
+      // From
+      LMessage.From.Text := LMessageNode.GetExpandedString('From');
+
+      // To
+      LRecipient := LMessage.Recipients.Add;
+      LRecipient.Text := AEmailAddress;
+
+      // Subject
+      LMessage.Subject := LMessageNode.GetExpandedString('Subject');
+
+      // Body in Text
+      LBody := LMessageNode.GetExpandedString('Body');
+      // Substitute Template #UserName#
+      LBody := StringReplace(LBody, '#UserName#', AUserName, [rfReplaceAll]);
+      // Substitute Template #TempPassword#
+      LBody := StringReplace(LBody, '#TempPassword#', APassword, [rfReplaceAll]);
+
+      //Body in HTML
+      LHTMLBody := LMessageNode.GetExpandedString('HTMLBody');
+      if LHTMLBody <> '' then
+      begin
+        // Substitute Template #UserName#
+        LHTMLBody := StringReplace(LHTMLBody, '#UserName#', AUserName, [rfReplaceAll]);
+        // Substitute Template #TempPassword#
+        LHTMLBody := StringReplace(LHTMLBody, '#TempPassword#', APassword, [rfReplaceAll]);
+        // HTML body present.
+        if LBody = '' then
+        begin
+          // HTML only.
+            LMessage.ContentType := 'text/html';
+            LMessage.Body.Text := LHTMLBody;
+        end
+        else
+        begin
+          // HTML + plaintext
+          // no attachments
+          LMessage.ContentType := 'multipart/alternative';
+          AddTextPart(LBody, 'text/plain');
+          AddTextPart(LHTMLBody, 'text/html');
+        end;
+      end
+      else
+      begin
+        LMessage.ContentType := 'text/plain';
+        LMessage.Body.Text := LBody;
+      end;
+
+      LSMTP.Connect;
+      try
+        LSMTP.Send(LMessage);
+      finally
+        LSMTP.Disconnect;
+      end;
+    finally
+      FreeAndNil(LMessage);
+    end;
+  finally
+    LSMTP.Free;
+    LIdSSLIOHandler.Free;
+  end;
+end;
+
+procedure TTasKittoBCryptAuthenticator.AfterResetPassword(const ADBConnection: TEFDBConnection; const AParams: TEFNode);
+var
+  LUserName, LEmailAddress, LPassword: string;
+begin
+  // We should send the generated password to the user here.
+  // AParams contains the nodes EmailAddress and Password.
+  // configure Email parameters in config and ResetMailMessage Node
+  LUserName := AParams.GetString('UserName');
+  LEmailAddress := AParams.GetString('EmailAddress');
+  LPassword := AParams.GetString('Password');
+  SendResetPasswordEmail(LUserName, LEmailAddress, LPassword);
+end;
+
+procedure TTasKittoBCryptAuthenticator.SetPassword(const AValue: string);
+var
+  LValidatePasswordNode: TEFNode;
+  LRegEx: string;
+  LErrorMsg: string;
+  LRegularExpression : TRegEx;
+  LMatch: TMatch;
+begin
+  // Example of enforcement of password strength rules.
+  LValidatePasswordNode := Config.FindNode('ValidatePassword');
+  Assert(Assigned(LValidatePasswordNode));
+  LErrorMsg := LValidatePasswordNode.GetExpandedString('Message','Minimun 8 characters');
+  LRegEx := LValidatePasswordNode.GetExpandedString('RegEx','^[ -~]{8,63}$');
+  LRegularExpression.Create(LRegEx);
+  LMatch := LRegularExpression.Match(AValue);
+  if not LMatch.Success then
+    raise Exception.Create(LErrorMsg);
+  inherited;
+end;
+
 initialization
   TKAuthenticatorRegistry.Instance.RegisterClass('TasKitto', TTasKittoAuthenticator);
+  TKAuthenticatorRegistry.Instance.RegisterClass('TasKittoBCrypt', TTasKittoBCryptAuthenticator);
 
 finalization
   TKAuthenticatorRegistry.Instance.UnregisterClass('TasKitto');
+  TKAuthenticatorRegistry.Instance.UnregisterClass('TasKittoBCrypt');
 
 end.

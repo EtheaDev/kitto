@@ -1,5 +1,5 @@
 {-------------------------------------------------------------------------------
-   Copyright 2012 Ethea S.r.l.
+   Copyright 2012-2021 Ethea S.r.l.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------}
 
 ///	<summary>
-///	  ADO-based database access layer.
+///	 ADO-based database access layer.
 ///	</summary>
 unit EF.DB.ADO;
 
@@ -733,6 +733,9 @@ begin
 end;
 
 initialization
+{$IFDEF MSWINDOWS}
+  EF.DB.IsCOMNeeded := True;
+{$ENDIF}
   TEFDBAdapterRegistry.Instance.RegisterDBAdapter(TEFDBADOAdapter.GetClassId, TEFDBADOAdapter.Create);
 
 finalization

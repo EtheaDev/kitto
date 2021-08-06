@@ -1,5 +1,5 @@
 {-------------------------------------------------------------------------------
-   Copyright 2014 Ethea S.r.l.
+   Copyright 2012-2021 Ethea S.r.l.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 -------------------------------------------------------------------------------}
 
 ///	<summary>
-///	  Support for XML format.
+///	 Support for XML format.
 ///	</summary>
 unit EF.XML;
 
@@ -24,8 +24,10 @@ unit EF.XML;
 interface
 
 uses
-  SysUtils, StrUtils,
-  EF.Types;
+  SysUtils
+  , StrUtils
+  , EF.Types
+  ;
 
 const
   XMLHeader = '<?xml version="1.0" encoding="UTF-8" ?>';

@@ -35,10 +35,12 @@ type
     FUserName: TExtFormTextField;
     FPassword: TExtFormTextField;
     FLanguage: TExtFormComboBox;
+    FTokenField: TExtFormTextField;
     FLocalStorageEnabled: TExtFormCheckbox;
     FResetPasswordLink: TExtBoxComponent;
     FRegisterNewUserLink: TExtBoxComponent;
     FPrivacyPolicyLink: TExtBoxComponent;
+    FSendQRLink: TExtBoxComponent;
     FLoginButton: TKExtButton;
     FStatusBar: TKExtStatusBar;
     FLocalStorageMode: string;
@@ -47,6 +49,8 @@ type
     FResetPasswordNode: TEFNode;
     FRegisterNewUserNode: TEFNode;
     FPrivacyPolicyNode: TEFNode;
+    FLoginTypeNode: TEFNode;
+    FSendQRNode: TEFNode;
     function GetEnableButtonJS: string;
     function GetSubmitJS: string;
     function GetLocalStorageSaveJSCode(const AMode: string; const AAskUser: Boolean): string;
@@ -61,6 +65,7 @@ type
     procedure DoResetPassword;
     procedure DoRegisterNewUser;
     procedure DoPrivacyPolicy;
+    procedure DoSendQR;
   end;
 
   // A login window, suitable as a stand-alone login interface.
@@ -215,17 +220,28 @@ end;
 
 function TKExtLoginFormPanel.GetEnableButtonJS: string;
 begin
-  Result := Format(
-    '%s.setDisabled(%s.getValue() == "" || %s.getValue() == "");',
-    [FLoginButton.JSName, FUserName.JSName, FPassword.JSName]);
+  if (Assigned(FLoginTypeNode)) and (AnsiUpperCase(FLoginTypeNode.AsString) = 'PIN') then
+    Result := Format(
+      '%s.setDisabled(%s.getValue() == "" || !(%s.getValue().length == 6) );',
+      [FLoginButton.JSName, FUserName.JSName, FTokenField.JSName])
+  else
+    Result := Format(
+      '%s.setDisabled(%s.getValue() == "" || %s.getValue() == "");',
+      [FLoginButton.JSName, FUserName.JSName, FPassword.JSName]);
 end;
 
 function TKExtLoginFormPanel.GetSubmitJS: string;
 begin
-  Result := Format(
-    // For some reason != does not survive rendering.
-    'if (e.getKey() == 13 && !(%s.getValue() == "") && !(%s.getValue() == "")) %s.handler.call(%s.scope, %s);',
-    [FUserName.JSName, FPassword.JSName, FLoginButton.JSName, FLoginButton.JSName, FLoginButton.JSName]);
+  if (Assigned(FLoginTypeNode)) and (AnsiUpperCase(FLoginTypeNode.AsString) = 'PIN') then
+    Result := Format(
+      // For some reason != does not survive rendering.
+      'if (e.getKey() == 13 && !(%s.getValue() == "") && !(%s.getValue() == "")) %s.handler.call(%s.scope, %s);',
+      [FUserName.JSName, FTokenField.JSName, FLoginButton.JSName, FLoginButton.JSName, FLoginButton.JSName])
+  else
+    Result := Format(
+      // For some reason != does not survive rendering.
+      'if (e.getKey() == 13 && !(%s.getValue() == "") && !(%s.getValue() == "")) %s.handler.call(%s.scope, %s);',
+      [FUserName.JSName, FPassword.JSName, FLoginButton.JSName, FLoginButton.JSName, FLoginButton.JSName]);
 end;
 
 procedure TKExtLoginFormPanel.Display(const AEditWidth: Integer; const AConfig: TEFNode; var ACurrentHeight: Integer);
@@ -235,7 +251,7 @@ var
   LLocalStorageAskUserDefault: Boolean;
   LLocalStorageAutoLogin: Boolean;
   LLocalStorageOptions: TEFNode;
-  LInputStyle, LResetPasswordStyle, LRegisterNewUserStyle, LRegisterNewUserLinkText, LResetPasswordNodeLinkText, LPrivacyPolicyStyle, LPrivacyPolicyNodeLinkText, LButtonStyle: string;
+  LInputStyle, LResetPasswordStyle, LRegisterNewUserStyle, LRegisterNewUserLinkText, LResetPasswordNodeLinkText, LPrivacyPolicyStyle, LPrivacyPolicyNodeLinkText, LSendQRNodeLinkText, LSendQRStyle, LButtonStyle: string;
 
   function ReplaceMacros(const ACode: string): string;
   begin
@@ -284,22 +300,41 @@ begin
 
   Inc(ACurrentHeight, CONTROL_HEIGHT);
 
-  FPassword := TExtFormTextField.CreateAndAddTo(Items);
-  FPassword.Name := 'Password';
-  FPassword.Value := Session.Config.Authenticator.AuthData.GetExpandedString('Password');
-  FPassword.FieldLabel := AConfig.GetString('FormPanel/Password',_('Password'));
-  FPassword.InputType := itPassword;
-  FPassword.AllowBlank := False;
-  FPassword.EnableKeyEvents := True;
-  FPassword.SelectOnFocus := True;
-  FPassword.Width := AEditWidth;
-  if LInputStyle <> '' then
-    FPassword.Style := LInputStyle;
-  Inc(ACurrentHeight, CONTROL_HEIGHT);
+  FLoginTypeNode := Session.Config.Instance.Config.FindNode('Auth/LoginType');
+  if (Assigned(FLoginTypeNode)) and (AnsiUpperCase(FLoginTypeNode.AsString) = 'PIN') then
+  begin
+    FTokenField := TExtFormTextField.CreateAndAddTo(Items);
+    FTokenField.Name := 'PIN';
+    FTokenField.FieldLabel := _('Google Authenticator PIN');
+    FTokenField.AllowBlank := False;
+    FTokenField.EnableKeyEvents := True;
+    FTokenField.SelectOnFocus := True;
+    FTokenField.Width := AEditWidth;
+//    FTokenField.On('keyup', JSFunction(GetEnableButtonJS));
+    FTokenField.On('keydown', JSFunction(GetCheckCapsLockJS));
+    FTokenField.On('specialkey', JSFunction('field, e', GetSubmitJS));
+  end
+  else
+  begin
+    FPassword := TExtFormTextField.CreateAndAddTo(Items);
+    FPassword.Name := 'Password';
+    FPassword.Value := Session.Config.Authenticator.AuthData.GetExpandedString('Password');
+    FPassword.FieldLabel := AConfig.GetString('FormPanel/Password',_('Password'));
+    FPassword.InputType := itPassword;
+    FPassword.AllowBlank := False;
+    FPassword.EnableKeyEvents := True;
+    FPassword.SelectOnFocus := True;
+    FPassword.Width := AEditWidth;
+    if LInputStyle <> '' then
+      FPassword.Style := LInputStyle;
+    Inc(ACurrentHeight, CONTROL_HEIGHT);
 
-  FPassword.On('keydown', JSFunction(GetCheckCapsLockJS));
+    FPassword.On('keydown', JSFunction(GetCheckCapsLockJS));
+    FPassword.On('specialkey', JSFunction('field, e', GetSubmitJS));
+  end;
+
   FUserName.On('specialkey', JSFunction('field, e', GetSubmitJS));
-  FPassword.On('specialkey', JSFunction('field, e', GetSubmitJS));
+
 
   Session.ResponseItems.ExecuteJSCode(Self, Format(
     '%s.enableTask = Ext.TaskMgr.start({ ' + sLineBreak +
@@ -357,27 +392,48 @@ begin
   end
   else
     FLocalStorageEnabled := nil;
-
-  if Assigned(FLanguage) then
-  begin
-    if Assigned(FLocalStorageEnabled) then
-      FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
-        'UserName', FUserName.GetValue, 'Password', FPassword.GetValue, 'Language', FLanguage.GetValue,
-        'LocalStorageEnabled', FLocalStorageEnabled.GetValue])
+  if (Assigned(FLoginTypeNode)) and (AnsiUpperCase(FLoginTypeNode.AsString) = 'PIN') then
+    if Assigned(FLanguage) then
+    begin
+      if Assigned(FLocalStorageEnabled) then
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FTokenField.GetValue, 'Language', FLanguage.GetValue,
+          'LocalStorageEnabled', FLocalStorageEnabled.GetValue])
+      else
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FTokenField.GetValue, 'Language', FLanguage.GetValue]);
+    end
     else
-      FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
-        'UserName', FUserName.GetValue, 'Password', FPassword.GetValue, 'Language', FLanguage.GetValue]);
-  end
+    begin
+      if Assigned(FLocalStorageEnabled) then
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FTokenField.GetValue,
+          'LocalStorageEnabled', FLocalStorageEnabled.GetValue])
+      else
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FTokenField.GetValue]);
+    end
   else
-  begin
-    if Assigned(FLocalStorageEnabled) then
-      FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
-        'UserName', FUserName.GetValue, 'Password', FPassword.GetValue,
-        'LocalStorageEnabled', FLocalStorageEnabled.GetValue])
+    if Assigned(FLanguage) then
+    begin
+      if Assigned(FLocalStorageEnabled) then
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FPassword.GetValue, 'Language', FLanguage.GetValue,
+          'LocalStorageEnabled', FLocalStorageEnabled.GetValue])
+      else
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FPassword.GetValue, 'Language', FLanguage.GetValue]);
+    end
     else
-      FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
-        'UserName', FUserName.GetValue, 'Password', FPassword.GetValue]);
-  end;
+    begin
+      if Assigned(FLocalStorageEnabled) then
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FPassword.GetValue,
+          'LocalStorageEnabled', FLocalStorageEnabled.GetValue])
+      else
+        FLoginButton.Handler := Ajax(DoLogin, ['Dummy', FStatusBar.ShowBusy,
+          'UserName', FUserName.GetValue, 'Password', FPassword.GetValue]);
+    end;
 
   if Assigned(FLanguage) then
     FLoginButton.Disabled := (FUserName.Value = '') or (FPassword.Value = '') or (FLanguage.Value = '')
@@ -456,6 +512,28 @@ begin
   end
   else
     FPrivacyPolicyLink := nil;
+
+  FSendQRNode := AConfig.FindNode('SendQR');
+  if Assigned(FSendQRNode) and FSendQRNode.AsBoolean then
+  begin
+    LSendQRNodeLinkText := FSendQRNode.GetString('LinkText');
+    if LSendQRNodeLinkText = '' then
+      LSendQRNodeLinkText := _('Lost QR code?');
+    LSendQRStyle := FSendQRNode.GetString('Style');
+    FSendQRLink := TExtBoxComponent.CreateAndAddTo(Items);
+    FSendQRLink.Html := Format(
+      '<div style="text-align:right"><a style="%s" href="#" onclick="%s">%s</a></div>',
+      [FSendQRNode.GetString('HrefStyle'),
+       HTMLEncode(JSMethod(Ajax(DoSendQR))),
+       HTMLEncode(LSendQRNodeLinkText)]);
+    FSendQRLink.Width := AEditWidth + LabelWidth;
+    if LSendQRStyle <> '' then
+      FSendQRLink.Style := LSendQRStyle;
+
+    Inc(ACurrentHeight, CONTROL_HEIGHT);
+  end
+  else
+    FSendQRLink := nil;
 end;
 
 procedure TKExtLoginFormPanel.InitDefaults;
@@ -480,7 +558,10 @@ begin
   else
   begin
     FStatusBar.SetErrorStatus(_('Invalid login.'));
-    FPassword.Focus(False, 750);
+    if Assigned(FLoginTypeNode) and (AnsiUpperCase(FLoginTypeNode.AsString) = 'PIN') then
+      FTokenField.Focus(False,750)
+    else
+      FPassword.Focus(False, 750);
   end;
 end;
 
@@ -509,6 +590,15 @@ begin
   { TODO : Add a way to open standard/system views without needing to store them in a yaml file.
     Maybe a json definition passed as a string? }
   Session.DisplayView('ResetPassword');
+end;
+
+procedure TKExtLoginFormPanel.DoSendQR;
+begin
+  Assert(Assigned(FSendQRNode));
+
+  { TODO : Add a way to open standard/system views without needing to store them in a yaml file.
+    Maybe a json definition passed as a string? }
+  Session.DisplayView('SendQR');
 end;
 
 function TKExtLoginFormPanel.GetLocalStorageSaveJSCode(const AMode: string; const AAskUser: Boolean): string;

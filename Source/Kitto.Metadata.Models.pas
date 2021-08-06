@@ -1,5 +1,5 @@
 {-------------------------------------------------------------------------------
-   Copyright 2012 Ethea S.r.l.
+   Copyright 2012-2021 Ethea S.r.l.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -44,16 +44,17 @@ type
 
   TKRules = class(TKMetadataItem)
   private
-    function GetRule(I: Integer): TKRule;
+    function GetRule(const AIndex: Integer): TKRule;
     function GetRuleCount: Integer;
   protected
     function GetChildClass(const AName: string): TEFNodeClass; override;
   public
     property RuleCount: Integer read GetRuleCount;
-    property Rules[I: Integer]: TKRule read GetRule; default;
+    property Rules[const AIndex: Integer]: TKRule read GetRule; default;
 
-    /// <summary>Returns True if there's a rule of the same type as the passed
-    /// one.</summary>
+    /// <summary>
+    ///  Returns True if there's a rule of the same type as the passed one.
+    /// </summary>
     function HasRule(const ARule: TKRule): Boolean;
   end;
 
@@ -75,6 +76,8 @@ type
     function GetQualifiedDBColumnName: string;
     function GetModel: TKModel;
     function GetDisplayLabel: string;
+    function GetDisplayLabel_Form: string;
+    function GetDisplayLabel_Grid: string;
     function GetIsVisible: Boolean;
     function GetDisplayWidth: Integer;
     function GetIsComputed: Boolean;
@@ -320,6 +323,18 @@ type
     property DisplayLabel: string read GetDisplayLabel;
 
     /// <summary>
+    ///   Default label for this field in Grid/List. If not present uses the
+    ///   value of DisplayLabel.
+    /// </summary>
+    property DisplayLabel_Grid: string read GetDisplayLabel_Grid;
+
+    /// <summary>
+    ///   Default label for this field in Form. If not present uses the
+    ///   value of DisplayLabel.
+    /// </summary>
+    property DisplayLabel_Form: string read GetDisplayLabel_Form;
+
+    /// <summary>
     ///   Default label for this field into editing control when the value is missing
     /// </summary>
     property Hint: string read GetHint;
@@ -496,6 +511,7 @@ type
     function GetDefaultPluralModelName: string;
     function GetPluralModelName: string;
   strict protected
+    function GetLookupSorting: string; protected
     function GetFields: TKModelFields;
     function GetChildClass(const AName: string): TEFNodeClass; override;
     function GetDetailReferences: TKModelDetailReferences;
@@ -621,6 +637,13 @@ type
     property DefaultSorting: string read GetDefaultSorting;
     property DefaultDefaultSorting: string read GetDefaultDefaultSorting;
 
+    /// <summary>
+    ///  Optional fixed ORDER BY expression to apply when building the select
+    ///  SQL statement for lookup. Should refer to fields through
+    ///  qualified names. Defaults CaptionField.DBColumnNameOrExpression
+    /// </summary>
+    property LookupSorting: string read GetLookupSorting;
+
     property CaptionFieldName: string read GetCaptionFieldName;
     property DefaultCaptionField: TKModelField read GetDefaultCaptionField;
     property CaptionField: TKModelField read GetCaptionField;
@@ -743,10 +766,12 @@ type
     function ModelByNode(const ANode: TEFNode): TKModel;
     function FindModelByNode(const ANode: TEFNode): TKModel;
 
-    /// <summary>Returns a reference to the first found model with the
-    /// specified physical name. If a model has no custom physical name
-    /// specified, the (case insensitive) match is done on its name
-    /// instead.</summary>
+    /// <summary>
+    ///  Returns a reference to the first found model with the
+    ///  specified physical name. If a model has no custom physical name
+    ///  specified, the (case insensitive) match is done on its name
+    ///  instead.
+    /// </summary>
     function FindModelByPhysicalName(const APhysicalName: string): TKModel;
   end;
 
@@ -1049,7 +1074,10 @@ end;
 
 function TKModel.GetPluralDisplayLabel: string;
 begin
-  Result := GetString('PluralDisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('PluralDisplayLabel2')
+  else
+    Result := GetString('PluralDisplayLabel');
   if Result = '' then
     Result := GetDefaultPluralDisplayLabel;
 end;
@@ -1231,7 +1259,14 @@ function TKModel.GetDefaultSorting: string;
 begin
   Result := GetString('DefaultSorting');
   if Result = '' then
-    Result := Join(GetKeyDBColumnNames(True), ', ');
+    Result := GetDefaultDefaultSorting;
+end;
+
+function TKModel.GetLookupSorting: string;
+begin
+  Result := GetString('LookupSorting');
+  if Result = '' then
+    Result := CaptionField.DBColumnNameOrExpression;
 end;
 
 function TKModel.GetDetailReference(I: Integer): TKModelDetailReference;
@@ -1285,7 +1320,10 @@ end;
 
 function TKModel.GetDisplayLabel: string;
 begin
-  Result := GetString('DisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel2')
+  else
+    Result := GetString('DisplayLabel');
   if Result = '' then
     Result := GetDefaultDisplayLabel;
 end;
@@ -1373,7 +1411,10 @@ end;
 
 function TKModelField.GetHint: string;
 begin
-  Result := GetString('Hint');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('Hint2')
+  else
+    Result := GetString('Hint');
 end;
 
 function TKModelField.GetIsContained: Boolean;
@@ -1750,9 +1791,32 @@ end;
 
 function TKModelField.GetDisplayLabel: string;
 begin
-  Result := GetString('DisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel2')
+  else
+    Result := GetString('DisplayLabel');
   if Result = '' then
     Result := GetDefaultDisplayLabel;
+end;
+
+function TKModelField.GetDisplayLabel_Form: string;
+begin
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel_Form2')
+  else
+    Result := GetString('DisplayLabel_Form');
+  if Result = '' then
+    Result := DisplayLabel;
+end;
+
+function TKModelField.GetDisplayLabel_Grid: string;
+begin
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel_Grid2')
+  else
+    Result := GetString('DisplayLabel_Grid');
+  if Result = '' then
+    Result := DisplayLabel;
 end;
 
 function TKModelField.GetDisplayTemplate: string;
@@ -2049,9 +2113,9 @@ begin
   Result := TKRule;
 end;
 
-function TKRules.GetRule(I: Integer): TKRule;
+function TKRules.GetRule(const AIndex: Integer): TKRule;
 begin
-  Result := Children[I] as TKRule;
+  Result := Children[AIndex] as TKRule;
 end;
 
 function TKRules.GetRuleCount: Integer;
@@ -2093,7 +2157,10 @@ end;
 
 function TKModelDetailReference.GetDisplayLabel: string;
 begin
-  Result := GetString('DisplayLabel');
+  if TKConfig.Instance.UseAltLanguage then
+    Result := GetString('DisplayLabel2')
+  else
+    Result := GetString('DisplayLabel');
   if (Result = '') and (DetailModel <> nil) then
     Result := DetailModel.DisplayLabel;
   if Result = '' then

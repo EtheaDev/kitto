@@ -54,6 +54,7 @@ type
     FSystemHomePath: string;
     FConfigClass: TKConfigClass;
     FOnGetAppName: TKConfigGetAppNameEvent;
+    FUseAltLanguage: Boolean;
   var
     FDBConnections: TDictionary<string, TEFDBConnection>;
     FMacroExpansionEngine: TEFMacroExpansionEngine;
@@ -66,6 +67,7 @@ type
     class function GetInstance: TKConfig; static;
     class function GetAppName: string; static;
     class procedure SetupResourcePathsURLs;
+    class function GetAppHomeURL: string; static;
     class function GetAppHomePath: string; static;
     class procedure SetAppHomePath(const AValue: string); static;
     class function GetSystemHomePath: string; static;
@@ -92,6 +94,7 @@ type
     function GetDefaultDBConnection: TEFDBConnection;
   strict protected
     function GetUploadPath: string;
+    function GetUploadURL: string;
     function GetConfigFileName: string; override;
     class function FindSystemHomePath: string;
   public
@@ -107,6 +110,7 @@ type
 
     class property AppName: string read GetAppName;
     class property OnGetAppName: TKConfigGetAppNameEvent read FOnGetAppName write FOnGetAppName;
+    class property UseAltLanguage: Boolean read FUseAltLanguage write FUseAltLanguage;
 
     /// <summary>
     ///   <para>Returns or changes the Application Home path.</para>
@@ -177,6 +181,11 @@ type
     ///   Returns the database instance.
     /// </summary>
     class property Database: TEFDBConnection read GetDatabase;
+
+    /// <summary>
+    ///   Returns the URL of the Application
+    /// </summary>
+    class property AppHomeURL: string read GetAppHomeURL;
 
     /// <summary>
     ///   Returns the URL for the specified resource, based on the first
@@ -310,6 +319,10 @@ type
     ///   <para>Returns or changes the Upload path accessible via %UPLOAD_PATH% macro.</para>
     /// </summary>
     property UploadPath: string read GetUploadPath;
+    /// <summary>
+    ///   Returns the URL of the UploadPath
+    /// </summary>
+    property UploadURL: string read GetUploadURL;
   end;
 
   /// <summary>
@@ -397,9 +410,15 @@ var
   
 begin
   FResourcePathsURLs.Clear;
+
+  //Path delle risorse mappate sulla "virtual-directory" di Apache
+  //eg. /MyApp/
   LPath := GetAppHomePath + 'Resources';
   if DirectoryExists(LPath) then
     FResourcePathsURLs.Add(TPathURL.Create(IncludeTrailingPathDelimiter(LPath), '/' + GetAppName + '/'));
+
+  //Path delle risorse di Kitto mappate sulla "virtual-directory" di Apache
+  //eg. /MyApp-kitto/
   LPath := FindSystemHomePath + 'Resources';
   if DirectoryExists(LPath) and not PathInList(IncludeTrailingPathDelimiter(LPath)) then
     FResourcePathsURLs.Add(TPathURL.Create(IncludeTrailingPathDelimiter(LPath), '/' + GetAppName + '-Kitto/'));
@@ -630,6 +649,11 @@ begin
   Result := Config.GetExpandedString('UploadPath');
 end;
 
+function TKConfig.GetUploadURL: string;
+begin
+  Result := Config.GetExpandedString('UploadURL', AppHomeURL);
+end;
+
 function TKConfig.GetViews: TKViews;
 begin
   if not Assigned(FViews) then
@@ -840,6 +864,14 @@ begin
     Result := ChangeFileExt(ExtractFileName(ParamStr(0)), '');
 end;
 
+class function TKConfig.GetAppHomeURL: string;
+begin
+  if FResourcePathsURLs.Count > 0 then
+    Result := FResourcePathsURLs[0].URL
+  else
+    Result := '';
+end;
+
 class function TKConfig.GetAppHomePath: string;
 begin
   if FAppHomePath = '' then
@@ -891,6 +923,7 @@ begin
   Assert(Assigned(AConfig));
 
   FConfig := AConfig;
+  FConfig.UseAltLanguage := False;
   inherited Create(AConfig.Config, 'Config');
 end;
 

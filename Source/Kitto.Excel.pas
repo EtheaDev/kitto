@@ -126,7 +126,8 @@ implementation
 uses
   Math, Variants,
   EF.StrUtils, EF.DB, EF.SysUtils,
-  Kitto.Metadata.Models, Kitto.Config, Kitto.Utils, EF.Macros;
+  Kitto.Metadata.Models, Kitto.Config, Kitto.Utils, EF.Macros,
+  EF.Types, EF.Localization;
 
 const
   ADO_EXCEL_2000 = 'Excel 8.0';
@@ -378,6 +379,8 @@ var
   LSourceField: TKViewTableField;
   LAdoTable: TAdoTable;
   LZeroValueForced: Boolean;
+  I: integer;
+  LAllowedValues: TEFPairs;
 
   function FindValidField(const AField: TField;
     const AUseDisplayLabel: Boolean): TKViewTableField;
@@ -442,6 +445,14 @@ begin
             if LAcceptField then
             begin
               LZeroValueForced := IsFieldToForceZero(LDestField) or LZeroValueForced;
+
+              if Assigned(LSourceField) and Assigned(LSourceField.ModelField) and (Length(LSourceField.ModelField.AllowedValues) > 0) then begin
+                LAllowedValues := LSourceField.ModelField.AllowedValues;
+                for I := Low(LAllowedValues) to High(LAllowedValues) do
+                  if LAllowedValues[I].Key = LSourceField.Value then
+                    LDestField.AsString := _(LAllowedValues[I].Value);
+              end
+              else
               if LSourceField.ViewField.ActualDataType is TEFMemoDataType then
               begin
                 if not VarIsNull(LSourceField.Value) then
