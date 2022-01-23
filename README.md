@@ -8,7 +8,7 @@ Kitto includes a **database-agnostic** data-access layer, allowing to create app
 
 A Kitto application is described as a set of easily maintained **YAML** files, keeping definitions abstract and declarative and allowing for future extensions. Business rules are enforced either declaratively or through small javascript fragments on the client, or in Delphi code on the server.
 
-Kitto was designed by Nando Dessena and its development is sponsored by [Ethea](http://www.ethea.it/), which uses Kitto for internal development projects and client work and provides Kitto-related tools, support and development services.
+Kitto was designed by Nando Dessena and its development is sponsored by [Ethea](http://www.ethea.it/) and maintained by Carlo Barazzetta, which uses Kitto for internal development projects and client work and provides Kitto-related tools, support and development services.
 
 Start [here](https://github.com/EtheaDev/kitto/wiki/Kitto-at-a-glance) for further information.
 
